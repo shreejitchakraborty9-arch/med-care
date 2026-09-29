@@ -1,4 +1,4 @@
-﻿// seed.js - Universal Database Seeder for MedWatch (Supports Node.js & Browser)
+// seed.js - Universal Database Seeder for MedWatch (Supports Node.js & Browser)
 import { HOSPITALS_DATA } from "./hospitals-data.js";
 
 /**
@@ -35,7 +35,7 @@ export async function seedHospitals() {
         await setDoc(doc(db, "hospitals", hospital.id), hospital);
       });
       await Promise.all(seedPromises);
-      console.log("All 25 hospitals seeded successfully");
+      console.log(`All ${HOSPITALS_DATA.length} hospitals seeded successfully`);
       return;
     } catch (e) {
       console.warn("Browser SDK seeding encountered error, switching to direct REST API:", e.message);
@@ -65,7 +65,7 @@ export async function seedHospitals() {
     });
 
     await Promise.all(restPromises);
-    console.log("All 25 hospitals seeded successfully");
+    console.log(`All ${HOSPITALS_DATA.length} hospitals seeded successfully`);
   } catch (error) {
     console.error("Error seeding hospitals to Firestore:", error);
   }

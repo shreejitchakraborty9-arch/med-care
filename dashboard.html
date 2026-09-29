@@ -196,6 +196,12 @@
             <select id="district-filter" class="select-filter">
               <option value="">All Districts</option>
             </select>
+            <select id="facility-type-filter" class="select-filter">
+              <option value="">All Facility Types</option>
+              <option value="medical_college">State Medical Colleges</option>
+              <option value="district">District Hospitals</option>
+              <option value="rural">Rural Hospitals</option>
+            </select>
           </div>
         </div>
 
@@ -911,6 +917,7 @@
       });
 
       select.addEventListener('change', filterTable);
+      document.getElementById('facility-type-filter')?.addEventListener('change', filterTable);
       document.getElementById('table-search').addEventListener('input', filterTable);
     }
 
@@ -1092,6 +1099,14 @@
           statusBadge = '<span class="alert-badge-low">NORMAL (<60%)</span>';
         }
 
+        const wards = h.wards || {};
+        const maleTotal = Number(wards.male?.total) || Math.round(total * 0.38);
+        const maleFree = wards.male?.free !== undefined ? Number(wards.male.free) : Math.max(0, maleTotal - (Number(wards.male?.occupied) || 0));
+        const femaleTotal = Number(wards.female?.total) || Math.round(total * 0.38);
+        const femaleFree = wards.female?.free !== undefined ? Number(wards.female.free) : Math.max(0, femaleTotal - (Number(wards.female?.occupied) || 0));
+        const maternityTotal = Number(wards.maternity?.total) || Math.max(0, total - maleTotal - femaleTotal);
+        const maternityFree = wards.maternity?.free !== undefined ? Number(wards.maternity.free) : Math.max(0, maternityTotal - (Number(wards.maternity?.occupied) || 0));
+
         tr.innerHTML = `
           <td>
             <div style="font-weight: 700; color: #1a2744;">${h.name}</div>
@@ -1100,8 +1115,16 @@
               🕒 Last updated: ${formatLastUpdated(h.lastUpdated)}
             </div>
           </td>
-          <td>${h.district}</td>
-          <td><span style="font-size: 11.5px; color: #4b5563;">${h.type}</span></td>
+          <td>
+            <div style="font-weight: 600;">${h.district}</div>
+            ${h.block ? `<div style="font-size: 11px; color: #64748b;">${h.block} Block</div>` : ''}
+          </td>
+          <td>
+            <span style="font-size: 11.5px; font-weight: 600; color: #4b5563;">${h.type}</span>
+            <div style="font-size: 10.5px; color: #64748b; margin-top: 3px; line-height: 1.35;">
+              👨 M: ${maleFree}/${maleTotal} &bull; 👩 F: ${femaleFree}/${femaleTotal} &bull; 🤰 Mat: ${maternityFree}/${maternityTotal}
+            </div>
+          </td>
           <td style="text-align: right; font-weight: 600;">
             <span class="read-only">${total}</span>
             <input type="number" min="1" class="edit-only edit-bed-input input-total-beds" value="${total}" data-id="${h.id}">
@@ -1259,14 +1282,17 @@
     function filterTable() {
       const search = document.getElementById('table-search').value.toLowerCase().trim();
       const district = document.getElementById('district-filter').value;
+      const facilityType = document.getElementById('facility-type-filter')?.value || '';
 
       const filtered = hospitals.filter(h => {
         const matchesSearch = !search || 
-          h.name.toLowerCase().includes(search) || 
-          h.district.toLowerCase().includes(search) ||
-          h.type.toLowerCase().includes(search);
+          (h.name || '').toLowerCase().includes(search) || 
+          (h.district || '').toLowerCase().includes(search) ||
+          (h.block || '').toLowerCase().includes(search) ||
+          (h.type || '').toLowerCase().includes(search);
         const matchesDistrict = !district || h.district === district;
-        return matchesSearch && matchesDistrict;
+        const matchesType = !facilityType || h.category === facilityType;
+        return matchesSearch && matchesDistrict && matchesType;
       });
 
       renderHospitalTable(filtered);

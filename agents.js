@@ -275,6 +275,23 @@ function generateBedFallbacks(hospitalsData) {
         resolved: false,
         timestamp: now
       });
+    } else if (h.wards?.maternity && h.wards.maternity.free <= 1 && alerts.length < 8) {
+      alerts.push({
+        agentType: 'BED',
+        hospitalName: h.name,
+        hospitalId: h.id,
+        district: h.district,
+        type: h.type || 'District Hospital',
+        priority: 'HIGH',
+        occupancyPercent: occPercent,
+        occupiedBeds: occupied,
+        totalBeds: total,
+        freeBeds: free,
+        alertMessage: `CRITICAL MATERNITY ALERT: ${h.name} in ${h.district} has only ${h.wards.maternity.free} pregnancy/maternity bed remaining.`,
+        recommendedAction: `Activate emergency obstetric surge protocol and coordinate ambulance diversion to nearest tertiary medical college.`,
+        resolved: false,
+        timestamp: now
+      });
     } else if (occPercent >= 60 && alerts.length < 6) {
       alerts.push({
         agentType: 'BED',
