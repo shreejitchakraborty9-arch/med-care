@@ -2715,20 +2715,30 @@
       return card;
     }
 
+    const createAlertCard = buildCard;
+    window.createAlertCard = buildCard;
+
     // Expose markAlertResolved globally for onclick handlers
     window.markAlertResolved = async function(alertId) {
       if (!alertId) return;
       const card = document.querySelector(`[data-id="${alertId}"]`);
       if (card) {
         card.classList.add("resolved-card");
-        const foot = card.querySelector(".ag-card-footer");
+        const foot = card.querySelector(".ag-card-footer, .alert-actions");
         if (foot) {
           foot.innerHTML = `<span class="ag-resolved-label">&#x2713; Resolved by Admin &mdash; ${fmtTime(new Date().toISOString())}</span>`;
         }
         card.parentElement?.appendChild(card);
       }
+      for (const k of ['medicine', 'bed', 'epidemic']) {
+        const item = localAlerts[k].find(a => (a.firestoreId === alertId || a._localId === alertId || a.id === alertId));
+        if (item) {
+          item.resolved = true;
+          item.resolvedAt = new Date().toISOString();
+        }
+      }
       updateBadges();
-      showToast();
+      showToast("Alert marked as resolved");
       await resolveAlertInFirestore(alertId);
     };
 

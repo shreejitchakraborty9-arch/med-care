@@ -1439,6 +1439,127 @@ body.mode-edit .read-only {
 .history-badge-emergency { background: #f3e8ff; color: #6b21a8; }
 .history-badge-bulk { background: #e0e7ff; color: #3730a3; }
 
+/* Alert Hospital Info in Notification Sidebar */
+.alert-hospital-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  padding: 6px 8px;
+  background: #f0f4ff;
+  border-radius: 4px;
+}
+
+.alert-hospital-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #1a2744;
+}
+
+.alert-district {
+  font-size: 12px;
+  color: #666;
+}
+
+.alert-type-badge {
+  font-size: 11px;
+  background: #e8eaf6;
+  color: #3949ab;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Alert Card Styles */
+.alert-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #1a2744;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: background 0.3s, opacity 0.3s;
+}
+.alert-card.type-medicine { border-left-color: #1565c0; }
+.alert-card.type-bed      { border-left-color: #2e7d32; }
+.alert-card.type-epidemic { border-left-color: #c62828; }
+
+.alert-card-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.agent-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  color: #ffffff;
+}
+.agent-badge.medicine { background: #1565c0; }
+.agent-badge.bed      { background: #2e7d32; }
+.agent-badge.epidemic { background: #c62828; }
+
+.priority-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  color: #fff;
+}
+.priority-badge.CRITICAL { background: #b71c1c; }
+.priority-badge.HIGH     { background: #e65100; }
+.priority-badge.MEDIUM   { background: #f57c00; color: #fff; }
+.priority-badge.LOW      { background: #388e3c; }
+
+.alert-time {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-left: auto;
+}
+
+.alert-message {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.45;
+  margin-bottom: 6px;
+}
+
+.alert-recommended {
+  font-size: 11.5px;
+  color: #4b5563;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.alert-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-done {
+  background: #2e7d32;
+  color: #ffffff;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 0.3px;
+}
+.btn-done:hover {
+  background: #1b5e20;
+}
+
+
+
 
 
 
