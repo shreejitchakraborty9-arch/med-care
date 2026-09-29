@@ -1,4 +1,4 @@
-// seed.js - Universal Database Seeder for MedCare WB (Supports Node.js & Browser)
+﻿// seed.js - Universal Database Seeder for MedWatch (Supports Node.js & Browser)
 import { HOSPITALS_DATA } from "./hospitals-data.js";
 
 /**
@@ -81,3 +81,4 @@ if (typeof window !== "undefined") {
 }
 
 export default seedHospitals;
+

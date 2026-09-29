@@ -7,7 +7,6 @@
       "**/node_modules/**",
       "seed.js",
       ".env",
-      "env-config.js",
       "IMPLEMENTATION_PLAN.md",
       "*.bat"
     ],

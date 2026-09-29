@@ -1,11 +1,11 @@
-/**
- * agents.js — Multi-Agent AI System for WB MedCare Dashboard
- * Government of West Bengal — Health Supply Chain Dashboard
+﻿/**
+ * agents.js â€” Multi-Agent AI System for MedWatch Dashboard
+ * Government of West Bengal â€” Health Supply Chain Dashboard
  *
  * Agents:
- *   1. MedicineAgent   — analyzes medicine stock every 5 minutes
- *   2. BedAgent        — monitors bed occupancy every 3 minutes
- *   3. EpidemicAgent   — detects outbreak patterns every 10 minutes
+ *   1. MedicineAgent   â€” analyzes medicine stock every 5 minutes
+ *   2. BedAgent        â€” monitors bed occupancy every 3 minutes
+ *   3. EpidemicAgent   â€” detects outbreak patterns every 10 minutes
  *
  * All agents run ONLY in dashboard.html and are NOT imported elsewhere.
  * Firestore writes go to the "agent_alerts" collection.
@@ -23,9 +23,9 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Environment Helpers
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getGeminiApiKey() {
   if (typeof window !== "undefined" && window.ENV && window.ENV.GEMINI_API_KEY) {
     return window.ENV.GEMINI_API_KEY.trim();
@@ -46,15 +46,15 @@ function getGeminiModel() {
   return "";
 }
 
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Shared Gemini caller
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function callGemini(prompt) {
   const GEMINI_API_KEY = getGeminiApiKey();
   const GEMINI_MODEL = getGeminiModel();
 
   if (!GEMINI_API_KEY || !GEMINI_MODEL) {
-    throw new Error("GEMINI_API_KEY or GEMINI_MODEL not found — agents offline.");
+    throw new Error("GEMINI_API_KEY or GEMINI_MODEL not found â€” agents offline.");
   }
 
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
@@ -83,9 +83,9 @@ async function callGemini(prompt) {
   return Array.isArray(parsed) ? parsed : (parsed.alerts ?? []);
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Web Audio — subtle beep for CRITICAL alerts
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Web Audio â€” subtle beep for CRITICAL alerts
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function playCriticalSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -102,9 +102,9 @@ function playCriticalSound() {
   } catch { /* AudioContext not available */ }
 }
 
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Firestore helpers
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let _db = null;
 export function initAgentsDb(db) { _db = db; }
 
@@ -149,19 +149,19 @@ export function subscribeToAgentAlerts(callback) {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────
-// AGENT 1 — Medicine Supply Agent
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// AGENT 1 â€” Medicine Supply Agent
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function MedicineAgent(hospitalsData) {
   const systemPrompt = `You are the Medicine Supply Agent for West Bengal Government Health Department. 
 Analyze the medicine stock data from all hospitals and generate alerts.
 
 Generate alerts for these exact situations:
-1. CRITICAL: Any medicine stock is 0 units — hospital has completely run out
-2. HIGH: Any medicine stock is below 20 units — will run out within days  
-3. MEDIUM: Any medicine stock is below 50 units — needs restocking soon
-4. LOW_ALERT: Any medicine stock is above 500 units — overstocked, redistribute
-5. TRANSFER: Hospital A has excess of medicine X, Hospital B is critically low on X — recommend transfer with exact quantities
+1. CRITICAL: Any medicine stock is 0 units â€” hospital has completely run out
+2. HIGH: Any medicine stock is below 20 units â€” will run out within days  
+3. MEDIUM: Any medicine stock is below 50 units â€” needs restocking soon
+4. LOW_ALERT: Any medicine stock is above 500 units â€” overstocked, redistribute
+5. TRANSFER: Hospital A has excess of medicine X, Hospital B is critically low on X â€” recommend transfer with exact quantities
 
 For each alert return a JSON array where each object has:
 - agentType: 'MEDICINE'
@@ -204,19 +204,19 @@ ${JSON.stringify(hospitalsData, null, 2)}`;
   }
 }
 
-// ─────────────────────────────────────────────────────────────────
-// AGENT 2 — Hospital Bed Agent
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// AGENT 2 â€” Hospital Bed Agent
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function BedAgent(hospitalsData) {
   const systemPrompt = `You are the Hospital Bed Management Agent for West Bengal Government Health Department.
 Analyze bed occupancy across all hospitals and generate alerts.
 
 Generate alerts for these exact situations:
-1. CRITICAL: Beds occupied above 90% — immediate crisis, hospital overwhelmed
-2. HIGH: Beds occupied between 80% and 90% — pandemic threshold crossed, prepare overflow
-3. MEDIUM: Beds occupied between 60% and 80% — monitor closely
-4. TOO_VACANT: Beds occupied below 20% — too many empty beds, possible resource waste or reporting issue
-5. TRANSFER: Hospital A is above 80% occupied and Hospital B nearby has less than 40% occupied — recommend patient transfer with exact numbers
+1. CRITICAL: Beds occupied above 90% â€” immediate crisis, hospital overwhelmed
+2. HIGH: Beds occupied between 80% and 90% â€” pandemic threshold crossed, prepare overflow
+3. MEDIUM: Beds occupied between 60% and 80% â€” monitor closely
+4. TOO_VACANT: Beds occupied below 20% â€” too many empty beds, possible resource waste or reporting issue
+5. TRANSFER: Hospital A is above 80% occupied and Hospital B nearby has less than 40% occupied â€” recommend patient transfer with exact numbers
 
 For each alert return a JSON array where each object has:
 - agentType: 'BED'
@@ -259,19 +259,19 @@ ${JSON.stringify(hospitalsData, null, 2)}`;
   }
 }
 
-// ─────────────────────────────────────────────────────────────────
-// AGENT 3 — Epidemic Early Warning Agent
-// ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// AGENT 3 â€” Epidemic Early Warning Agent
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function EpidemicAgent(hospitalsData) {
   const systemPrompt = `You are the Epidemic Early Warning Agent for West Bengal Government Health Department.
-Your job is to detect patterns that suggest a disease outbreak is beginning — before it becomes a crisis.
+Your job is to detect patterns that suggest a disease outbreak is beginning â€” before it becomes a crisis.
 
 Analyze ALL hospital data together and look for these patterns:
-1. If 3 or more hospitals in the same district show bed occupancy above 70% simultaneously — possible local outbreak
-2. If paracetamol AND ORS stock are both depleting fast across a region — possible gastroenteritis or viral fever outbreak  
-3. If chloroquine stock is critically low in multiple hospitals in same area — possible malaria spike
-4. If childrenNeedingVaccines is high across multiple hospitals in same district — vaccination gap risk
-5. If any single district has more than 2 hospitals with CRITICAL alerts — district-level emergency
+1. If 3 or more hospitals in the same district show bed occupancy above 70% simultaneously â€” possible local outbreak
+2. If paracetamol AND ORS stock are both depleting fast across a region â€” possible gastroenteritis or viral fever outbreak  
+3. If chloroquine stock is critically low in multiple hospitals in same area â€” possible malaria spike
+4. If childrenNeedingVaccines is high across multiple hospitals in same district â€” vaccination gap risk
+5. If any single district has more than 2 hospitals with CRITICAL alerts â€” district-level emergency
 
 For each pattern found return a JSON array where each object has:
 - agentType: 'EPIDEMIC'
@@ -312,3 +312,4 @@ ${JSON.stringify(hospitalsData, null, 2)}`;
     return [{ _error: true, agentType: "EPIDEMIC", message: "Agent temporarily unavailable. " + err.message }];
   }
 }
+

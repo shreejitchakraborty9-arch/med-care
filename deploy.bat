@@ -1,6 +1,6 @@
-@echo off
+﻿@echo off
 echo ================================
-echo Deploying MedCare WB to Firebase
+echo Deploying MedWatch to Firebase
 echo ================================
 echo.
 echo Step 1: Installing Firebase tools...
@@ -21,3 +21,4 @@ echo Your app is live at:
 echo https://the-med-care.web.app
 echo ================================
 pause
+

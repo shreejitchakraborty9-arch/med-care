@@ -1,5 +1,5 @@
-# MedCare WB — West Bengal Health Supply Chain Dashboard
-## Government of West Bengal — Department of Health & Family Welfare
+﻿# MedWatch â€” West Bengal Health Supply Chain Dashboard
+## Government of West Bengal â€” Department of Health & Family Welfare
 
 ### Live Demo
 https://the-med-care.web.app
@@ -18,9 +18,9 @@ https://the-med-care.web.app
 - Real-time hospital bed availability across 23 West Bengal districts
 - Medicine stock monitoring with AI alerts
 - 3 AI Agents powered by Gemini 3.5 Flash Lite:
-  - Medicine Supply Agent — monitors stock levels
-  - Hospital Bed Agent — monitors bed occupancy
-  - Epidemic Early Warning Agent — detects outbreak patterns
+  - Medicine Supply Agent â€” monitors stock levels
+  - Hospital Bed Agent â€” monitors bed occupancy
+  - Epidemic Early Warning Agent â€” detects outbreak patterns
 - Emergency declaration system with AI redistribution planning
 - Citizen mobile view with nearest hospital finder
 - Interactive Google Maps with color-coded hospital markers
@@ -35,4 +35,5 @@ https://the-med-care.web.app
 - Data: 25 real West Bengal government hospitals across 23 districts
 
 ### Built For
-Hack2Skill Hackathon — Track 03: Smart Health & Supply Chain Resilience
+Hack2Skill Hackathon â€” Track 03: Smart Health & Supply Chain Resilience
+
