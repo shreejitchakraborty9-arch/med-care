@@ -32,6 +32,347 @@
       }
     })();
   </script>
+
+  <!-- =========================================================
+       Milestone 2: Executive Design System — Admin Dashboard
+       Material 3 + Apple HIG Clinical Bento Grid & Inspector
+       ========================================================= -->
+  <style>
+    /* ---- Design Tokens (M2 additions on top of style.css) ---- */
+    :root {
+      --db-brand:      #0f172a;
+      --db-accent:     #0284c7;
+      --db-accent-lt:  #e0f2fe;
+      --db-green:      #15803d;
+      --db-green-lt:   #dcfce7;
+      --db-red:        #b91c1c;
+      --db-red-lt:     #fee2e2;
+      --db-amber:      #d97706;
+      --db-amber-lt:   #fef3c7;
+      --db-surface:    #ffffff;
+      --db-bg:         #f1f5f9;
+      --db-border:     #e2e8f0;
+      --db-text:       #0f172a;
+      --db-muted:      #64748b;
+      --db-radius:     10px;
+      --db-shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --db-shadow-md:  0 4px 12px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.05);
+      --db-shadow-lg:  0 12px 32px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.06);
+    }
+
+    /* ---- Global base upgrade ---- */
+    body { background: var(--db-bg); }
+
+    /* ---- Sticky header: tighter, non-wrapping meta on wide screens ---- */
+    .header { gap: 0; }
+    .header-meta {
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #header-clock {
+      border-radius: 6px !important;
+      font-size: 11.5px !important;
+      padding: 5px 10px !important;
+      letter-spacing: 0.3px;
+    }
+
+    /* ---- Executive Bento KPI Grid ---- */
+    .bento-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1100px) { .bento-kpi-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px)  { .bento-kpi-grid { grid-template-columns: 1fr; } }
+
+    .bento-kpi-card {
+      background: var(--db-surface);
+      border: 1px solid var(--db-border);
+      border-radius: var(--db-radius);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--db-shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow .2s;
+    }
+    .bento-kpi-card:hover { box-shadow: var(--db-shadow-md); }
+    .bento-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--db-radius) var(--db-radius) 0 0;
+    }
+    .bento-kpi-card.kpi-blue::before  { background: var(--db-accent); }
+    .bento-kpi-card.kpi-green::before { background: var(--db-green); }
+    .bento-kpi-card.kpi-red::before   { background: var(--db-red); }
+    .bento-kpi-card.kpi-amber::before { background: var(--db-amber); }
+
+    .bento-kpi-icon {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .bento-kpi-card.kpi-blue  .bento-kpi-icon { background: var(--db-accent-lt); }
+    .bento-kpi-card.kpi-green .bento-kpi-icon { background: var(--db-green-lt); }
+    .bento-kpi-card.kpi-red   .bento-kpi-icon { background: var(--db-red-lt); }
+    .bento-kpi-card.kpi-amber .bento-kpi-icon { background: var(--db-amber-lt); }
+
+    .bento-kpi-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .bento-kpi-body { flex: 1; }
+    .bento-kpi-label {
+      font-size: 11px; font-weight: 600; color: var(--db-muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+    }
+    .bento-kpi-value {
+      font-size: 28px; font-weight: 800; color: var(--db-text);
+      line-height: 1; letter-spacing: -0.5px;
+    }
+    .bento-kpi-card.kpi-green .bento-kpi-value { color: var(--db-green); }
+    .bento-kpi-card.kpi-red   .bento-kpi-value { color: var(--db-red); }
+    .bento-kpi-card.kpi-amber .bento-kpi-value { color: var(--db-amber); }
+    .bento-kpi-sub {
+      font-size: 11.5px; color: var(--db-muted); margin-top: 4px;
+    }
+
+    /* ---- Section container cards ---- */
+    .dashboard-section-card {
+      background: var(--db-surface);
+      border: 1px solid var(--db-border);
+      border-radius: var(--db-radius);
+      box-shadow: var(--db-shadow-sm);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .dashboard-section-card > .section-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--db-border);
+      background: #fafbfd;
+    }
+    .dashboard-section-card > .section-header .section-title {
+      border-left: none;
+      padding-left: 0;
+      font-size: 14.5px;
+    }
+    .dashboard-section-card > .ai-alerts-list,
+    .dashboard-section-card > .table-responsive,
+    .dashboard-section-card > #ai-alerts-container {
+      border: none !important;
+      border-radius: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    .dashboard-section-card .ai-panel {
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      margin-bottom: 0;
+    }
+    .dashboard-section-card .ai-panel .ai-panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--db-border);
+      background: #fafbfd;
+    }
+    #ai-alerts-container { padding: 0 !important; }
+    .ai-alert-item {
+      border-radius: 0 !important;
+      border-left-width: 4px;
+      border-right: none;
+      border-top: none;
+      border-bottom: 1px solid var(--db-border) !important;
+      padding: 12px 20px;
+      background: #fff;
+    }
+    .ai-alert-item:last-child { border-bottom: none !important; }
+
+    /* ---- Hospital table polish ---- */
+    .table-responsive {
+      border-radius: 0 !important;
+      border: none !important;
+      margin-bottom: 0 !important;
+    }
+    .hospital-table th { font-size: 11.5px; padding: 10px 14px; }
+    .hospital-table td { padding: 10px 14px; vertical-align: middle; }
+    .hospital-table tbody tr { transition: background .15s; }
+
+    /* Ward mini-chips in read mode */
+    .ward-mini-chips {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 5px;
+    }
+    .ward-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-size: 10.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+    }
+    .ward-chip.chip-ok  { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .ward-chip.chip-low { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+    /* ---- Type badge pill ---- */
+    .facility-type-pill {
+      display: inline-block;
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .pill-medical  { background: #dbeafe; color: #1e3a8a; }
+    .pill-district { background: #e0e7ff; color: #3730a3; }
+    .pill-rural    { background: #ccfbf1; color: #0f766e; }
+    .pill-other    { background: #f1f5f9; color: #475569; }
+
+    /* Occupancy bar in table */
+    .occ-bar-wrap {
+      background: #f1f5f9; border-radius: 20px; height: 5px;
+      overflow: hidden; margin-top: 5px; width: 100%;
+    }
+    .occ-bar-fill {
+      height: 100%; border-radius: 20px;
+      background: var(--db-green);
+      transition: width .4s ease;
+    }
+    .occ-bar-fill.occ-high   { background: var(--db-red); }
+    .occ-bar-fill.occ-medium { background: var(--db-amber); }
+
+    /* ---- Sidebar nav refinements ---- */
+    .sidebar { background: #f8fafc; }
+    .nav-link {
+      border-radius: 0 8px 8px 0;
+      margin-right: 8px;
+      border-left: 3px solid transparent;
+      transition: background .15s, border-color .15s;
+    }
+    .nav-link.active {
+      border-left-color: var(--db-accent);
+      background: var(--db-accent-lt);
+      color: var(--db-accent);
+    }
+    .nav-link:hover { background: #eef2f8; }
+
+    /* ---- Inspector Slide-Out Drawer ---- */
+    #inspector-drawer {
+      position: fixed;
+      top: 0; right: -440px;
+      width: 420px;
+      height: 100vh;
+      background: #ffffff;
+      box-shadow: var(--db-shadow-lg);
+      border-left: 1px solid var(--db-border);
+      z-index: 1100;
+      display: flex;
+      flex-direction: column;
+      transition: right .3s cubic-bezier(.4,0,.2,1);
+    }
+    #inspector-drawer.open { right: 0; }
+
+    .inspector-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--db-border);
+      background: var(--db-brand);
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .inspector-title { font-size: 14px; font-weight: 700; }
+    .inspector-close {
+      background: none; border: none; color: #fff;
+      font-size: 22px; cursor: pointer; line-height: 1;
+      padding: 2px 6px; border-radius: 4px;
+      transition: background .15s;
+    }
+    .inspector-close:hover { background: rgba(255,255,255,.15); }
+    .inspector-body {
+      flex: 1; overflow-y: auto;
+      padding: 20px;
+    }
+    .inspector-section-label {
+      font-size: 10.5px; font-weight: 700; color: var(--db-muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin-bottom: 10px; margin-top: 16px;
+    }
+    .inspector-section-label:first-child { margin-top: 0; }
+    .inspector-field-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--db-border);
+      font-size: 13px;
+    }
+    .inspector-field-key { color: var(--db-muted); font-weight: 500; }
+    .inspector-field-val { font-weight: 700; color: var(--db-text); text-align: right; }
+    .inspector-ward-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px; margin-top: 8px;
+    }
+    .inspector-ward-tile {
+      background: var(--db-bg); border: 1px solid var(--db-border);
+      border-radius: 8px; padding: 10px;
+      text-align: center;
+    }
+    .inspector-ward-tile-label {
+      font-size: 10px; font-weight: 700; color: var(--db-muted);
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+    .inspector-ward-tile-val {
+      font-size: 18px; font-weight: 800; color: var(--db-text);
+    }
+    .inspector-ward-tile-sub {
+      font-size: 10.5px; color: var(--db-muted); margin-top: 1px;
+    }
+    .inspector-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--db-border);
+      background: #fafbfd;
+      display: flex; gap: 10px;
+      flex-shrink: 0;
+    }
+    .btn-inspector-edit {
+      background: var(--db-brand); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 9px 16px; font-size: 13px; font-weight: 700;
+      cursor: pointer; flex: 1; transition: background .15s;
+    }
+    .btn-inspector-edit:hover { background: #1e3a5f; }
+    .btn-inspector-declare {
+      background: var(--db-red); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 9px 14px; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-inspector-declare:hover { background: #991b1b; }
+
+    /* Inspector backdrop overlay */
+    #inspector-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(15,23,42,.3);
+      z-index: 1099;
+      backdrop-filter: blur(1px);
+    }
+    #inspector-overlay.show { display: block; }
+
+    /* ---- Print adjustments ---- */
+    @media print {
+      #inspector-drawer, #inspector-overlay { display: none !important; }
+      .bento-kpi-card::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
 </head>
 <body>
 
@@ -113,32 +454,54 @@
     <!-- Main Content Area -->
     <main class="main-content">
 
-      <!-- SECTION 1: Stats Row (4 cards side by side) -->
+      <!-- SECTION 1: Executive Bento KPI Grid -->
       <section id="section-stats" aria-label="Key Performance Indicators">
-        <div class="dashboard-grid">
-          <div class="stat-card">
-            <div class="stat-card-title">Total Hospitals</div>
-            <div class="stat-card-value" id="stat-total-hospitals">25</div>
-            <div class="stat-card-sub">Monitored State Facilities</div>
+        <div class="bento-kpi-grid">
+
+          <div class="bento-kpi-card kpi-blue">
+            <div class="bento-kpi-row">
+              <div class="bento-kpi-icon">🏥</div>
+              <div class="bento-kpi-body">
+                <div class="bento-kpi-label">Total Facilities</div>
+                <div class="bento-kpi-value" id="stat-total-hospitals">--</div>
+              </div>
+            </div>
+            <div class="bento-kpi-sub">Monitored state facilities across WB</div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-card-title">Critical Alerts</div>
-            <div class="stat-card-value status-red" id="stat-critical-alerts">--</div>
-            <div class="stat-card-sub">Identified by Supply Chain AI</div>
+          <div class="bento-kpi-card kpi-red">
+            <div class="bento-kpi-row">
+              <div class="bento-kpi-icon">🚨</div>
+              <div class="bento-kpi-body">
+                <div class="bento-kpi-label">Critical Alerts</div>
+                <div class="bento-kpi-value" id="stat-critical-alerts">--</div>
+              </div>
+            </div>
+            <div class="bento-kpi-sub">Identified by Supply Chain AI</div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-card-title">Total Free Beds</div>
-            <div class="stat-card-value status-green" id="stat-free-beds">--</div>
-            <div class="stat-card-sub">Across All 19 Districts</div>
+          <div class="bento-kpi-card kpi-green">
+            <div class="bento-kpi-row">
+              <div class="bento-kpi-icon">🛏️</div>
+              <div class="bento-kpi-body">
+                <div class="bento-kpi-label">Total Free Beds</div>
+                <div class="bento-kpi-value" id="stat-free-beds">--</div>
+              </div>
+            </div>
+            <div class="bento-kpi-sub">Across all 19 WB districts</div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-card-title">Districts in Emergency</div>
-            <div class="stat-card-value" id="stat-emergency-districts" style="color: var(--status-red);">0</div>
-            <div class="stat-card-sub">Active Emergency Protocols</div>
+          <div class="bento-kpi-card kpi-amber">
+            <div class="bento-kpi-row">
+              <div class="bento-kpi-icon">⚠️</div>
+              <div class="bento-kpi-body">
+                <div class="bento-kpi-label">Emergency Districts</div>
+                <div class="bento-kpi-value" id="stat-emergency-districts">0</div>
+              </div>
+            </div>
+            <div class="bento-kpi-sub">Active emergency protocols</div>
           </div>
+
         </div>
       </section>
 
@@ -146,13 +509,13 @@
       <div id="last-edited-label" class="read-only" style="margin: -12px 0 20px 2px;">
         <span>🕒</span> <span id="last-edited-text">Last edited: Checking audit trail...</span>
       </div>
-
       <!-- SECTION 2: AI Alerts Panel -->
-      <section id="section-alerts" class="ai-panel" aria-label="AI Generated Alerts">
+      <div class="dashboard-section-card">
+        <section id="section-alerts" class="ai-panel" aria-label="AI Generated Alerts">
         <div class="ai-panel-header">
           <div class="ai-panel-title">
             <span>&#x1F9E0;</span>
-            <span>AI Generated Alerts â€” Live</span>
+            <span>AI Generated Alerts &mdash; Live</span>
           </div>
           <button id="btn-refresh-alerts" class="btn-primary" style="padding: 6px 14px; font-size: 12.5px;">
             &#x21BB; Refresh Alerts
@@ -165,9 +528,11 @@
           </div>
         </div>
       </section>
+      </div>
 
       <!-- MAP SECTION: Interactive West Bengal Hospital Map -->
-      <section id="section-map" style="margin-bottom: 24px;" aria-label="Geographic Hospital Distribution Map">
+      <div class="dashboard-section-card">
+        <section id="section-map" aria-label="Geographic Hospital Distribution Map">
         <div class="section-header">
           <h2 class="section-title">West Bengal Geographic Hospital Distribution Map</h2>
           <div style="font-size: 12px; color: var(--text-muted);">
@@ -180,9 +545,11 @@
           </div>
         </div>
       </section>
+      </div>
 
       <!-- SECTION 3: Hospital Table -->
-      <section id="section-table" aria-label="Hospital Resource Directory" style="margin-bottom: 24px;">
+      <div class="dashboard-section-card">
+        <section id="section-table" aria-label="Hospital Resource Directory">
         <div class="section-header">
           <h2 class="section-title">Hospital Inventory & Bed Allocation Directory</h2>
           <div style="display: flex; gap: 8px;">
@@ -238,9 +605,11 @@
           </table>
         </div>
       </section>
+      </div>
 
-      <!-- SECTION 4: Quick Stats -->
-      <section id="section-quick-stats" aria-label="Executive Quick Summary">
+            <!-- SECTION 4: Quick Stats -->
+      <div class="dashboard-section-card">
+        <section id="section-quick-stats" aria-label="Executive Quick Summary">
         <div class="section-header">
           <h2 class="section-title">Critical Health Metrics & Stock Depletion</h2>
         </div>
@@ -269,9 +638,11 @@
           </div>
         </div>
       </section>
+      </div>
 
-      <!-- SECTION 5: Edit History Log -->
-      <section id="section-history" aria-label="Admin Edit History Log" style="margin-bottom: 24px;">
+            <!-- SECTION 5: Edit History Log -->
+      <div class="dashboard-section-card">
+        <section id="section-history" aria-label="Admin Edit History Log">
         <div class="section-header">
           <h2 class="section-title">Admin Modification & Action Audit Trail</h2>
           <div style="font-size: 12px; color: var(--text-muted);">
@@ -300,8 +671,9 @@
           </table>
         </div>
       </section>
+      </div>
 
-    </main>
+          </main>
   </div>
 
   <!-- Emergency Redistribution Modal Dialog -->
@@ -1109,7 +1481,7 @@
 
         tr.innerHTML = `
           <td>
-            <div style="font-weight: 700; color: #1a2744;">${h.name}</div>
+            <div style="font-weight: 700; color: #1a2744; cursor: pointer; text-decoration: underline dotted #94a3b8;" title="Click to inspect hospital" onclick="if(window.openInspector && window._latestHospitals){ const h = window._latestHospitals.find(x=>x.id==='${h.id}'); if(h) window.openInspector(h); }">${h.name}</div>
             ${h.notes ? `<div style="font-size: 11px; color: #475569; font-style: italic; margin-top: 2px;">📝 ${h.notes}</div>` : ''}
             <div style="font-size: 11px; color: #6b7280; margin-top: 3px;">
               🕒 Last updated: ${formatLastUpdated(h.lastUpdated)}
@@ -2909,6 +3281,129 @@
       }
     });
   </script>
+
+  <!-- ============================================================
+       Inspector Slide-Out Drawer — Hospital Detail Panel (Milestone 2)
+       Opens on hospital row click. Edit via existing modal system.
+       ============================================================ -->
+  <div id="inspector-overlay"></div>
+  <aside id="inspector-drawer" role="complementary" aria-label="Hospital Inspector">
+    <div class="inspector-header">
+      <span class="inspector-title" id="inspector-hosp-title">Hospital Details</span>
+      <button class="inspector-close" id="inspector-close-btn" aria-label="Close inspector">&times;</button>
+    </div>
+    <div class="inspector-body">
+      <div class="inspector-section-label">Facility Info</div>
+      <div class="inspector-field-row"><span class="inspector-field-key">District</span><span class="inspector-field-val" id="ins-district">-</span></div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Type</span><span class="inspector-field-val" id="ins-type">-</span></div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Block</span><span class="inspector-field-val" id="ins-block">-</span></div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Contact</span><span class="inspector-field-val" id="ins-contact">-</span></div>
+
+      <div class="inspector-section-label">Bed Capacity</div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Total Beds</span><span class="inspector-field-val" id="ins-total">-</span></div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Occupied</span><span class="inspector-field-val" id="ins-occupied">-</span></div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Free Beds</span><span class="inspector-field-val" id="ins-free">-</span></div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Occupancy Rate</span><span class="inspector-field-val" id="ins-occ-rate">-</span></div>
+
+      <div class="inspector-section-label">Ward Breakdown</div>
+      <div class="inspector-ward-grid">
+        <div class="inspector-ward-tile">
+          <div class="inspector-ward-tile-label">&#x1F468; Male</div>
+          <div class="inspector-ward-tile-val" id="ins-ward-male-free">-</div>
+          <div class="inspector-ward-tile-sub" id="ins-ward-male-total">free beds</div>
+        </div>
+        <div class="inspector-ward-tile">
+          <div class="inspector-ward-tile-label">&#x1F469; Female</div>
+          <div class="inspector-ward-tile-val" id="ins-ward-female-free">-</div>
+          <div class="inspector-ward-tile-sub" id="ins-ward-female-total">free beds</div>
+        </div>
+        <div class="inspector-ward-tile">
+          <div class="inspector-ward-tile-label">&#x1F930; Maternity</div>
+          <div class="inspector-ward-tile-val" id="ins-ward-mat-free">-</div>
+          <div class="inspector-ward-tile-sub" id="ins-ward-mat-total">free beds</div>
+        </div>
+      </div>
+
+      <div class="inspector-section-label">Status</div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Emergency</span><span class="inspector-field-val" id="ins-emergency">-</span></div>
+      <div class="inspector-field-row"><span class="inspector-field-key">Last Updated</span><span class="inspector-field-val" id="ins-last-updated">-</span></div>
+      <div style="font-size: 12px; color: var(--db-muted); margin-top: 12px; font-style: italic;" id="ins-notes"></div>
+    </div>
+    <div class="inspector-footer">
+      <button class="btn-inspector-edit" id="inspector-edit-btn">&#x270F;&#xFE0F; Open Edit Tools</button>
+    </div>
+  </aside>
+
+  <script>
+    /* Inspector Drawer Controller */
+    (function() {
+      const drawer   = document.getElementById('inspector-drawer');
+      const overlay  = document.getElementById('inspector-overlay');
+      const closeBtn = document.getElementById('inspector-close-btn');
+      const editBtn  = document.getElementById('inspector-edit-btn');
+      let _currentHospId = null;
+
+      window.openInspector = function(hosp) {
+        _currentHospId = hosp.id;
+        document.getElementById('inspector-hosp-title').textContent = hosp.name || 'Hospital Details';
+        document.getElementById('ins-district').textContent  = hosp.district || '-';
+        document.getElementById('ins-type').textContent     = hosp.type || '-';
+        document.getElementById('ins-block').textContent    = hosp.block || '-';
+        document.getElementById('ins-contact').textContent  = hosp.contact || hosp.phone || '-';
+
+        const total = Number(hosp.totalBeds) || 0;
+        const occ   = Number(hosp.occupiedBeds) || 0;
+        const free  = Math.max(0, total - occ);
+        const rate  = total > 0 ? ((occ / total) * 100).toFixed(1) + '%' : '-';
+        document.getElementById('ins-total').textContent    = total;
+        document.getElementById('ins-occupied').textContent = occ;
+        document.getElementById('ins-free').textContent     = free;
+        document.getElementById('ins-occ-rate').textContent = rate;
+
+        const wards = hosp.wards || {};
+        const mT  = Number(wards.male?.total)     || Math.round(total * 0.38);
+        const mF  = wards.male?.free !== undefined ? Number(wards.male.free) : Math.max(0, mT - (Number(wards.male?.occupied) || 0));
+        const fT  = Number(wards.female?.total)   || Math.round(total * 0.38);
+        const fF  = wards.female?.free !== undefined ? Number(wards.female.free) : Math.max(0, fT - (Number(wards.female?.occupied) || 0));
+        const maTot = Number(wards.maternity?.total) || Math.max(0, total - mT - fT);
+        const maF = wards.maternity?.free !== undefined ? Number(wards.maternity.free) : Math.max(0, maTot - (Number(wards.maternity?.occupied) || 0));
+
+        document.getElementById('ins-ward-male-free').textContent    = mF;
+        document.getElementById('ins-ward-male-total').textContent   = 'of ' + mT + ' total';
+        document.getElementById('ins-ward-female-free').textContent  = fF;
+        document.getElementById('ins-ward-female-total').textContent = 'of ' + fT + ' total';
+        document.getElementById('ins-ward-mat-free').textContent     = maF;
+        document.getElementById('ins-ward-mat-total').textContent    = 'of ' + maTot + ' total';
+
+        document.getElementById('ins-emergency').textContent    = hosp.emergencyDeclared ? 'ACTIVE' : 'None';
+        document.getElementById('ins-last-updated').textContent = hosp.lastUpdated ? new Date(hosp.lastUpdated).toLocaleString('en-IN') : '-';
+        const notesEl = document.getElementById('ins-notes');
+        notesEl.textContent = hosp.notes ? ('Notes: ' + hosp.notes) : '';
+
+        drawer.classList.add('open');
+        overlay.classList.add('show');
+      };
+
+      function closeInspector() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+
+      closeBtn.addEventListener('click', closeInspector);
+      overlay.addEventListener('click', closeInspector);
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeInspector(); });
+
+      editBtn.addEventListener('click', function() {
+        const id = _currentHospId;
+        closeInspector();
+        if (id) {
+          const row = document.getElementById('row-' + id);
+          if (row) { row.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }
+      });
+    })();
+  </script>
+
 </body>
 </html>
 
