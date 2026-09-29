@@ -1,0 +1,13 @@
+{
+  "name": "medcare-wb",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "seed": "node seed.js",
+    "deploy": "firebase deploy --only hosting"
+  },
+  "devDependencies": {
+    "serve": "^14.0.0"
+  }
+}

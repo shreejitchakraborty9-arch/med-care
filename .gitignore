@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment variables and confidential keys (NEVER COMMIT)
+.env
+.env.local
+.env.*.local
+env-config.js
+
+# OS & Editor artifacts
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Firebase debug logs
+.firebase/
+firebase-debug.log*
+firestore-debug.log*

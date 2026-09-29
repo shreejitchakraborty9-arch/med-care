@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Government of West Bengal — MedCare Supply Chain System</title>
+  <script src="env-config.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+
+  <!-- Government Official Header -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="wb-logo" aria-label="Government of West Bengal Emblem">
+        <span>WB<br>GOV</span>
+      </div>
+      <div class="header-title-wrap">
+        <h1>Government of West Bengal — MedCare Supply Chain System</h1>
+        <p>Department of Health & Family Welfare • State Control Centre</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span class="header-badge">PORTAL ACCESS v2.4</span>
+    </div>
+  </header>
+
+  <!-- Main Content Center -->
+  <main class="login-main">
+    <div class="portal-notice-bar">
+      Official Health Logistics & Resource Monitoring Portal for West Bengal Government Hospitals & PHCs
+    </div>
+
+    <div class="login-grid">
+      <!-- LEFT CARD: Admin Login -->
+      <section class="login-card" aria-labelledby="admin-title">
+        <div class="login-card-header">
+          <div class="login-icon" aria-hidden="true">&#x1F6E1;&#xFE0F;</div>
+          <h2 id="admin-title" class="login-card-title">Admin Login</h2>
+          <p class="login-card-subtitle">Authorized Personnel Only</p>
+        </div>
+
+        <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
+          <div class="form-group">
+            <label for="admin-email" class="form-label">Email Address</label>
+            <input 
+              type="email" 
+              id="admin-email" 
+              class="form-control" 
+              placeholder="admin@wbhealth.gov.in"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="admin-password" class="form-label">Password</label>
+            <input 
+              type="password" 
+              id="admin-password" 
+              class="form-control" 
+              placeholder="••••••••••••"
+              required
+            >
+          </div>
+
+          <div class="form-group" style="margin-top: 24px; margin-bottom: 0;">
+            <button type="submit" class="btn-primary" style="width: 100%;">
+              Login as Admin
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- RIGHT CARD: Citizen Login -->
+      <section class="login-card" aria-labelledby="citizen-title">
+        <div class="login-card-header">
+          <div class="login-icon" aria-hidden="true">&#x1F464;</div>
+          <h2 id="citizen-title" class="login-card-title">Citizen Login</h2>
+          <p class="login-card-subtitle">Check Hospital Availability</p>
+        </div>
+
+        <form id="citizen-login-form" onsubmit="handleCitizenLogin(event)">
+          <div class="form-group">
+            <label for="citizen-email" class="form-label">Email Address</label>
+            <input 
+              type="email" 
+              id="citizen-email" 
+              class="form-control" 
+              placeholder="citizen@wb.nic.in"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="citizen-password" class="form-label">Password</label>
+            <input 
+              type="password" 
+              id="citizen-password" 
+              class="form-control" 
+              placeholder="••••••••••••"
+              required
+            >
+          </div>
+
+          <div class="form-group" style="margin-top: 24px; margin-bottom: 0;">
+            <button type="submit" class="btn-citizen" style="width: 100%;">
+              Login as Citizen
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- Small footer notice -->
+    <footer class="login-footer-notice">
+      For access issues contact State Health Department IT Cell
+    </footer>
+  </main>
+
+  <script>
+    function handleAdminLogin(event) {
+      if (event) event.preventDefault();
+      const emailInput = document.getElementById('admin-email').value;
+      localStorage.setItem('role', 'admin');
+      localStorage.setItem('userRole', 'admin');
+      localStorage.setItem('userEmail', emailInput || 'admin@wbhealth.gov.in');
+      window.location.href = 'dashboard.html';
+    }
+
+    function handleCitizenLogin(event) {
+      if (event) event.preventDefault();
+      const emailInput = document.getElementById('citizen-email').value;
+      localStorage.setItem('role', 'user');
+      localStorage.setItem('userRole', 'user');
+      localStorage.setItem('userEmail', emailInput || 'citizen@wb.nic.in');
+      window.location.href = 'user-view.html';
+    }
+  </script>
+</body>
+</html>

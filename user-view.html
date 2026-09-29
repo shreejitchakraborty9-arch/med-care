@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>WB MedCare — Hospital Availability</title>
+  <script src="env-config.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Immediate Security Check: only "user" allowed
+    (function() {
+      const role = localStorage.getItem('role') || localStorage.getItem('userRole');
+      if (role !== 'user') {
+        window.location.replace('index.html');
+      }
+    })();
+  </script>
+  <style>
+    /* Mobile-first citizen view stylesheet */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f5f6fa;
+      color: #1f2937;
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* Compact Header */
+    .citizen-header {
+      background-color: #1a2744;
+      color: #ffffff;
+      min-height: 56px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 2px solid #b71c1c;
+      width: 100%;
+    }
+
+    .citizen-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .citizen-title-wrap h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .citizen-title-wrap p {
+      font-size: 11px;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-logout-citizen {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 0;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn-logout-citizen:active {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Container */
+    .citizen-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 90px; /* Space for phone navigation bar */
+    }
+
+    /* Search Bar & View Toggle */
+    .search-section {
+      margin-bottom: 16px;
+    }
+
+    .citizen-search-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-family: inherit;
+      border: 1.5px solid #d1d5db;
+      border-radius: 4px;
+      background-color: #ffffff;
+      color: #1f2937;
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .citizen-search-input:focus {
+      border-color: #1a2744;
+      box-shadow: 0 0 0 2px rgba(26, 39, 68, 0.15);
+    }
+
+    .btn-view-toggle {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 10px;
+      background-color: #1a2744;
+      color: #ffffff;
+      border: 1px solid #121c31;
+      border-radius: 0;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-view-toggle:active {
+      background-color: #121c31;
+    }
+
+    /* Summary Bar */
+    .availability-summary-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: #4b5563;
+      padding: 4px 2px 10px;
+      font-weight: 500;
+    }
+
+    /* Hospital Cards */
+    .hospital-card {
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      width: 100%;
+    }
+
+    .hospital-card.card-emergency {
+      border-left: 5px solid #d32f2f;
+      background-color: #fffdfd;
+    }
+
+    .emergency-badge {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .card-header-row {
+      margin-bottom: 8px;
+    }
+
+    .hospital-card-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a2744;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+
+    .hospital-card-meta {
+      font-size: 14px;
+      color: #4b5563;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .facility-pill {
+      background-color: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      border-radius: 2px;
+    }
+
+    /* Bed Availability Progress Bar */
+    .progress-section {
+      margin-top: 14px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background-color: #e5e7eb;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-green {
+      background-color: #388e3c;
+    }
+
+    .progress-orange {
+      background-color: #f57c00;
+    }
+
+    .progress-red {
+      background-color: #d32f2f;
+    }
+
+    .bed-text-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .bed-free-count {
+      color: #1a2744;
+    }
+
+    .bed-percentage-tag {
+      font-size: 13px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .tag-green { background-color: #388e3c; }
+    .tag-orange { background-color: #f57c00; }
+    .tag-red { background-color: #d32f2f; }
+
+    /* Nearest Hospital Highlighting */
+    .btn-nearest-toggle {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 8px;
+      background-color: #0d47a1;
+      color: #ffffff;
+      border: 1px solid #08306b;
+      border-radius: 0;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.2px;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-nearest-toggle:active {
+      background-color: #08306b;
+    }
+
+    .btn-nearest-toggle.active {
+      background-color: #1b5e20;
+      border-color: #144618;
+    }
+
+    .hospital-card.card-nearest {
+      border: 2px solid #0d47a1 !important;
+      box-shadow: 0 4px 14px rgba(13, 71, 161, 0.22);
+      position: relative;
+    }
+
+    .nearest-banner {
+      background-color: #e3f2fd;
+      color: #0d47a1;
+      border: 1.5px solid #90caf9;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .distance-tag {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0d47a1;
+      background-color: #e3f2fd;
+      padding: 2px 7px;
+      border-radius: 3px;
+      border: 1px solid #bbdefb;
+    }
+
+    /* Map View Container */
+    #citizen-map-view {
+      display: none;
+      width: 100%;
+      height: calc(100vh - 220px);
+      min-height: 420px;
+      background-color: #e5e7eb;
+      border: 1.5px solid #d1d5db;
+      border-radius: 4px;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    /* Empty state */
+    .empty-search-state {
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 32px 16px;
+      text-align: center;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. HEADER: Compact Gov Header with Logout -->
+  <header class="citizen-header">
+    <div class="citizen-title-wrap">
+      <div style="width: 32px; height: 32px; background: #ffffff; color: #1a2744; font-weight: 700; font-size: 10px; display: flex; align-items: center; justify-content: center; line-height: 1; border-radius: 3px;">
+        WB<br>GOV
+      </div>
+      <div>
+        <h1>WB MedCare — Hospital Availability</h1>
+        <p>Public Health Information Directory</p>
+      </div>
+    </div>
+    <button id="btn-logout" class="btn-logout-citizen" aria-label="Logout">
+      Logout
+    </button>
+  </header>
+
+  <!-- Main Mobile Container -->
+  <main class="citizen-container">
+
+    <!-- 2. SEARCH BAR & VIEW TOGGLE BUTTONS -->
+    <section class="search-section">
+      <input 
+        type="search" 
+        id="citizen-search" 
+        class="citizen-search-input" 
+        placeholder="Search by district or hospital name"
+        aria-label="Search by district or hospital name"
+      >
+      <!-- 4. MAP TOGGLE BUTTON (Min 44px height) -->
+      <button id="btn-toggle-view" class="btn-view-toggle">
+        <span>&#x1F5FA;&#xFE0F;</span>
+        <span id="toggle-btn-label">Switch to Map View</span>
+      </button>
+
+      <!-- 6. FIND NEAREST HOSPITAL WITH FREE BEDS BUTTON -->
+      <button id="btn-nearest-hospital" class="btn-nearest-toggle">
+        <span>📍</span>
+        <span id="nearest-btn-label">Find Nearest Hospital with Free Beds</span>
+      </button>
+    </section>
+
+    <!-- Availability Status Summary -->
+    <div class="availability-summary-bar">
+      <span id="hospital-count-label">Loading real-time availability...</span>
+      <span id="sort-mode-indicator" style="font-size: 12px; color: #6b7280;">Sorted by Least Free Beds</span>
+    </div>
+
+    <!-- 3. HOSPITAL CARDS LIST -->
+    <section id="citizen-card-list" aria-label="Hospital Availability Directory">
+      <div style="text-align: center; padding: 40px 16px; color: #6b7280;">
+        Connecting to West Bengal Public Health Database...
+      </div>
+    </section>
+
+    <!-- 4. GOOGLE MAP VIEW (Initially hidden) -->
+    <section id="citizen-map-view" aria-label="Hospital Map View">
+      <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #6b7280; font-size: 14px;">
+        Loading West Bengal Map...
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ES Module Application Logic -->
+  <script type="module">
+    // Security check at top of page JavaScript: if role is not "user" -> immediately redirect to index.html
+    const currentRole = localStorage.getItem('role') || localStorage.getItem('userRole');
+    if (currentRole !== 'user') {
+      window.location.replace('index.html');
+    }
+
+    import { db } from "./firebase-config.js";
+    import { HOSPITALS_DATA } from "./hospitals-data.js";
+    import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // State
+    let hospitals = [];
+    let isMapView = false;
+    let googleMap = null;
+    let mapMarkers = [];
+    let userMarker = null;
+    let infoWindow = null;
+    let userLocation = null;
+    let isNearestActive = false;
+
+    // Logout Handler: Clears localStorage completely and redirects to index.html
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    });
+
+    /**
+     * Haversine formula for distance calculation between two lat/lng points in kilometers
+     */
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth radius in km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    /**
+     * Map toggle handler (Switch between List View and Google Maps View)
+     */
+    const toggleBtn = document.getElementById('btn-toggle-view');
+    const toggleLabel = document.getElementById('toggle-btn-label');
+    const cardListSection = document.getElementById('citizen-card-list');
+    const mapViewSection = document.getElementById('citizen-map-view');
+
+    toggleBtn.addEventListener('click', async () => {
+      isMapView = !isMapView;
+      if (isMapView) {
+        cardListSection.style.display = 'none';
+        mapViewSection.style.display = 'block';
+        toggleLabel.textContent = 'Switch to List View';
+        toggleBtn.querySelector('span:first-child').textContent = '📋';
+
+        if (!googleMap) {
+          await initCitizenMap();
+        } else {
+          // Trigger resize so map renders smoothly after display change
+          google.maps.event.trigger(googleMap, 'resize');
+          if (userLocation) {
+            googleMap.setCenter({ lat: userLocation.lat, lng: userLocation.lng });
+          } else {
+            googleMap.setCenter({ lat: 23.6850, lng: 88.3522 });
+          }
+          updateCitizenMapMarkers();
+        }
+      } else {
+        mapViewSection.style.display = 'none';
+        cardListSection.style.display = 'block';
+        toggleLabel.textContent = 'Switch to Map View';
+        toggleBtn.querySelector('span:first-child').textContent = '🗺️';
+      }
+    });
+
+    /**
+     * 6. Find Nearest Hospital with Free Beds Geolocation Handler
+     */
+    const nearestBtn = document.getElementById('btn-nearest-hospital');
+    const nearestBtnLabel = document.getElementById('nearest-btn-label');
+    const sortIndicator = document.getElementById('sort-mode-indicator');
+
+    nearestBtn.addEventListener('click', () => {
+      if (isNearestActive) {
+        // Toggle OFF
+        isNearestActive = false;
+        nearestBtn.classList.remove('active');
+        nearestBtnLabel.textContent = 'Find Nearest Hospital with Free Beds';
+        nearestBtn.querySelector('span:first-child').textContent = '📍';
+        sortIndicator.textContent = 'Sorted by Least Free Beds';
+        renderHospitalCards();
+        if (isMapView && googleMap) updateCitizenMapMarkers();
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        return;
+      }
+
+      nearestBtnLabel.textContent = 'Detecting your location...';
+      nearestBtn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          isNearestActive = true;
+          nearestBtn.disabled = false;
+          nearestBtn.classList.add('active');
+          nearestBtn.querySelector('span:first-child').textContent = '✓';
+          nearestBtnLabel.textContent = 'Nearest Active (Click to reset)';
+          sortIndicator.textContent = 'Sorted by Nearest Available';
+
+          renderHospitalCards();
+
+          if (isMapView && googleMap) {
+            updateCitizenMapMarkers();
+            googleMap.setCenter({ lat: userLocation.lat, lng: userLocation.lng });
+            googleMap.setZoom(10);
+          }
+        },
+        (error) => {
+          nearestBtn.disabled = false;
+          nearestBtnLabel.textContent = 'Find Nearest Hospital with Free Beds';
+          console.warn("Geolocation warning:", error);
+          alert("Unable to access current location. Please verify location permissions in your browser or search by district.");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
+    });
+
+    /**
+     * Search filtering in real time
+     */
+    document.getElementById('citizen-search').addEventListener('input', () => {
+      renderHospitalCards();
+      if (isMapView && googleMap) {
+        updateCitizenMapMarkers();
+      }
+    });
+
+    /**
+     * Helper to retrieve MAPS_API_KEY from window.ENV
+     */
+    function getMapsApiKey() {
+      if (typeof window !== "undefined" && window.ENV && window.ENV.MAPS_API_KEY) {
+        return window.ENV.MAPS_API_KEY.trim();
+      }
+      if (typeof process !== "undefined" && process.env?.MAPS_API_KEY) {
+        return process.env.MAPS_API_KEY.trim();
+      }
+      return "";
+    }
+
+    /**
+     * Load Google Maps Script
+     */
+    function loadGoogleMapsApi(apiKey) {
+      return new Promise((resolve, reject) => {
+        if (window.google && window.google.maps && window.google.maps.Map) {
+          return resolve(window.google.maps);
+        }
+
+        const callbackName = "initMap";
+        window[callbackName] = () => {
+          resolve(window.google.maps);
+        };
+
+        const script = document.createElement("script");
+        const keyParam = apiKey ? `key=${apiKey}&` : "";
+        script.src = `https://maps.googleapis.com/maps/api/js?${keyParam}callback=${callbackName}`;
+        script.async = true;
+        script.defer = true;
+        script.onerror = (err) => {
+          reject(new Error("Failed to load Google Maps: " + err));
+        };
+        document.head.appendChild(script);
+      });
+    }
+
+    /**
+     * Initialize Google Maps View
+     */
+    async function initCitizenMap() {
+      try {
+        const apiKey = await getMapsApiKey();
+        await loadGoogleMapsApi(apiKey);
+
+        googleMap = new google.maps.Map(mapViewSection, {
+          center: { lat: 23.6850, lng: 88.3522 },
+          zoom: 7,
+          mapTypeId: "roadmap",
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: true,
+          zoomControl: true
+        });
+
+        infoWindow = new google.maps.InfoWindow();
+        updateCitizenMapMarkers();
+      } catch (err) {
+        console.warn("Google Maps load notice:", err.message);
+        renderCitizenMapFallback();
+      }
+    }
+
+    /**
+     * Marker SVG Generator matching admin colors
+     */
+    function getCitizenMarkerIcon(colorHex, isEmergency) {
+      if (isEmergency) {
+        const svgBlinking = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">
+            <circle cx="19" cy="19" r="17" fill="%23d32f2f" opacity="0.3">
+              <animate attributeName="r" values="8;18;8" dur="1s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;0.1;0.9" dur="1s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="19" cy="19" r="10" fill="%23d32f2f" stroke="%23ffffff" stroke-width="2"/>
+            <path d="M17 12h4v14h-4zM12 17h14v4h-14z" fill="%23ffffff"/>
+          </svg>
+        `.trim();
+        return {
+          url: `data:image/svg+xml;utf-8,${encodeURIComponent(svgBlinking)}`,
+          scaledSize: new google.maps.Size(38, 38),
+          anchor: new google.maps.Point(19, 19)
+        };
+      }
+
+      const cleanColor = colorHex.replace("#", "%23");
+      const svgPin = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
+          <path d="M16 0C7.2 0 0 7.2 0 16c0 11.2 16 26 16 26s16-14.8 16-26c0-8.8-7.2-16-16-16z" fill="${cleanColor}" stroke="%23ffffff" stroke-width="1.8"/>
+          <circle cx="16" cy="15" r="7.5" fill="%23ffffff"/>
+          <path d="M14.5 10h3v10h-3zM10.5 13.5h11v3h-11z" fill="${cleanColor}"/>
+        </svg>
+      `.trim();
+      return {
+        url: `data:image/svg+xml;utf-8,${encodeURIComponent(svgPin)}`,
+        scaledSize: new google.maps.Size(32, 42),
+        anchor: new google.maps.Point(16, 42)
+      };
+    }
+
+    /**
+     * Update markers on citizen map based on search filter
+     */
+    function updateCitizenMapMarkers() {
+      if (!googleMap) return;
+
+      // Clear existing markers
+      mapMarkers.forEach(m => m.setMap(null));
+      mapMarkers = [];
+
+      // If user location is active, plot a distinct user marker
+      if (userLocation) {
+        userMarker = new google.maps.Marker({
+          position: { lat: userLocation.lat, lng: userLocation.lng },
+          map: googleMap,
+          title: "Your Location",
+          zIndex: 999,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 9,
+            fillColor: "#0d47a1",
+            fillOpacity: 1,
+            strokeColor: "#ffffff",
+            strokeWeight: 2.5
+          }
+        });
+        mapMarkers.push(userMarker);
+      }
+
+      const filtered = getFilteredAndSortedHospitals();
+
+      filtered.forEach(h => {
+        const total = Number(h.totalBeds) || 1;
+        const occupied = Number(h.occupiedBeds) || 0;
+        const free = Math.max(0, total - occupied);
+        const freeRatio = free / total;
+
+        let color = "#388e3c"; // Green: > 40% free
+        if (freeRatio < 0.2) {
+          color = "#d32f2f"; // Red: < 20% free
+        } else if (freeRatio <= 0.4) {
+          color = "#f57c00"; // Orange: 20% - 40% free
+        }
+
+        const icon = getCitizenMarkerIcon(color, h.emergencyDeclared);
+        const marker = new google.maps.Marker({
+          position: { lat: Number(h.lat), lng: Number(h.lng) },
+          map: googleMap,
+          title: h.name,
+          icon: icon
+        });
+
+        // Simple citizen popup: hospital name, beds free, emergency status, distance
+        marker.addListener('click', () => {
+          const distanceHtml = (h.distanceKm !== undefined) 
+            ? `<div style="font-size: 12.5px; color: #0d47a1; font-weight: 700; margin-bottom: 6px;">📍 ${h.distanceKm.toFixed(1)} km away from you</div>`
+            : '';
+
+          const content = `
+            <div style="font-family: sans-serif; font-size: 14px; min-width: 220px; color: #1f2937; padding: 4px;">
+              <div style="font-weight: 700; font-size: 15px; color: #1a2744; margin-bottom: 2px;">${h.name}</div>
+              <div style="font-size: 12px; color: #6b7280; margin-bottom: 6px;">${h.district} &bull; ${h.type}</div>
+              ${distanceHtml}
+              <div style="padding: 6px 8px; background-color: #f3f4f6; margin-bottom: 8px; font-weight: 600;">
+                Beds Free: <span style="color: ${color}; font-weight: 700;">${free}</span> out of ${total} total
+              </div>
+              <div>
+                <strong>Status:</strong> ${h.emergencyDeclared ? '<span style="color: #d32f2f; font-weight: 700;">🚨 EMERGENCY ACTIVE</span>' : '<span style="color: #388e3c; font-weight: 600;">Standard Operations</span>'}
+              </div>
+            </div>
+          `;
+          infoWindow.setContent(content);
+          infoWindow.open(googleMap, marker);
+        });
+
+        mapMarkers.push(marker);
+      });
+    }
+
+    /**
+     * Map fallback for offline or unconfigured API keys
+     */
+    function renderCitizenMapFallback() {
+      const filtered = getFilteredAndSortedHospitals();
+      mapViewSection.innerHTML = `
+        <div style="padding: 16px; background-color: #1a2744; color: #ffffff; font-size: 14px; font-weight: 700;">
+          West Bengal Geographic Grid (${filtered.length} Facilities)
+        </div>
+        <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+          <p style="font-size: 15px; color: #4b5563; margin-bottom: 12px;">
+            Interactive map view is ready. Add <code>MAPS_API_KEY</code> in <code>.env</code> for live Google Maps tiles.
+          </p>
+          <div style="font-size: 14px; color: #1a2744; font-weight: 600;">
+            ${filtered.map(h => `• ${h.name} (${h.district}): ${Math.max(0, h.totalBeds - h.occupiedBeds)} Free Beds`).slice(0, 5).join('<br>')}
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Returns filtered hospitals sorted by least beds available first (most critical at top)
+     * OR sorted by nearest distance when nearest mode is active
+     */
+    function getFilteredAndSortedHospitals() {
+      const search = (document.getElementById('citizen-search').value || '').toLowerCase().trim();
+
+      let list = hospitals.filter(h => {
+        if (!search) return true;
+        return h.name.toLowerCase().includes(search) || h.district.toLowerCase().includes(search);
+      });
+
+      // Compute distance for all filtered items if user location is available
+      if (userLocation) {
+        list.forEach(h => {
+          h.distanceKm = calculateDistance(userLocation.lat, userLocation.lng, Number(h.lat), Number(h.lng));
+        });
+      }
+
+      // If nearest filter is active: filter for freeBeds > 0 and sort closest first
+      if (isNearestActive && userLocation) {
+        list = list.filter(h => {
+          const total = Number(h.totalBeds) || 0;
+          const occupied = Number(h.occupiedBeds) || 0;
+          return (total - occupied) > 0;
+        });
+
+        return list.sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
+      }
+
+      // Default sort: least beds available at top
+      return list.sort((a, b) => {
+        const freeA = Math.max(0, Number(a.totalBeds) - Number(a.occupiedBeds));
+        const freeB = Math.max(0, Number(b.totalBeds) - Number(b.occupiedBeds));
+        if (freeA === freeB) {
+          const ratioA = freeA / (Number(a.totalBeds) || 1);
+          const ratioB = freeB / (Number(b.totalBeds) || 1);
+          return ratioA - ratioB;
+        }
+        return freeA - freeB;
+      });
+    }
+
+    /**
+     * 3. Renders Hospital Cards List
+     */
+    function renderHospitalCards() {
+      const filtered = getFilteredAndSortedHospitals();
+      const container = document.getElementById('citizen-card-list');
+      const countLabel = document.getElementById('hospital-count-label');
+
+      countLabel.textContent = `Showing ${filtered.length} of ${hospitals.length} Hospitals`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-search-state">
+            <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+            <div style="font-size: 17px; font-weight: 700; color: #1a2744; margin-bottom: 4px;">No matching hospitals found</div>
+            <div style="font-size: 14px;">Try searching for a different district or reset filters.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      filtered.forEach((h, index) => {
+        const total = Number(h.totalBeds) || 0;
+        const occupied = Number(h.occupiedBeds) || 0;
+        const free = Math.max(0, total - occupied);
+        const freePercentage = total > 0 ? (free / total) * 100 : 0;
+        const isNearestCard = isNearestActive && index === 0;
+
+        // Bed availability coloring rules
+        let progressClass = 'progress-green';
+        let tagClass = 'tag-green';
+        let statusText = 'Adequate Beds';
+
+        if (freePercentage < 20) {
+          progressClass = 'progress-red';
+          tagClass = 'tag-red';
+          statusText = 'Critical (< 20% Free)';
+        } else if (freePercentage <= 40) {
+          progressClass = 'progress-orange';
+          tagClass = 'tag-orange';
+          statusText = 'Moderate (20-40% Free)';
+        } else {
+          progressClass = 'progress-green';
+          tagClass = 'tag-green';
+          statusText = 'Available (> 40% Free)';
+        }
+
+        const card = document.createElement('article');
+        card.className = `hospital-card ${h.emergencyDeclared ? 'card-emergency' : ''} ${isNearestCard ? 'card-nearest' : ''}`;
+
+        card.innerHTML = `
+          ${isNearestCard ? `
+            <div class="nearest-banner">
+              <span>📍</span>
+              <span><strong>Nearest to you: ${h.distanceKm.toFixed(1)} km away</strong> &bull; ${free} Beds Free</span>
+            </div>
+          ` : ''}
+
+          ${h.emergencyDeclared ? `
+            <div class="emergency-badge">
+              <span>&#x1F6A8;</span>
+              <span>EMERGENCY — Limited Capacity</span>
+            </div>
+          ` : ''}
+
+          <div class="card-header-row">
+            <h2 class="hospital-card-name">${h.name}</h2>
+            <div class="hospital-card-meta">
+              <span><strong>${h.district}</strong> District</span>
+              <span>&bull;</span>
+              <span class="facility-pill">${h.type}</span>
+              ${h.distanceKm !== undefined ? `
+                <span>&bull;</span>
+                <span class="distance-tag">📍 ${h.distanceKm.toFixed(1)} km</span>
+              ` : ''}
+            </div>
+          </div>
+
+          <div class="progress-section">
+            <div class="progress-track" aria-hidden="true">
+              <div 
+                class="progress-fill ${progressClass}" 
+                style="width: ${Math.max(5, Math.min(100, freePercentage))}%;"
+              ></div>
+            </div>
+
+            <div class="bed-text-row">
+              <span class="bed-free-count">
+                ${free} beds free <span style="font-weight: 400; color: #6b7280;">out of ${total} total</span>
+              </span>
+              <span class="bed-percentage-tag ${tagClass}">
+                ${freePercentage.toFixed(0)}% Free
+              </span>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    /**
+     * Real-time Firestore sync using onSnapshot
+     */
+    function initCitizenRealtimeData() {
+      onSnapshot(collection(db, "hospitals"), (snapshot) => {
+        let list = [];
+        if (!snapshot.empty) {
+          snapshot.forEach(docSnap => {
+            list.push({ id: docSnap.id, ...docSnap.data() });
+          });
+        } else {
+          list = [...HOSPITALS_DATA];
+        }
+
+        hospitals = list;
+        renderHospitalCards();
+
+        if (isMapView && googleMap) {
+          updateCitizenMapMarkers();
+        }
+      }, (err) => {
+        console.warn("Citizen Firestore listener notice:", err);
+        hospitals = [...HOSPITALS_DATA];
+        renderHospitalCards();
+      });
+    }
+
+    // Initialize real-time synchronization on page open
+    initCitizenRealtimeData();
+  </script>
+</body>
+</html>
