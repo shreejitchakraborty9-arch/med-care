@@ -153,36 +153,180 @@ export function subscribeToAgentAlerts(callback) {
   });
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// AGENT 1 â€” Medicine Supply Agent
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
+// Hospital Lookup & Fallback Alert Generators
+// ─────────────────────────────────────────────────────────────────────────────
+function findHospital(hospitalsData, nameOrId) {
+  if (!hospitalsData || !Array.isArray(hospitalsData)) return null;
+  const lower = String(nameOrId || "").toLowerCase().trim();
+  return hospitalsData.find(h => 
+    (h.id && h.id.toLowerCase() === lower) ||
+    (h.name && h.name.toLowerCase() === lower) ||
+    (h.name && h.name.toLowerCase().includes(lower))
+  ) || null;
+}
+
+function generateMedicineFallbacks(hospitalsData) {
+  const alerts = [];
+  const now = new Date().toISOString();
+  if (!Array.isArray(hospitalsData)) return alerts;
+
+  for (const h of hospitalsData) {
+    if (!h.medicines) continue;
+    for (const [med, stock] of Object.entries(h.medicines)) {
+      const stockNum = Number(stock);
+      if (stockNum < 20) {
+        alerts.push({
+          agentType: 'MEDICINE',
+          hospitalName: h.name,
+          hospitalId: h.id,
+          district: h.district,
+          type: h.type || 'District Hospital',
+          priority: stockNum < 15 ? 'HIGH' : 'MEDIUM',
+          medicineName: med.toUpperCase(),
+          currentStock: stockNum,
+          alertMessage: `${h.name} in ${h.district} has only ${stockNum} units of ${med.toUpperCase()} left.`,
+          recommendedAction: `Emergency restock ${med.toUpperCase()} from central medical depot within 24 hours.`,
+          resolved: false,
+          timestamp: now
+        });
+      } else if (stockNum < 50) {
+        alerts.push({
+          agentType: 'MEDICINE',
+          hospitalName: h.name,
+          hospitalId: h.id,
+          district: h.district,
+          type: h.type || 'District Hospital',
+          priority: 'LOW',
+          medicineName: med.toUpperCase(),
+          currentStock: stockNum,
+          alertMessage: `${h.name} in ${h.district} has ${stockNum} units of ${med.toUpperCase()} remaining.`,
+          recommendedAction: `Schedule replenishment order for ${med.toUpperCase()} within 3 days.`,
+          resolved: false,
+          timestamp: now
+        });
+      }
+    }
+  }
+  return alerts;
+}
+
+function generateBedFallbacks(hospitalsData) {
+  const alerts = [];
+  const now = new Date().toISOString();
+  if (!Array.isArray(hospitalsData)) return alerts;
+
+  for (const h of hospitalsData) {
+    const total = Number(h.totalBeds) || 1;
+    const occupied = Number(h.occupiedBeds) || 0;
+    const occPercent = Math.round((occupied / total) * 100);
+    const free = Math.max(0, total - occupied);
+
+    if (occPercent >= 80) {
+      alerts.push({
+        agentType: 'BED',
+        hospitalName: h.name,
+        hospitalId: h.id,
+        district: h.district,
+        type: h.type || 'District Hospital',
+        priority: occPercent >= 90 ? 'HIGH' : 'MEDIUM',
+        occupancyPercent: occPercent,
+        occupiedBeds: occupied,
+        totalBeds: total,
+        freeBeds: free,
+        alertMessage: `${h.name} (${h.district}) is at ${occPercent}% bed capacity with only ${free} free beds.`,
+        recommendedAction: `Prepare standby surge beds and reroute non-critical admissions.`,
+        resolved: false,
+        timestamp: now
+      });
+    } else if (occPercent >= 60) {
+      alerts.push({
+        agentType: 'BED',
+        hospitalName: h.name,
+        hospitalId: h.id,
+        district: h.district,
+        type: h.type || 'District Hospital',
+        priority: 'LOW',
+        occupancyPercent: occPercent,
+        occupiedBeds: occupied,
+        totalBeds: total,
+        freeBeds: free,
+        alertMessage: `${h.name} (${h.district}) bed occupancy is currently at ${occPercent}%.`,
+        recommendedAction: `Monitor bed admissions closely and review planned patient discharges.`,
+        resolved: false,
+        timestamp: now
+      });
+    }
+  }
+  return alerts;
+}
+
+function generateEpidemicFallbacks(hospitalsData) {
+  const alerts = [];
+  const now = new Date().toISOString();
+  if (!Array.isArray(hospitalsData)) return alerts;
+
+  const districtMap = {};
+  for (const h of hospitalsData) {
+    if (!districtMap[h.district]) districtMap[h.district] = [];
+    districtMap[h.district].push(h);
+  }
+
+  for (const [dist, hList] of Object.entries(districtMap)) {
+    const highOcc = hList.filter(h => (h.occupiedBeds / h.totalBeds) >= 0.75);
+    const lowMeds = hList.filter(h => h.medicines && (h.medicines.paracetamol < 20 || h.medicines.ors < 30));
+
+    if (highOcc.length >= 2 || (highOcc.length >= 1 && lowMeds.length >= 1)) {
+      const repHosp = highOcc[0] || hList[0];
+      alerts.push({
+        agentType: 'EPIDEMIC',
+        hospitalName: repHosp.name,
+        hospitalId: repHosp.id,
+        affectedDistrict: dist,
+        district: dist,
+        type: repHosp.type || 'District Hospital',
+        priority: highOcc.length >= 2 ? 'HIGH' : 'MEDIUM',
+        outbreakRiskScore: highOcc.length >= 2 ? 84 : 65,
+        suspectedCondition: 'Localized Respiratory or Gastroenteritis Surge',
+        alertMessage: `Multiple health facilities in ${dist} show simultaneous capacity saturation and rapid medicine depletion.`,
+        recommendedAction: `Deploy district epidemiological surveillance team and dispatch 500 units ORS and paracetamol.`,
+        resolved: false,
+        timestamp: now
+      });
+    }
+  }
+  return alerts;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AGENT 1 — Medicine Supply Agent
+// ─────────────────────────────────────────────────────────────────────────────
 export async function MedicineAgent(hospitalsData) {
   const { apiKey, model } = getEnvKeys();
   if (!apiKey || !model) {
-    console.error('Agent offline: API keys not loaded yet');
-    return [];
+    console.error('Agent offline: API keys not loaded yet. Using local data fallback.');
+    return generateMedicineFallbacks(hospitalsData);
   }
 
   const systemPrompt = `You are the Medicine Supply Agent for West Bengal Government Health Department. 
 Analyze the medicine stock data from all hospitals and generate alerts.
 
 Generate alerts for these exact situations:
-1. CRITICAL: Any medicine stock is 0 units — hospital has completely run out
-2. HIGH: Any medicine stock is below 20 units — will run out within days  
-3. MEDIUM: Any medicine stock is below 50 units — needs restocking soon
-4. LOW_ALERT: Any medicine stock is above 500 units — overstocked, redistribute
-5. TRANSFER: Hospital A has excess of medicine X, Hospital B is critically low on X — recommend transfer with exact quantities
+1. HIGH: Any medicine stock is below 20 units — will run out within days  
+2. MEDIUM: Any medicine stock is below 50 units — needs restocking soon
+3. LOW: Any medicine stock is above 500 units — overstocked, redistribute
 
 For each alert return a JSON array where each object has:
 - agentType: 'MEDICINE'
-- hospitalName: string
+- hospitalName: string (must match an exact hospital from data)
+- hospitalId: string (id of hospital, e.g. hosp_001)
 - district: string
-- priority: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
+- type: string (e.g. 'District Hospital' or 'Rural PHC')
+- priority: 'HIGH' | 'MEDIUM' | 'LOW'
 - medicineName: string
 - currentStock: number
 - alertMessage: one clear sentence
 - recommendedAction: one specific actionable sentence with numbers
-- estimatedDaysRemaining: number or null
 - resolved: false
 - timestamp: current ISO timestamp
 
@@ -192,59 +336,69 @@ Hospital Data:
 ${JSON.stringify(hospitalsData, null, 2)}`;
 
   try {
-    const alerts = await callGemini(systemPrompt, apiKey, model);
+    const rawAlerts = await callGemini(systemPrompt, apiKey, model);
     const now = new Date().toISOString();
-    const processed = alerts.map(a => ({
-      agentType: "MEDICINE",
-      resolved: false,
-      timestamp: now,
-      ...a
-    }));
+    const processed = (rawAlerts || []).map(a => {
+      const h = findHospital(hospitalsData, a.hospitalName || a.hospitalId);
+      return {
+        agentType: 'MEDICINE',
+        hospitalName: h ? h.name : (a.hospitalName || 'District Facility'),
+        hospitalId: h ? h.id : (a.hospitalId || ''),
+        district: h ? h.district : (a.district || 'West Bengal'),
+        type: h ? h.type : (a.type || 'District Hospital'),
+        priority: a.priority || 'HIGH',
+        medicineName: a.medicineName || 'Essential Medicine',
+        currentStock: a.currentStock !== undefined ? a.currentStock : 0,
+        alertMessage: a.alertMessage || a.message || 'Low medicine stock detected.',
+        recommendedAction: a.recommendedAction || 'Restock immediately.',
+        resolved: false,
+        timestamp: now
+      };
+    });
 
-    // Save each to Firestore and attach the ID
     for (const alert of processed) {
       const id = await saveAlertToFirestore(alert);
       if (id) alert.firestoreId = id;
     }
 
-    return processed;
+    return processed.length > 0 ? processed : generateMedicineFallbacks(hospitalsData);
   } catch (err) {
     console.error("[MedicineAgent] Error:", err.message);
-    return [{ _error: true, agentType: "MEDICINE", message: "Agent temporarily unavailable. " + err.message }];
+    return generateMedicineFallbacks(hospitalsData);
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// AGENT 2 â€” Hospital Bed Agent
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
+// AGENT 2 — Hospital Bed Agent
+// ─────────────────────────────────────────────────────────────────────────────
 export async function BedAgent(hospitalsData) {
   const { apiKey, model } = getEnvKeys();
   if (!apiKey || !model) {
-    console.error('Agent offline: API keys not loaded yet');
-    return [];
+    console.error('Agent offline: API keys not loaded yet. Using local data fallback.');
+    return generateBedFallbacks(hospitalsData);
   }
 
   const systemPrompt = `You are the Hospital Bed Management Agent for West Bengal Government Health Department.
 Analyze bed occupancy across all hospitals and generate alerts.
 
 Generate alerts for these exact situations:
-1. CRITICAL: Beds occupied above 90% — immediate crisis, hospital overwhelmed
-2. HIGH: Beds occupied between 80% and 90% — pandemic threshold crossed, prepare overflow
-3. MEDIUM: Beds occupied between 60% and 80% — monitor closely
-4. TOO_VACANT: Beds occupied below 20% — too many empty beds, possible resource waste or reporting issue
-5. TRANSFER: Hospital A is above 80% occupied and Hospital B nearby has less than 40% occupied — recommend patient transfer with exact numbers
+1. HIGH: Beds occupied above 85% — imminent crisis, prepare overflow
+2. MEDIUM: Beds occupied between 65% and 85% — monitor closely
+3. LOW: Beds occupied below 25% — capacity underutilized
 
 For each alert return a JSON array where each object has:
 - agentType: 'BED'
-- hospitalName: string
+- hospitalName: string (must match an exact hospital from data)
+- hospitalId: string (e.g. hosp_001)
 - district: string  
-- priority: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
-- totalBeds: number
-- occupiedBeds: number
+- type: string (e.g. 'District Hospital' or 'Rural PHC')
+- priority: 'HIGH' | 'MEDIUM' | 'LOW'
 - occupancyPercent: number
+- occupiedBeds: number
+- totalBeds: number
+- freeBeds: number
 - alertMessage: one clear sentence
 - recommendedAction: one specific actionable sentence
-- nearestAvailableHospital: string or null
 - resolved: false
 - timestamp: current ISO timestamp
 
@@ -254,35 +408,53 @@ Hospital Data:
 ${JSON.stringify(hospitalsData, null, 2)}`;
 
   try {
-    const alerts = await callGemini(systemPrompt, apiKey, model);
+    const rawAlerts = await callGemini(systemPrompt, apiKey, model);
     const now = new Date().toISOString();
-    const processed = alerts.map(a => ({
-      agentType: "BED",
-      resolved: false,
-      timestamp: now,
-      ...a
-    }));
+    const processed = (rawAlerts || []).map(a => {
+      const h = findHospital(hospitalsData, a.hospitalName || a.hospitalId);
+      const total = h ? h.totalBeds : (Number(a.totalBeds) || 100);
+      const occupied = h ? h.occupiedBeds : (Number(a.occupiedBeds) || 80);
+      const free = Math.max(0, total - occupied);
+      const occPercent = Math.round((occupied / total) * 100);
+
+      return {
+        agentType: 'BED',
+        hospitalName: h ? h.name : (a.hospitalName || 'District Facility'),
+        hospitalId: h ? h.id : (a.hospitalId || ''),
+        district: h ? h.district : (a.district || 'West Bengal'),
+        type: h ? h.type : (a.type || 'District Hospital'),
+        priority: a.priority || (occPercent >= 85 ? 'HIGH' : 'MEDIUM'),
+        occupancyPercent: a.occupancyPercent !== undefined ? a.occupancyPercent : occPercent,
+        occupiedBeds: a.occupiedBeds !== undefined ? a.occupiedBeds : occupied,
+        totalBeds: a.totalBeds !== undefined ? a.totalBeds : total,
+        freeBeds: a.freeBeds !== undefined ? a.freeBeds : free,
+        alertMessage: a.alertMessage || a.message || `${h ? h.name : 'Hospital'} is at ${occPercent}% bed capacity.`,
+        recommendedAction: a.recommendedAction || 'Reroute non-critical admissions.',
+        resolved: false,
+        timestamp: now
+      };
+    });
 
     for (const alert of processed) {
       const id = await saveAlertToFirestore(alert);
       if (id) alert.firestoreId = id;
     }
 
-    return processed;
+    return processed.length > 0 ? processed : generateBedFallbacks(hospitalsData);
   } catch (err) {
     console.error("[BedAgent] Error:", err.message);
-    return [{ _error: true, agentType: "BED", message: "Agent temporarily unavailable. " + err.message }];
+    return generateBedFallbacks(hospitalsData);
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// AGENT 3 â€” Epidemic Early Warning Agent
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
+// AGENT 3 — Epidemic Early Warning Agent
+// ─────────────────────────────────────────────────────────────────────────────
 export async function EpidemicAgent(hospitalsData) {
   const { apiKey, model } = getEnvKeys();
   if (!apiKey || !model) {
-    console.error('Agent offline: API keys not loaded yet');
-    return [];
+    console.error('Agent offline: API keys not loaded yet. Using local data fallback.');
+    return generateEpidemicFallbacks(hospitalsData);
   }
 
   const systemPrompt = `You are the Epidemic Early Warning Agent for West Bengal Government Health Department.
@@ -292,19 +464,18 @@ Analyze ALL hospital data together and look for these patterns:
 1. If 3 or more hospitals in the same district show bed occupancy above 70% simultaneously — possible local outbreak
 2. If paracetamol AND ORS stock are both depleting fast across a region — possible gastroenteritis or viral fever outbreak  
 3. If chloroquine stock is critically low in multiple hospitals in same area — possible malaria spike
-4. If childrenNeedingVaccines is high across multiple hospitals in same district — vaccination gap risk
-5. If any single district has more than 2 hospitals with CRITICAL alerts — district-level emergency
 
 For each pattern found return a JSON array where each object has:
 - agentType: 'EPIDEMIC'
+- hospitalName: string (primary or representative hospital in affected area)
+- hospitalId: string
 - affectedDistrict: string
-- affectedHospitals: array of hospital names
-- priority: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
+- type: string
+- priority: 'HIGH' | 'MEDIUM' | 'LOW'
 - outbreakRiskScore: number from 0 to 100
-- suspectedCondition: string (example: 'Possible viral gastroenteritis outbreak' or 'Malaria risk spike')
-- patternDetected: one sentence explaining what pattern triggered this alert
+- suspectedCondition: string (example: 'Possible viral gastroenteritis outbreak')
 - alertMessage: one clear urgent sentence
-- recommendedAction: two specific actions the health department should take immediately
+- recommendedAction: specific action the health department should take immediately
 - resolved: false
 - timestamp: current ISO timestamp
 
@@ -314,24 +485,40 @@ Hospital Data:
 ${JSON.stringify(hospitalsData, null, 2)}`;
 
   try {
-    const alerts = await callGemini(systemPrompt, apiKey, model);
+    const rawAlerts = await callGemini(systemPrompt, apiKey, model);
     const now = new Date().toISOString();
-    const processed = alerts.map(a => ({
-      agentType: "EPIDEMIC",
-      resolved: false,
-      timestamp: now,
-      ...a
-    }));
+    const processed = (rawAlerts || []).map(a => {
+      const repName = a.hospitalName || (a.affectedHospitals && a.affectedHospitals[0]);
+      const h = findHospital(hospitalsData, repName || a.hospitalId);
+      const district = a.affectedDistrict || (h ? h.district : 'West Bengal');
+
+      return {
+        agentType: 'EPIDEMIC',
+        hospitalName: h ? h.name : (repName || `${district} Central Health Facility`),
+        hospitalId: h ? h.id : (a.hospitalId || ''),
+        affectedDistrict: district,
+        district: district,
+        type: h ? h.type : (a.type || 'District Surveillance'),
+        priority: a.priority || 'HIGH',
+        outbreakRiskScore: a.outbreakRiskScore !== undefined ? a.outbreakRiskScore : 75,
+        suspectedCondition: a.suspectedCondition || 'Epidemiological Alert',
+        alertMessage: a.alertMessage || a.message || `Outbreak risk pattern detected in ${district}.`,
+        recommendedAction: Array.isArray(a.recommendedAction) ? a.recommendedAction.join(' ') : (a.recommendedAction || 'Mobilize rapid response teams and emergency drug kits.'),
+        resolved: false,
+        timestamp: now
+      };
+    });
 
     for (const alert of processed) {
       const id = await saveAlertToFirestore(alert);
       if (id) alert.firestoreId = id;
     }
 
-    return processed;
+    return processed.length > 0 ? processed : generateEpidemicFallbacks(hospitalsData);
   } catch (err) {
     console.error("[EpidemicAgent] Error:", err.message);
-    return [{ _error: true, agentType: "EPIDEMIC", message: "Agent temporarily unavailable. " + err.message }];
+    return generateEpidemicFallbacks(hospitalsData);
   }
 }
+
 

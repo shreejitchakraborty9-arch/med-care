@@ -1017,10 +1017,35 @@
     .ag-priority-badge.HIGH     { background: #e65100; }
     .ag-priority-badge.MEDIUM   { background: #f57c00; color: #fff; }
     .ag-priority-badge.LOW      { background: #388e3c; }
-    .ag-timestamp {
+    .ag-timestamp, .alert-time {
       font-size: 10px;
       color: #9ca3af;
       margin-left: auto;
+    }
+    .alert-hospital-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+      padding: 6px 8px;
+      background: #f0f4ff;
+      border-radius: 4px;
+    }
+    .alert-hospital-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: #1a2744;
+    }
+    .alert-district {
+      font-size: 12px;
+      color: #666;
+    }
+    .alert-type-badge {
+      font-size: 11px;
+      background: #e8eaf6;
+      color: #3949ab;
+      padding: 2px 6px;
+      border-radius: 3px;
     }
     .ag-card-msg {
       font-size: 12.5px;
@@ -1259,30 +1284,36 @@
       }
     }
 
-    // â”€â”€ Build one alert card element â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Build one alert card element ─────────────────────────
     function buildCard(alert) {
       const type   = (alert.agentType || "").toLowerCase(); // medicine|bed|epidemic
       const isResolved = !!alert.resolved;
 
       const card = document.createElement("div");
-      card.className = `ag-card type-${type}${isResolved ? " resolved-card" : ""}`;
-      card.dataset.id = alert.firestoreId || alert._localId || "";
+      card.className = `ag-card alert-card type-${type}${isResolved ? " resolved-card" : ""}`;
+      const alertId = alert.firestoreId || alert._localId || alert.id || "";
+      card.dataset.id = alertId;
 
       const agentLabel = type === "medicine" ? "MEDICINE" : type === "bed" ? "BED" : "EPIDEMIC";
       const priority   = alert.priority || "MEDIUM";
 
+      // Hospital information fields (PART 2)
+      const hospitalName = alert.hospitalName || "West Bengal Medical Facility";
+      const district     = alert.district || alert.affectedDistrict || "West Bengal";
+      const hospType     = alert.type || (type === "epidemic" ? "Surveillance" : "District Hospital");
+
       // message + action text
-      const msg     = alert.alertMessage || alert.message || alert.suspectedCondition || "â€“";
+      const msg     = alert.alertMessage || alert.message || alert.suspectedCondition || "–";
       const action  = alert.recommendedAction || "";
       const actionTxt = Array.isArray(action) ? action.join(" ") : action;
 
       // resolved footer
       const footerHtml = isResolved
-        ? `<div class="ag-card-footer">
+        ? `<div class="ag-card-footer alert-actions">
              <span class="ag-resolved-label">&#x2713; Resolved by Admin &mdash; ${fmtTime(alert.resolvedAt || "")}</span>
            </div>`
-        : `<div class="ag-card-footer">
-             <button class="ag-done-btn" data-card-id="${card.dataset.id}">&#x2713; DONE</button>
+        : `<div class="ag-card-footer alert-actions">
+             <button class="ag-done-btn btn-done" data-card-id="${alertId}" onclick="markAlertResolved('${alertId}')">&#x2713; DONE</button>
            </div>`;
 
       // extra fields for epidemic
@@ -1294,20 +1325,35 @@
         if (alert.patternDetected) {
           extraHtml += `<div style="font-size:11px;color:#6b7280;margin-bottom:6px;"><em>${alert.patternDetected}</em></div>`;
         }
-        if (alert.affectedHospitals && alert.affectedHospitals.length) {
-          extraHtml += `<div style="font-size:10.5px;color:#4b5563;margin-bottom:6px;">Affected: ${alert.affectedHospitals.join(", ")}</div>`;
-        }
       }
 
       card.innerHTML = `
-        <div class="ag-card-top">
-          <span class="ag-agent-badge ${type}">${agentLabel}</span>
-          <span class="ag-priority-badge ${priority}">${priority}</span>
-          <span class="ag-timestamp">${fmtTime(alert.timestamp)}</span>
+        <!-- TOP ROW -->
+        <div class="ag-card-top alert-card-top">
+          <span class="ag-agent-badge agent-badge ${type}">${agentLabel}</span>
+          <span class="ag-priority-badge priority-badge ${priority}">${priority}</span>
+          <span class="ag-timestamp alert-time">${fmtTime(alert.timestamp)}</span>
         </div>
+
+        <!-- HOSPITAL INFO ROW — THIS IS WHAT WAS MISSING -->
+        <div class="alert-hospital-info">
+          <span class="alert-hospital-icon">🏥</span>
+          <span class="alert-hospital-name">${hospitalName}</span>
+          <span class="alert-district">${district}</span>
+          <span class="alert-type-badge">${hospType}</span>
+        </div>
+
         ${extraHtml}
-        <div class="ag-card-msg">${msg}</div>
-        <div class="ag-card-action"><span>Recommended:</span> ${actionTxt}</div>
+
+        <!-- ALERT MESSAGE -->
+        <div class="ag-card-msg alert-message">${msg}</div>
+
+        <!-- RECOMMENDED ACTION -->
+        <div class="ag-card-action alert-recommended">
+          <em>Recommended:</em> ${actionTxt}
+        </div>
+
+        <!-- DONE BUTTON -->
         ${footerHtml}
       `;
 
@@ -1316,24 +1362,40 @@
       if (doneBtn) {
         doneBtn.addEventListener("click", async () => {
           const cid = doneBtn.dataset.cardId;
-          // Optimistic UI update
           alert.resolved = true;
           alert.resolvedAt = new Date().toISOString();
           card.classList.add("resolved-card");
           card.classList.remove(`type-${type}`);
-          doneBtn.closest(".ag-card-footer").innerHTML =
-            `<span class="ag-resolved-label">&#x2713; Resolved by Admin &mdash; ${fmtTime(alert.resolvedAt)}</span>`;
-          // Move to bottom within list
+          const foot = card.querySelector(".ag-card-footer");
+          if (foot) {
+            foot.innerHTML = `<span class="ag-resolved-label">&#x2713; Resolved by Admin &mdash; ${fmtTime(alert.resolvedAt)}</span>`;
+          }
           card.parentElement?.appendChild(card);
           updateBadges();
           showToast();
-          // Firestore update
           if (cid) await resolveAlertInFirestore(cid);
         });
       }
 
       return card;
     }
+
+    // Expose markAlertResolved globally for onclick handlers
+    window.markAlertResolved = async function(alertId) {
+      if (!alertId) return;
+      const card = document.querySelector(`[data-id="${alertId}"]`);
+      if (card) {
+        card.classList.add("resolved-card");
+        const foot = card.querySelector(".ag-card-footer");
+        if (foot) {
+          foot.innerHTML = `<span class="ag-resolved-label">&#x2713; Resolved by Admin &mdash; ${fmtTime(new Date().toISOString())}</span>`;
+        }
+        card.parentElement?.appendChild(card);
+      }
+      updateBadges();
+      showToast();
+      await resolveAlertInFirestore(alertId);
+    };
 
     // â”€â”€ Render the active tab's alerts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function renderAlertList() {
