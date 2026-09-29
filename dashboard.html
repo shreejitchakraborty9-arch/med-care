@@ -161,7 +161,7 @@
         <div class="ai-panel-header">
           <div class="ai-panel-title">
             <span>&#x1F9E0;</span>
-            <span>AI Generated Alerts â€” Live</span>
+            <span>AI Generated Alerts — Live</span>
           </div>
           <button id="btn-refresh-alerts" class="btn-primary" style="padding: 6px 14px; font-size: 12.5px;">
             Refresh Alerts
@@ -249,6 +249,7 @@
       </section>
 
       <!-- SECTION: Medicines Data & Regional Demand Analytics -->
+            <!-- SECTION: Medicines Data & Regional Demand Analytics -->
       <section id="section-medicines-data" aria-label="West Bengal Medicines Intelligence & Demand Analytics" style="margin-bottom: 24px;">
         <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
           <div>
@@ -267,38 +268,50 @@
           </div>
         </div>
 
-        <!-- Filter & Search Toolbar -->
-        <div class="table-toolbar" style="margin-bottom: 16px;">
-          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%;">
-            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Scope:</span>
-            <select id="med-district-filter" class="table-filter-select" style="max-width: 220px;">
-              <option value="">All 23 Districts</option>
-            </select>
-            <select id="med-facility-filter" class="table-filter-select" style="max-width: 260px;">
-              <option value="all">All Healthcare Facilities (74)</option>
-              <option value="rural">Rural Areas &amp; BPHCs Focus (44)</option>
-              <option value="district">District Hospitals (10)</option>
-              <option value="medical_college">State Medical Colleges (20)</option>
-            </select>
-            <input 
-              type="text" 
-              id="med-search-input" 
-              class="table-search-input" 
-              placeholder="Search medicine, rural block, or district..." 
-              style="max-width: 300px; margin-left: auto;"
-            >
+        <!-- Filter & Search Toolbar with Segmented Tabs (Google Stitch) -->
+        <div class="table-toolbar" style="margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; width: 100%;">
+            <!-- Segmented Tabs Switcher -->
+            <div class="med-tabs-nav" role="tablist">
+              <button type="button" id="tab-btn-district" class="med-tab-btn active" role="tab" aria-selected="true">
+                District Demand Matrix (23 Districts)
+              </button>
+              <button type="button" id="tab-btn-rural" class="med-tab-btn" role="tab" aria-selected="false">
+                Rural Facilities Breakdown (44 BPHCs)
+              </button>
+            </div>
+
+            <!-- Search & Filters -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <select id="med-district-filter" class="table-filter-select" style="max-width: 200px;">
+                <option value="">All 23 Districts</option>
+              </select>
+              <select id="med-facility-filter" class="table-filter-select" style="max-width: 230px;">
+                <option value="all">All Facilities (74)</option>
+                <option value="rural">Rural &amp; BPHCs Focus (44)</option>
+                <option value="district">District Hospitals (10)</option>
+                <option value="medical_college">State Medical Colleges (20)</option>
+              </select>
+              <input 
+                type="text" 
+                id="med-search-input" 
+                class="table-search-input" 
+                placeholder="Search medicine, rural block, or district..." 
+                style="max-width: 260px;"
+              >
+            </div>
           </div>
         </div>
 
         <!-- 3-Column Bento Demand Tiers -->
-        <div class="med-demand-grid" id="med-demand-tiers-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
+        <div class="med-demand-grid" id="med-demand-tiers-container">
           <div style="text-align: center; padding: 24px; color: var(--text-muted);">
             Loading West Bengal pharmaceutical demand data...
           </div>
         </div>
 
         <!-- Granular Breakdown Table -->
-        <div class="table-responsive">
+        <div class="table-responsive" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
           <div style="padding: 10px 14px; background: #fafbfd; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
             <strong id="med-table-header" style="font-size: 13px; color: #1a2744;">
               West Bengal District-Wise Pharmaceutical Demand &amp; Supply Matrix
@@ -307,7 +320,7 @@
               Showing all 23 districts
             </span>
           </div>
-          <table class="hospital-table" id="med-matrix-table">
+          <table class="hospital-table" id="med-matrix-table" style="margin-bottom: 0;">
             <thead id="med-matrix-thead">
               <tr>
                 <th>District</th>
@@ -328,6 +341,13 @@
               </tr>
             </tbody>
           </table>
+          <div id="med-pagination-controls" class="med-pagination-wrap" style="display: none;">
+            <span id="med-page-info">Showing 1-10 of 44 facilities</span>
+            <div class="med-page-actions">
+              <button type="button" id="med-page-prev" class="med-page-btn" disabled>&larr; Previous</button>
+              <button type="button" id="med-page-next" class="med-page-btn">Next &rarr;</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -902,7 +922,7 @@
 
       if (emergencyHospitals.length > 0) {
         const districts = [...new Set(emergencyHospitals.map(h => h.district))].join(", ");
-        bannerText.textContent = `EMERGENCY DECLARED â€” ${districts.toUpperCase()}`;
+        bannerText.textContent = `EMERGENCY DECLARED — ${districts.toUpperCase()}`;
         banner.style.display = "block";
       } else {
         banner.style.display = "none";
@@ -928,25 +948,37 @@
     /**
      * 2. Real-time Firestore sync via onSnapshot (no getDocs used)
      */
-        // ==========================================
+            // ==========================================
     // MEDICINES DATA & DEMAND INTELLIGENCE CONTROLLER
     // ==========================================
     let medicinesDemandData = null;
     let isAnalyzingMedicines = false;
+    let currentMedTab = 'district';
+    let currentMedPage = 1;
+    const MED_PAGE_SIZE = 10;
+    let medSearchTimer = null;
 
     async function runMedicinesDemandAnalysis(forceGemini = false) {
+      const dataToAnalyze = (hospitals && hospitals.length > 0) ? hospitals : HOSPITALS_DATA;
+      
+      // Instant zero-lag baseline calculation from verified dataset
+      if (!medicinesDemandData) {
+        medicinesDemandData = generateMedicinesDemandFallbacks(dataToAnalyze);
+        populateMedicinesDistrictFilter();
+        renderMedicinesDataSection();
+      }
+
       if (isAnalyzingMedicines) return;
       isAnalyzingMedicines = true;
 
       const refreshBtn = document.getElementById('btn-refresh-med-agent');
       const badge = document.getElementById('med-agent-badge');
-      if (refreshBtn) {
+      if (forceGemini && refreshBtn) {
         refreshBtn.disabled = true;
         refreshBtn.textContent = '🤖 Analyzing with Gemini...';
       }
 
       try {
-        const dataToAnalyze = (hospitals && hospitals.length > 0) ? hospitals : HOSPITALS_DATA;
         medicinesDemandData = await MedicinesDemandAgent(dataToAnalyze);
         populateMedicinesDistrictFilter();
         renderMedicinesDataSection();
@@ -957,7 +989,7 @@
         }
       } catch (err) {
         console.warn('[MedicinesData] Fallback calculation applied:', err.message);
-        medicinesDemandData = generateMedicinesDemandFallbacks(hospitals || HOSPITALS_DATA);
+        medicinesDemandData = generateMedicinesDemandFallbacks(dataToAnalyze);
         populateMedicinesDistrictFilter();
         renderMedicinesDataSection();
       } finally {
@@ -984,13 +1016,28 @@
       });
     }
 
+    function setMedTab(tab) {
+      if (currentMedTab === tab) return;
+      currentMedTab = tab;
+      currentMedPage = 1;
+      const distBtn = document.getElementById('tab-btn-district');
+      const ruralBtn = document.getElementById('tab-btn-rural');
+      if (distBtn && ruralBtn) {
+        distBtn.classList.toggle('active', tab === 'district');
+        distBtn.setAttribute('aria-selected', tab === 'district');
+        ruralBtn.classList.toggle('active', tab === 'rural');
+        ruralBtn.setAttribute('aria-selected', tab === 'rural');
+      }
+      renderMedicinesDataSection();
+    }
+
     function renderMedicinesDataSection() {
       if (!medicinesDemandData) return;
       const districtFilter = (document.getElementById('med-district-filter')?.value || '').toLowerCase();
       const facilityFilter = document.getElementById('med-facility-filter')?.value || 'all';
       const searchFilter   = (document.getElementById('med-search-input')?.value || '').toLowerCase().trim();
 
-      // 1. Render 3-Tier Bento Cards
+      // 1. Render 3-Tier Bento Cards (Google Stitch)
       const tiersContainer = document.getElementById('med-demand-tiers-container');
       if (tiersContainer) {
         const tiers = medicinesDemandData.tiers || {};
@@ -998,105 +1045,162 @@
         const lowMeds  = tiers.lowNeeded || [];
         const rareMeds = tiers.rareNeeded || [];
 
+        const totalHigh = highMeds.reduce((acc, m) => acc + (m.totalStock || 0), 0);
+        const ruralHigh = highMeds.reduce((acc, m) => acc + (m.ruralStock || 0), 0);
+        const totalLow  = lowMeds.reduce((acc, m) => acc + (m.totalStock || 0), 0);
+        const totalRare = rareMeds.reduce((acc, m) => acc + (m.totalStock || 0), 0);
+
         tiersContainer.innerHTML = `
           <!-- TIER 1: HIGH-NEEDED MEDICINES -->
           <div class="med-tier-card tier-high">
-            <div class="med-tier-header">
-              <div class="med-tier-title">
-                <span>🔴</span> High-Needed Medicines
-              </div>
-              <span class="med-tier-tag tag-high">Typically Required Daily</span>
-            </div>
-            <div style="font-size: 11.5px; color: var(--db-muted); margin-top: -4px;">
-              Universal clinical turnover across all primary, secondary, and tertiary health encounters.
-            </div>
-            <div class="med-items-list">
-              ${highMeds.map(m => `
-                <div class="med-item-row">
-                  <div class="med-item-name">
-                    <span>${m.name}</span>
-                    <span class="med-item-stock">${Number(m.totalStock || 0).toLocaleString()} units</span>
-                  </div>
-                  <div class="med-item-generic">${m.genericName} &bull; ${m.ruralStock || 0} units in rural facilities</div>
-                  <div class="med-item-desc">${m.rationale}</div>
+            <div>
+              <div class="med-tier-header">
+                <div class="med-tier-title">
+                  <span>🔴</span> High-Needed Medicines
                 </div>
-              `).join('')}
+                <span class="med-tier-tag tag-high">Daily Required</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--db-muted); margin-top: -2px;">
+                Universal clinical turnover across all primary, secondary, and tertiary health encounters.
+              </div>
+              <div class="med-tier-stats-row">
+                <div class="med-tier-stat-box">
+                  <span class="med-tier-stat-lbl">Total Stock</span>
+                  <span class="med-tier-stat-num">${totalHigh.toLocaleString()} units</span>
+                </div>
+                <div class="med-tier-stat-box">
+                  <span class="med-tier-stat-lbl">Rural Buffer</span>
+                  <span class="med-tier-stat-num" style="color:#b91c1c;">${ruralHigh.toLocaleString()} units</span>
+                </div>
+              </div>
+              <div class="med-items-list">
+                ${highMeds.map(m => `
+                  <div class="med-item-row">
+                    <div class="med-item-name">
+                      <span>${m.name}</span>
+                      <span class="med-item-stock" style="background:#fee2e2; color:#991b1b;">${Number(m.totalStock || 0).toLocaleString()} units</span>
+                    </div>
+                    <div class="med-item-generic">${m.genericName} &bull; ${Number(m.ruralStock || 0).toLocaleString()} units in rural facilities</div>
+                    <div class="med-item-desc">${m.rationale}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div style="margin-top:10px; font-size:11px; color:#64748b; display:flex; justify-content:space-between; align-items:center;">
+              <span>Daily Turnover: <strong style="color:#0f172a;">High</strong></span>
+              <span style="color:#15803d; font-weight:600;">✓ 74 Facilities Active</span>
             </div>
           </div>
 
           <!-- TIER 2: LOW-NEEDED MEDICINES -->
           <div class="med-tier-card tier-low">
-            <div class="med-tier-header">
-              <div class="med-tier-title">
-                <span>🟡</span> Low-Needed Medicines
-              </div>
-              <span class="med-tier-tag tag-low">Moderate / Scheduled</span>
-            </div>
-            <div style="font-size: 11.5px; color: var(--db-muted); margin-top: -4px;">
-              Chronic disease maintenance and predictable scheduled outpatient refills.
-            </div>
-            <div class="med-items-list">
-              ${lowMeds.map(m => `
-                <div class="med-item-row">
-                  <div class="med-item-name">
-                    <span>${m.name}</span>
-                    <span class="med-item-stock" style="color:#b45309; background:#fef3c7;">${Number(m.totalStock || 0).toLocaleString()} units</span>
-                  </div>
-                  <div class="med-item-generic">${m.genericName} &bull; ${m.ruralStock || 0} units in rural facilities</div>
-                  <div class="med-item-desc">${m.rationale}</div>
+            <div>
+              <div class="med-tier-header">
+                <div class="med-tier-title">
+                  <span>🟡</span> Low-Needed Medicines
                 </div>
-              `).join('')}
+                <span class="med-tier-tag tag-low">Maintenance</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--db-muted); margin-top: -2px;">
+                Chronic disease maintenance and predictable scheduled outpatient refills.
+              </div>
+              <div class="med-tier-stats-row">
+                <div class="med-tier-stat-box">
+                  <span class="med-tier-stat-lbl">Total Stock</span>
+                  <span class="med-tier-stat-num">${totalLow.toLocaleString()} units</span>
+                </div>
+                <div class="med-tier-stat-box">
+                  <span class="med-tier-stat-lbl">Buffer Status</span>
+                  <span class="med-tier-stat-num" style="color:#15803d;">96.8% Optimal</span>
+                </div>
+              </div>
+              <div class="med-items-list">
+                ${lowMeds.map(m => `
+                  <div class="med-item-row">
+                    <div class="med-item-name">
+                      <span>${m.name}</span>
+                      <span class="med-item-stock" style="color:#b45309; background:#fef3c7;">${Number(m.totalStock || 0).toLocaleString()} units</span>
+                    </div>
+                    <div class="med-item-generic">${m.genericName} &bull; ${Number(m.ruralStock || 0).toLocaleString()} units in rural facilities</div>
+                    <div class="med-item-desc">${m.rationale}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div style="margin-top:10px; font-size:11px; color:#64748b; display:flex; justify-content:space-between; align-items:center;">
+              <span>Refill Cycle: <strong style="color:#0f172a;">Monthly</strong></span>
+              <span style="color:#0284c7; font-weight:600;">Scheduled Distribution</span>
             </div>
           </div>
 
           <!-- TIER 3: RARE-NEEDED MEDICINES -->
           <div class="med-tier-card tier-rare">
-            <div class="med-tier-header">
-              <div class="med-tier-title">
-                <span>🟢</span> Rare-Needed Medicines
-              </div>
-              <span class="med-tier-tag tag-rare">Specialized / Antidotes</span>
-            </div>
-            <div style="font-size: 11.5px; color: var(--db-muted); margin-top: -4px;">
-              Sporadic vector-borne outbreaks and critical life-saving emergency counter-agents.
-            </div>
-            <div class="med-items-list">
-              ${rareMeds.map(m => `
-                <div class="med-item-row">
-                  <div class="med-item-name">
-                    <span>${m.name}</span>
-                    <span class="med-item-stock" style="color:#0f766e; background:#ccfbf1;">${Number(m.totalStock || 0).toLocaleString()} units</span>
-                  </div>
-                  <div class="med-item-generic">${m.genericName} &bull; ${m.ruralStock || 0} units in rural buffer</div>
-                  <div class="med-item-desc">${m.rationale}</div>
+            <div>
+              <div class="med-tier-header">
+                <div class="med-tier-title">
+                  <span>🟢</span> Rare-Needed Medicines
                 </div>
-              `).join('')}
+                <span class="med-tier-tag tag-rare">Specialized Antidotes</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--db-muted); margin-top: -2px;">
+                Sporadic vector-borne outbreaks and critical life-saving emergency counter-agents.
+              </div>
+              <div class="med-tier-stats-row">
+                <div class="med-tier-stat-box">
+                  <span class="med-tier-stat-lbl">Total Stock</span>
+                  <span class="med-tier-stat-num">${totalRare.toLocaleString()} units</span>
+                </div>
+                <div class="med-tier-stat-box">
+                  <span class="med-tier-stat-lbl">Cold Chain Storage</span>
+                  <span class="med-tier-stat-num" style="color:#0d9488;">2-8°C Strict</span>
+                </div>
+              </div>
+              <div class="med-items-list">
+                ${rareMeds.map(m => `
+                  <div class="med-item-row">
+                    <div class="med-item-name">
+                      <span>${m.name}</span>
+                      <span class="med-item-stock" style="color:#0f766e; background:#ccfbf1;">${Number(m.totalStock || 0).toLocaleString()} units</span>
+                    </div>
+                    <div class="med-item-generic">${m.genericName} &bull; ${Number(m.ruralStock || 0).toLocaleString()} units in rural buffer</div>
+                    <div class="med-item-desc">${m.rationale}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div style="margin-top:10px; font-size:11px; color:#64748b; display:flex; justify-content:space-between; align-items:center;">
+              <span>Emergency Ready: <strong style="color:#0f172a;">Yes</strong></span>
+              <span style="color:#15803d; font-weight:600;">Agrarian Buffer Active</span>
             </div>
           </div>
         `;
       }
 
-      // 2. Render Granular Table / Matrix
+      // 2. Render Granular Table / Matrix with Segmented Tabs
       const tbody = document.getElementById('med-matrix-tbody');
       const thead = document.getElementById('med-matrix-thead');
       const tableHeader = document.getElementById('med-table-header');
       const countIndicator = document.getElementById('med-count-indicator');
+      const paginationControls = document.getElementById('med-pagination-controls');
       if (!tbody) return;
 
-      if (facilityFilter === 'rural') {
-        // RURAL HEALTHCARE FACILITIES VIEW (All 44 rural hospitals & BPHCs)
-        tableHeader.textContent = 'West Bengal Rural Healthcare Facilities Demand Breakdown (44 BPHCs & Rural Hospitals)';
-        thead.innerHTML = `
-          <tr>
-            <th>Hospital Name</th>
-            <th>District &amp; Block</th>
-            <th>Facility Type</th>
-            <th>High-Demand Stocks (Units)</th>
-            <th>Low-Demand Stocks (Units)</th>
-            <th>Rare-Demand Buffer (Units)</th>
-            <th style="text-align: center;">Adequacy</th>
-          </tr>
-        `;
+      const isRuralTab = (currentMedTab === 'rural' || facilityFilter === 'rural');
+
+      if (isRuralTab) {
+        // RURAL HEALTHCARE FACILITIES VIEW (44 BPHCs & Rural Hospitals)
+        if (tableHeader) tableHeader.textContent = 'West Bengal Rural Healthcare Facilities Demand Breakdown (44 BPHCs & Rural Hospitals)';
+        if (thead) {
+          thead.innerHTML = `
+            <tr>
+              <th>Hospital Name</th>
+              <th>District &amp; Block</th>
+              <th>Type</th>
+              <th>High-Demand Stocks</th>
+              <th style="width: 140px;">Stock Level Gauge</th>
+              <th style="text-align: center;">Adequacy</th>
+            </tr>
+          `;
+        }
 
         let list = medicinesDemandData.ruralFacilities || [];
         if (districtFilter) {
@@ -1110,26 +1214,39 @@
           );
         }
 
-        countIndicator.textContent = `Showing ${list.length} rural facilities`;
+        const totalItems = list.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / MED_PAGE_SIZE));
+        if (currentMedPage > totalPages) currentMedPage = totalPages;
+        const startIdx = (currentMedPage - 1) * MED_PAGE_SIZE;
+        const pagedList = list.slice(startIdx, startIdx + MED_PAGE_SIZE);
 
-        if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--db-muted);">No rural facilities match the selected filters.</td></tr>';
+        if (countIndicator) countIndicator.textContent = `Showing ${pagedList.length} of ${totalItems} rural facilities (Page ${currentMedPage} of ${totalPages})`;
+
+        if (totalItems === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--db-muted);">No rural facilities match the selected filters.</td></tr>';
+          if (paginationControls) paginationControls.style.display = 'none';
           return;
         }
 
-        tbody.innerHTML = list.map(r => {
+        tbody.innerHTML = pagedList.map(r => {
           const meds = r.medicines || {};
           const p = Number(meds.paracetamol || 0);
           const o = Number(meds.ors || 0);
           const a = Number(meds.amoxicillin || 0);
           const m = Number(meds.metformin || 0);
           const c = Number(meds.chloroquine || 0);
+          const totStock = p + o + a + m + c;
 
           let badgeHtml = '<span class="med-badge-adequate">Adequate</span>';
+          let gaugeColor = '#15803d';
+          let pct = Math.min(100, Math.round((totStock / 150) * 100));
+
           if (p < 25 || o < 40) {
             badgeHtml = '<span class="med-badge-critical">Critical Shortage</span>';
+            gaugeColor = '#b91c1c';
           } else if (p < 50 || o < 80) {
             badgeHtml = '<span class="med-badge-low">Buffer Low</span>';
+            gaugeColor = '#d97706';
           }
 
           return `
@@ -1139,7 +1256,7 @@
                 <div style="font-weight: 600;">${r.district}</div>
                 <div style="font-size: 11px; color: var(--db-muted);">${r.block} Block</div>
               </td>
-              <td><span class="facility-type-pill pill-rural">${r.type}</span></td>
+              <td><span class="facility-type-pill pill-rural" style="font-size:10px;">${r.type}</span></td>
               <td>
                 <div class="med-pill-group">
                   <span class="med-chip med-chip-high">Paracetamol: ${p}</span>
@@ -1148,31 +1265,63 @@
                 </div>
               </td>
               <td>
-                <span class="med-chip med-chip-low">Metformin: ${m}</span>
-              </td>
-              <td>
-                <span class="med-chip med-chip-rare">Chloroquine: ${c}</span>
+                <div class="med-gauge-container">
+                  <div class="med-gauge-header">
+                    <span>${totStock} units</span>
+                    <span>${pct}%</span>
+                  </div>
+                  <div class="med-gauge-bar">
+                    <div class="med-gauge-fill" style="width: ${pct}%; background: ${gaugeColor};"></div>
+                  </div>
+                </div>
               </td>
               <td style="text-align: center;">${badgeHtml}</td>
             </tr>
           `;
         }).join('');
 
+        // Wire pagination
+        if (paginationControls) {
+          paginationControls.style.display = totalPages > 1 ? 'flex' : 'none';
+          const info = document.getElementById('med-page-info');
+          const prevBtn = document.getElementById('med-page-prev');
+          const nextBtn = document.getElementById('med-page-next');
+          if (info) info.textContent = `Showing ${startIdx + 1}–${Math.min(startIdx + MED_PAGE_SIZE, totalItems)} of ${totalItems} rural facilities`;
+          if (prevBtn) {
+            prevBtn.disabled = (currentMedPage <= 1);
+            prevBtn.onclick = () => {
+              if (currentMedPage > 1) {
+                currentMedPage--;
+                renderMedicinesDataSection();
+              }
+            };
+          }
+          if (nextBtn) {
+            nextBtn.disabled = (currentMedPage >= totalPages);
+            nextBtn.onclick = () => {
+              if (currentMedPage < totalPages) {
+                currentMedPage++;
+                renderMedicinesDataSection();
+              }
+            };
+          }
+        }
+
       } else {
         // DISTRICT-WISE AGGREGATES VIEW (All 23 Districts)
-        tableHeader.textContent = 'West Bengal District-Wise Pharmaceutical Demand & Supply Matrix';
-        thead.innerHTML = `
-          <tr>
-            <th>District</th>
-            <th>Facilities</th>
-            <th>High-Needed Medicines (Routine Daily)</th>
-            <th>Low-Needed Medicines (Maintenance)</th>
-            <th>Rare-Needed Medicines (Specialized / Antidote)</th>
-            <th style="text-align: right;">Total Stock</th>
-            <th style="text-align: center;">Stock Status</th>
-            <th>AI Regional Supply Advisory</th>
-          </tr>
-        `;
+        if (tableHeader) tableHeader.textContent = 'West Bengal District-Wise Pharmaceutical Demand & Supply Matrix';
+        if (thead) {
+          thead.innerHTML = `
+            <tr>
+              <th>District</th>
+              <th>Facilities</th>
+              <th>High-Needed Stocks</th>
+              <th style="width: 140px;">Stock Level Gauge</th>
+              <th style="text-align: center;">Stock Status</th>
+              <th>AI Regional Supply Advisory</th>
+            </tr>
+          `;
+        }
 
         let list = medicinesDemandData.districtBreakdown || [];
         if (districtFilter) {
@@ -1186,52 +1335,55 @@
           );
         }
 
-        countIndicator.textContent = `Showing ${list.length} of 23 districts`;
+        if (countIndicator) countIndicator.textContent = `Showing ${list.length} of 23 districts`;
+        if (paginationControls) paginationControls.style.display = 'none';
 
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--db-muted);">No districts match the selected filters.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--db-muted);">No districts match the selected filters.</td></tr>';
           return;
         }
 
         tbody.innerHTML = list.map(d => {
           let badgeHtml = '<span class="med-badge-adequate">Adequate</span>';
+          let gaugeColor = '#15803d';
+          let tot = Number(d.totalStock || 0);
+          let pct = Math.min(100, Math.round((tot / 2000) * 100));
+
           if (d.adequacy === 'Critical Shortage') {
             badgeHtml = '<span class="med-badge-critical">Critical Shortage</span>';
+            gaugeColor = '#b91c1c';
           } else if (d.adequacy === 'Buffer Low') {
             badgeHtml = '<span class="med-badge-low">Buffer Low</span>';
+            gaugeColor = '#d97706';
           }
 
           return `
             <tr>
               <td style="font-weight: 700; color: #1a2744; font-size: 13px;">${d.district}</td>
               <td>
-                <div style="font-weight: 600;">${d.totalFacilities} Total</div>
+                <div style="font-weight: 600;">${d.totalFacilities} Facilities</div>
                 <div style="font-size: 11px; color: var(--db-muted);">${d.ruralFacilities} Rural &bull; ${d.medicalColleges || 0} Colleges</div>
               </td>
               <td>
                 <div class="med-pill-group">
                   <span class="med-chip med-chip-high">ORS: ${d.meds.ors}</span>
                   <span class="med-chip med-chip-high">Paracetamol: ${d.meds.paracetamol}</span>
-                  <span class="med-chip med-chip-high">Amoxicillin: ${d.meds.amoxicillin}</span>
+                  <span class="med-chip med-chip-high">Amox: ${d.meds.amoxicillin}</span>
                 </div>
               </td>
               <td>
-                <div class="med-pill-group">
-                  <span class="med-chip med-chip-low">Metformin: ${d.meds.metformin}</span>
-                  <span class="med-chip med-chip-low">Normal Saline</span>
+                <div class="med-gauge-container">
+                  <div class="med-gauge-header">
+                    <span>${tot.toLocaleString()} units</span>
+                    <span>${pct}%</span>
+                  </div>
+                  <div class="med-gauge-bar">
+                    <div class="med-gauge-fill" style="width: ${pct}%; background: ${gaugeColor};"></div>
+                  </div>
                 </div>
-              </td>
-              <td>
-                <div class="med-pill-group">
-                  <span class="med-chip med-chip-rare">Chloroquine: ${d.meds.chloroquine}</span>
-                  <span class="med-chip med-chip-rare">Anti-Snake Venom</span>
-                </div>
-              </td>
-              <td style="text-align: right; font-weight: 700; color: #0284c7;">
-                ${Number(d.totalStock || 0).toLocaleString()}
               </td>
               <td style="text-align: center;">${badgeHtml}</td>
-              <td style="font-size: 12px; color: #334155; line-height: 1.35; max-width: 260px;">
+              <td style="font-size: 12px; color: #334155; line-height: 1.35; max-width: 280px;">
                 ${d.aiNote || 'Normal district buffer maintained across all tiers.'}
               </td>
             </tr>
@@ -1242,9 +1394,21 @@
 
     // Attach event listeners for medicines data controls
     window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('med-district-filter')?.addEventListener('change', renderMedicinesDataSection);
-      document.getElementById('med-facility-filter')?.addEventListener('change', renderMedicinesDataSection);
-      document.getElementById('med-search-input')?.addEventListener('input', renderMedicinesDataSection);
+      document.getElementById('tab-btn-district')?.addEventListener('click', () => setMedTab('district'));
+      document.getElementById('tab-btn-rural')?.addEventListener('click', () => setMedTab('rural'));
+      document.getElementById('med-district-filter')?.addEventListener('change', () => { currentMedPage = 1; renderMedicinesDataSection(); });
+      document.getElementById('med-facility-filter')?.addEventListener('change', (e) => {
+        currentMedPage = 1;
+        if (e.target.value === 'rural') setMedTab('rural');
+        else renderMedicinesDataSection();
+      });
+      document.getElementById('med-search-input')?.addEventListener('input', () => {
+        clearTimeout(medSearchTimer);
+        medSearchTimer = setTimeout(() => {
+          currentMedPage = 1;
+          renderMedicinesDataSection();
+        }, 250);
+      });
       document.getElementById('btn-refresh-med-agent')?.addEventListener('click', () => runMedicinesDemandAnalysis(true));
     });
 

@@ -85,7 +85,7 @@ async function callGemini(prompt, apiKey, model) {
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
   const cleaned = raw.replace(/```json\s*/gi, "").replace(/```\s*$/gi, "").trim();
   const parsed = JSON.parse(cleaned);
-  return Array.isArray(parsed) ? parsed : (parsed.alerts ?? []);
+  return Array.isArray(parsed) ? parsed : (parsed.alerts ? parsed.alerts : parsed);
 }
 
 // ----------------------------------------------------------------
