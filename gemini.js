@@ -1,30 +1,14 @@
 // gemini.js - Medical Supply Chain AI Engine for West Bengal Government Health Dashboard
 
-function getGeminiApiKey() {
-  if (typeof window !== "undefined" && window.ENV && window.ENV.GEMINI_API_KEY) {
-    return window.ENV.GEMINI_API_KEY.trim();
+const getGeminiConfig = () => {
+  if (typeof window !== 'undefined' && window.ENV) {
+    return {
+      apiKey: window.ENV.GEMINI_API_KEY,
+      model: window.ENV.GEMINI_MODEL
+    };
   }
-  if (typeof process !== "undefined" && process.env?.GEMINI_API_KEY) {
-    return process.env.GEMINI_API_KEY.trim();
-  }
-  return "";
-}
-
-function getGeminiModel() {
-  if (typeof window !== "undefined" && window.ENV && window.ENV.GEMINI_MODEL) {
-    return window.ENV.GEMINI_MODEL.trim();
-  }
-  if (typeof process !== "undefined" && process.env?.GEMINI_MODEL) {
-    return process.env.GEMINI_MODEL.trim();
-  }
-  return "";
-}
-
-function getGeminiEndpoint() {
-  const GEMINI_API_KEY = getGeminiApiKey();
-  const GEMINI_MODEL = getGeminiModel();
-  return `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-}
+  return { apiKey: null, model: null };
+};
 
 /**
  * Fallback generator for hospital alerts when API key is unconfigured or offline
@@ -149,8 +133,7 @@ function generateFallbackRedistribution(emergencyDistrict, allHospitals) {
  * Format includes: PRIORITY LEVEL, HOSPITAL, DISTRICT, ISSUE, RECOMMENDED ACTION, ESTIMATED TIME TO CRISIS
  */
 export async function generateHospitalAlerts(hospitalsArray) {
-  const GEMINI_API_KEY = getGeminiApiKey();
-  const GEMINI_MODEL = getGeminiModel();
+  const { apiKey: GEMINI_API_KEY, model: GEMINI_MODEL } = getGeminiConfig();
 
   if (!GEMINI_API_KEY || !GEMINI_MODEL) {
     console.warn("[Gemini AI] GEMINI_API_KEY or GEMINI_MODEL not found. Using intelligent local rule engine.");
@@ -213,8 +196,7 @@ ${JSON.stringify(hospitalsArray, null, 2)}`;
  * 2. Generates a Daily Executive Summary Report for the Health Department Admin
  */
 export async function generateDailySummaryReport(allHospitals) {
-  const GEMINI_API_KEY = getGeminiApiKey();
-  const GEMINI_MODEL = getGeminiModel();
+  const { apiKey: GEMINI_API_KEY, model: GEMINI_MODEL } = getGeminiConfig();
 
   // Local fallback summary calculation
   const criticalCount = allHospitals.filter(h => (h.occupiedBeds / h.totalBeds) >= 0.8).length;
@@ -287,8 +269,6 @@ ${JSON.stringify(allHospitals, null, 2)}`;
  * 3. Calculates Pandemic Risk Score (0 to 100) for each West Bengal district
  */
 export async function generatePandemicRiskScores(allHospitals) {
-  const apiKey = await getGeminiApiKey();
-
   // Local fallback calculation based on bed saturation and supply deficit
   const districts = [...new Set(allHospitals.map(h => h.district))];
   const fallbackScores = districts.map(district => {
@@ -320,8 +300,7 @@ export async function generatePandemicRiskScores(allHospitals) {
     };
   }).sort((a, b) => b.riskScore - a.riskScore);
 
-  const GEMINI_API_KEY = getGeminiApiKey();
-  const GEMINI_MODEL = getGeminiModel();
+  const { apiKey: GEMINI_API_KEY, model: GEMINI_MODEL } = getGeminiConfig();
 
   if (!GEMINI_API_KEY || !GEMINI_MODEL) {
     return fallbackScores;
@@ -373,8 +352,7 @@ ${JSON.stringify(allHospitals, null, 2)}`;
  * 4. Generates an emergency resource redistribution plan for an emergency district.
  */
 export async function generateRedistributionPlan(emergencyDistrict, allHospitals) {
-  const GEMINI_API_KEY = getGeminiApiKey();
-  const GEMINI_MODEL = getGeminiModel();
+  const { apiKey: GEMINI_API_KEY, model: GEMINI_MODEL } = getGeminiConfig();
 
   if (!GEMINI_API_KEY || !GEMINI_MODEL) {
     console.warn("[Gemini AI] GEMINI_API_KEY or GEMINI_MODEL not found. Using local redistribution algorithm.");

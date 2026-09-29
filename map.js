@@ -43,7 +43,7 @@ function loadGoogleMapsApi(apiKey) {
 
     const script = document.createElement("script");
     const keyParam = apiKey ? `key=${apiKey}&` : "";
-    script.src = `https://maps.googleapis.com/maps/api/js?${keyParam}callback=initMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?${keyParam}callback=initMap&loading=async`;
     script.async = true;
     script.defer = true;
 

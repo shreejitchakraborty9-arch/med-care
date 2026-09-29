@@ -1,4 +1,4 @@
-﻿/**
+/**
  * agents.js â€” Multi-Agent AI System for MedWatch Dashboard
  * Government of West Bengal â€” Health Supply Chain Dashboard
  *
@@ -23,41 +23,45 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Environment Helpers
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function getGeminiApiKey() {
-  if (typeof window !== "undefined" && window.ENV && window.ENV.GEMINI_API_KEY) {
-    return window.ENV.GEMINI_API_KEY.trim();
+const getEnvKeys = () => {
+  if (typeof window !== 'undefined' && window.ENV) {
+    return {
+      apiKey: window.ENV.GEMINI_API_KEY,
+      model: window.ENV.GEMINI_MODEL
+    };
   }
-  if (typeof process !== "undefined" && process.env?.GEMINI_API_KEY) {
-    return process.env.GEMINI_API_KEY.trim();
-  }
-  return "";
+  return { apiKey: null, model: null };
+};
+
+const GEMINI_API_KEY = window.ENV && window.ENV.GEMINI_API_KEY 
+  ? window.ENV.GEMINI_API_KEY 
+  : null;
+
+const GEMINI_MODEL = window.ENV && window.ENV.GEMINI_MODEL
+  ? window.ENV.GEMINI_MODEL
+  : null;
+
+if (!GEMINI_API_KEY || !GEMINI_MODEL) {
+  console.error("GEMINI_API_KEY or GEMINI_MODEL not found - agents offline");
+} else {
+  console.log("All agents online - using model:", GEMINI_MODEL);
 }
 
-function getGeminiModel() {
-  if (typeof window !== "undefined" && window.ENV && window.ENV.GEMINI_MODEL) {
-    return window.ENV.GEMINI_MODEL.trim();
-  }
-  if (typeof process !== "undefined" && process.env?.GEMINI_MODEL) {
-    return process.env.GEMINI_MODEL.trim();
-  }
-  return "";
-}
-
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // Shared Gemini caller
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-async function callGemini(prompt) {
-  const GEMINI_API_KEY = getGeminiApiKey();
-  const GEMINI_MODEL = getGeminiModel();
-
-  if (!GEMINI_API_KEY || !GEMINI_MODEL) {
-    throw new Error("GEMINI_API_KEY or GEMINI_MODEL not found â€” agents offline.");
+// ─────────────────────────────────────────────────────────────────────────────
+async function callGemini(prompt, apiKey, model) {
+  if (!apiKey || !model) {
+    const env = getEnvKeys();
+    apiKey = apiKey || env.apiKey;
+    model = model || env.model;
   }
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+  if (!apiKey || !model) {
+    throw new Error("GEMINI_API_KEY or GEMINI_MODEL not found — agents offline.");
+  }
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const res = await fetch(endpoint, {
     method: "POST",
@@ -153,15 +157,21 @@ export function subscribeToAgentAlerts(callback) {
 // AGENT 1 â€” Medicine Supply Agent
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function MedicineAgent(hospitalsData) {
+  const { apiKey, model } = getEnvKeys();
+  if (!apiKey || !model) {
+    console.error('Agent offline: API keys not loaded yet');
+    return [];
+  }
+
   const systemPrompt = `You are the Medicine Supply Agent for West Bengal Government Health Department. 
 Analyze the medicine stock data from all hospitals and generate alerts.
 
 Generate alerts for these exact situations:
-1. CRITICAL: Any medicine stock is 0 units â€” hospital has completely run out
-2. HIGH: Any medicine stock is below 20 units â€” will run out within days  
-3. MEDIUM: Any medicine stock is below 50 units â€” needs restocking soon
-4. LOW_ALERT: Any medicine stock is above 500 units â€” overstocked, redistribute
-5. TRANSFER: Hospital A has excess of medicine X, Hospital B is critically low on X â€” recommend transfer with exact quantities
+1. CRITICAL: Any medicine stock is 0 units — hospital has completely run out
+2. HIGH: Any medicine stock is below 20 units — will run out within days  
+3. MEDIUM: Any medicine stock is below 50 units — needs restocking soon
+4. LOW_ALERT: Any medicine stock is above 500 units — overstocked, redistribute
+5. TRANSFER: Hospital A has excess of medicine X, Hospital B is critically low on X — recommend transfer with exact quantities
 
 For each alert return a JSON array where each object has:
 - agentType: 'MEDICINE'
@@ -182,7 +192,7 @@ Hospital Data:
 ${JSON.stringify(hospitalsData, null, 2)}`;
 
   try {
-    const alerts = await callGemini(systemPrompt);
+    const alerts = await callGemini(systemPrompt, apiKey, model);
     const now = new Date().toISOString();
     const processed = alerts.map(a => ({
       agentType: "MEDICINE",
@@ -208,15 +218,21 @@ ${JSON.stringify(hospitalsData, null, 2)}`;
 // AGENT 2 â€” Hospital Bed Agent
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function BedAgent(hospitalsData) {
+  const { apiKey, model } = getEnvKeys();
+  if (!apiKey || !model) {
+    console.error('Agent offline: API keys not loaded yet');
+    return [];
+  }
+
   const systemPrompt = `You are the Hospital Bed Management Agent for West Bengal Government Health Department.
 Analyze bed occupancy across all hospitals and generate alerts.
 
 Generate alerts for these exact situations:
-1. CRITICAL: Beds occupied above 90% â€” immediate crisis, hospital overwhelmed
-2. HIGH: Beds occupied between 80% and 90% â€” pandemic threshold crossed, prepare overflow
-3. MEDIUM: Beds occupied between 60% and 80% â€” monitor closely
-4. TOO_VACANT: Beds occupied below 20% â€” too many empty beds, possible resource waste or reporting issue
-5. TRANSFER: Hospital A is above 80% occupied and Hospital B nearby has less than 40% occupied â€” recommend patient transfer with exact numbers
+1. CRITICAL: Beds occupied above 90% — immediate crisis, hospital overwhelmed
+2. HIGH: Beds occupied between 80% and 90% — pandemic threshold crossed, prepare overflow
+3. MEDIUM: Beds occupied between 60% and 80% — monitor closely
+4. TOO_VACANT: Beds occupied below 20% — too many empty beds, possible resource waste or reporting issue
+5. TRANSFER: Hospital A is above 80% occupied and Hospital B nearby has less than 40% occupied — recommend patient transfer with exact numbers
 
 For each alert return a JSON array where each object has:
 - agentType: 'BED'
@@ -238,7 +254,7 @@ Hospital Data:
 ${JSON.stringify(hospitalsData, null, 2)}`;
 
   try {
-    const alerts = await callGemini(systemPrompt);
+    const alerts = await callGemini(systemPrompt, apiKey, model);
     const now = new Date().toISOString();
     const processed = alerts.map(a => ({
       agentType: "BED",
@@ -263,15 +279,21 @@ ${JSON.stringify(hospitalsData, null, 2)}`;
 // AGENT 3 â€” Epidemic Early Warning Agent
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function EpidemicAgent(hospitalsData) {
+  const { apiKey, model } = getEnvKeys();
+  if (!apiKey || !model) {
+    console.error('Agent offline: API keys not loaded yet');
+    return [];
+  }
+
   const systemPrompt = `You are the Epidemic Early Warning Agent for West Bengal Government Health Department.
-Your job is to detect patterns that suggest a disease outbreak is beginning â€” before it becomes a crisis.
+Your job is to detect patterns that suggest a disease outbreak is beginning — before it becomes a crisis.
 
 Analyze ALL hospital data together and look for these patterns:
-1. If 3 or more hospitals in the same district show bed occupancy above 70% simultaneously â€” possible local outbreak
-2. If paracetamol AND ORS stock are both depleting fast across a region â€” possible gastroenteritis or viral fever outbreak  
-3. If chloroquine stock is critically low in multiple hospitals in same area â€” possible malaria spike
-4. If childrenNeedingVaccines is high across multiple hospitals in same district â€” vaccination gap risk
-5. If any single district has more than 2 hospitals with CRITICAL alerts â€” district-level emergency
+1. If 3 or more hospitals in the same district show bed occupancy above 70% simultaneously — possible local outbreak
+2. If paracetamol AND ORS stock are both depleting fast across a region — possible gastroenteritis or viral fever outbreak  
+3. If chloroquine stock is critically low in multiple hospitals in same area — possible malaria spike
+4. If childrenNeedingVaccines is high across multiple hospitals in same district — vaccination gap risk
+5. If any single district has more than 2 hospitals with CRITICAL alerts — district-level emergency
 
 For each pattern found return a JSON array where each object has:
 - agentType: 'EPIDEMIC'
@@ -292,7 +314,7 @@ Hospital Data:
 ${JSON.stringify(hospitalsData, null, 2)}`;
 
   try {
-    const alerts = await callGemini(systemPrompt);
+    const alerts = await callGemini(systemPrompt, apiKey, model);
     const now = new Date().toISOString();
     const processed = alerts.map(a => ({
       agentType: "EPIDEMIC",
