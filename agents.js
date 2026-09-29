@@ -1,11 +1,11 @@
 /**
- * agents.js â€” Multi-Agent AI System for MedWatch Dashboard
- * Government of West Bengal â€” Health Supply Chain Dashboard
+ * agents.js — Multi-Agent AI System for MedWatch Dashboard
+ * Government of West Bengal — Health Supply Chain Dashboard
  *
  * Agents:
- *   1. MedicineAgent   â€” analyzes medicine stock every 5 minutes
- *   2. BedAgent        â€” monitors bed occupancy every 3 minutes
- *   3. EpidemicAgent   â€” detects outbreak patterns every 10 minutes
+ *   1. MedicineAgent   — analyzes medicine stock every 5 minutes
+ *   2. BedAgent        — monitors bed occupancy every 3 minutes
+ *   3. EpidemicAgent   — detects outbreak patterns every 10 minutes
  *
  * All agents run ONLY in dashboard.html and are NOT imported elsewhere.
  * Firestore writes go to the "agent_alerts" collection.
@@ -48,9 +48,9 @@ if (!GEMINI_API_KEY || !GEMINI_MODEL) {
   console.log("All agents online - using model:", GEMINI_MODEL);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 // Shared Gemini caller
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 async function callGemini(prompt, apiKey, model) {
   if (!apiKey || !model) {
     const env = getEnvKeys();
@@ -88,9 +88,9 @@ async function callGemini(prompt, apiKey, model) {
   return Array.isArray(parsed) ? parsed : (parsed.alerts ?? []);
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Web Audio â€” subtle beep for CRITICAL alerts
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ----------------------------------------------------------------
+// Web Audio — subtle beep for CRITICAL alerts
+// ----------------------------------------------------------------
 function playCriticalSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -107,9 +107,9 @@ function playCriticalSound() {
   } catch { /* AudioContext not available */ }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ----------------------------------------------------------------
 // Firestore helpers
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ----------------------------------------------------------------
 let _db = null;
 export function initAgentsDb(db) { _db = db; }
 
@@ -154,9 +154,9 @@ export function subscribeToAgentAlerts(callback) {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 // Hospital Lookup & Fallback Alert Generators
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 function findHospital(hospitalsData, nameOrId) {
   const data = (Array.isArray(hospitalsData) && hospitalsData.length > 0) ? hospitalsData : HOSPITALS_DATA;
   if (!data || !Array.isArray(data)) return null;
@@ -351,9 +351,9 @@ function generateEpidemicFallbacks(hospitalsData) {
   return alerts;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 // AGENT 1 — Medicine Supply Agent
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 export async function MedicineAgent(hospitalsData) {
   const data = (Array.isArray(hospitalsData) && hospitalsData.length > 0) ? hospitalsData : HOSPITALS_DATA;
   const { apiKey, model } = getEnvKeys();
@@ -427,9 +427,9 @@ ${JSON.stringify(data, null, 2)}`;
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 // AGENT 2 — Hospital Bed Agent
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 export async function BedAgent(hospitalsData) {
   const data = (Array.isArray(hospitalsData) && hospitalsData.length > 0) ? hospitalsData : HOSPITALS_DATA;
   const { apiKey, model } = getEnvKeys();
@@ -507,9 +507,9 @@ ${JSON.stringify(data, null, 2)}`;
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 // AGENT 3 — Epidemic Early Warning Agent
-// ─────────────────────────────────────────────────────────────────────────────
+// ----------------------------------------------------------------
 export async function EpidemicAgent(hospitalsData) {
   const data = (Array.isArray(hospitalsData) && hospitalsData.length > 0) ? hospitalsData : HOSPITALS_DATA;
   const { apiKey, model } = getEnvKeys();
