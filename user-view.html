@@ -595,6 +595,447 @@
       gap: 6px;
       line-height: 1.35;
     }
+
+    /* Ambulance Buttons */
+    .btn-ambulance-toggle {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 8px;
+      background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+      color: #ffffff;
+      border: 1px solid #7f1d1d;
+      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 6px rgba(185, 28, 28, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-ambulance-toggle:hover {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      box-shadow: 0 4px 10px rgba(185, 28, 28, 0.35);
+    }
+
+    .btn-card-ambulance {
+      width: 100%;
+      margin-top: 10px;
+      padding: 9px 12px;
+      background: #fff1f2;
+      color: #991b1b;
+      border: 1.5px solid #fecdd3;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-card-ambulance:hover {
+      background: #ffe4e6;
+      border-color: #fda4af;
+      color: #881337;
+    }
+
+    /* Ambulance Modal Styles */
+    .amb-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .amb-modal-overlay.open {
+      display: flex;
+    }
+
+    .amb-modal-content {
+      background: #ffffff;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .amb-modal-header {
+      padding: 16px 20px;
+      background: #1a2744;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+
+    .amb-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .amb-modal-subtitle {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .amb-btn-close {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: #ffffff;
+      font-size: 18px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .amb-btn-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .amb-modal-body {
+      padding: 16px 20px;
+    }
+
+    .amb-demo-badge {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .amb-filter-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .amb-select {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #ffffff;
+      width: 100%;
+    }
+
+    .amb-type-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .amb-type-pill {
+      flex: 1;
+      text-align: center;
+      padding: 6px 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .amb-type-pill.active {
+      background: #b91c1c;
+      color: #ffffff;
+      border-color: #b91c1c;
+    }
+
+    .amb-driver-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #b91c1c;
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .amb-driver-card:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .amb-driver-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .amb-driver-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .amb-driver-vehicle {
+      font-size: 11.5px;
+      font-family: monospace;
+      font-weight: 700;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .amb-driver-meta {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .amb-driver-meta strong {
+      color: #334155;
+    }
+
+    .amb-driver-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .amb-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    .amb-badge-bls { background: #e0f2fe; color: #0369a1; }
+    .amb-badge-als { background: #fef3c7; color: #b45309; }
+    .amb-badge-mat { background: #fce7f3; color: #be185d; }
+    .amb-badge-area { background: #f1f5f9; color: #334155; }
+    .amb-badge-eta { background: #dcfce7; color: #15803d; }
+
+    .amb-driver-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .amb-btn-call {
+      flex: 1;
+      padding: 8px 12px;
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .amb-btn-call:hover {
+      background: #0369a1;
+    }
+
+    .amb-btn-dispatch {
+      flex: 1.3;
+      padding: 8px 12px;
+      background: #b91c1c;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .amb-btn-dispatch:hover {
+      background: #991b1b;
+    }
+
+    /* Live Tracking Screen */
+    .amb-tracking-screen {
+      display: none;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .amb-tracking-screen.active {
+      display: block;
+    }
+
+    .amb-siren-animation {
+      font-size: 38px;
+      animation: ambSiren 1s infinite alternate;
+      margin-bottom: 8px;
+    }
+
+    @keyframes ambSiren {
+      0% { transform: scale(1) rotate(-5deg); }
+      100% { transform: scale(1.15) rotate(5deg); }
+    }
+
+    .amb-tracking-status {
+      font-size: 17px;
+      font-weight: 800;
+      color: #b91c1c;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .amb-progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    .amb-step {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .amb-step.done {
+      color: #15803d;
+    }
+
+    .amb-step.active {
+      color: #b91c1c;
+    }
+
+    .amb-step-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #cbd5e1;
+    }
+
+    .amb-step.done .amb-step-dot {
+      background: #15803d;
+    }
+
+    .amb-step.active .amb-step-dot {
+      background: #b91c1c;
+      box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.2);
+    }
+
+    .amb-tracking-eta {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+
+    .amb-target-facility-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 12.5px;
+      color: #1e40af;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .amb-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .amb-live-badge {
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .amb-tracking-driver-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .amb-tracking-actions {
+      display: flex;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
@@ -637,6 +1078,12 @@
       <button id="btn-nearest-hospital" class="btn-nearest-toggle">
         <span>📍</span>
         <span id="nearest-btn-label">Find Nearest Hospital with Free Beds</span>
+      </button>
+
+      <!-- 7. BOOK AN AMBULANCE BUTTON -->
+      <button id="btn-book-ambulance" class="btn-ambulance-toggle">
+        <span>🚑</span>
+        <span>Book an Ambulance (Connect to Driver)</span>
       </button>
     </section>
 
@@ -1377,7 +1824,18 @@
               </div>
             ` : ''}
           </div>
+
+          <!-- Quick Ambulance Action Button -->
+          <button class="btn-card-ambulance" type="button" aria-label="Request Ambulance to this Facility">
+            <span>🚑</span>
+            <span>Request Ambulance to this Facility</span>
+          </button>
         `;
+
+        card.querySelector('.btn-card-ambulance')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openAmbulanceModal(h);
+        });
 
         container.appendChild(card);
       });
@@ -1412,6 +1870,1034 @@
 
     // Initialize real-time synchronization on page open
     initCitizenRealtimeData();
+
+    /* ==========================================================================
+       AMBULANCE DISPATCH & DRIVER CONNECTION SYSTEM (DEMO ONLY)
+       Simulated emergency dispatch linking citizens to nearby rural, district,
+       and state medical college ambulance drivers across West Bengal.
+       ========================================================================== */
+
+    const WB_RTO_CODES = {
+      "Kolkata": "WB-02",
+      "Howrah": "WB-12",
+      "Hooghly": "WB-15",
+      "North 24 Parganas": "WB-24",
+      "South 24 Parganas": "WB-96",
+      "Nadia": "WB-52",
+      "Murshidabad": "WB-58",
+      "Purba Bardhaman": "WB-39",
+      "Paschim Bardhaman": "WB-40",
+      "Birbhum": "WB-54",
+      "Bankura": "WB-68",
+      "Purulia": "WB-56",
+      "Midnapore West": "WB-34",
+      "Midnapore East": "WB-30",
+      "Jhargram": "WB-79",
+      "Malda": "WB-66",
+      "Uttar Dinajpur": "WB-60",
+      "Dakshin Dinajpur": "WB-62",
+      "Darjeeling": "WB-74",
+      "Kalimpong": "WB-77",
+      "Jalpaiguri": "WB-70",
+      "Alipurduar": "WB-72",
+      "Cooch Behar": "WB-64"
+    };
+
+    // Authentic West Bengal Ambulance Drivers Registry (Rural, District, State)
+    const AMBULANCE_DRIVERS_DATA = [
+      // Hooghly District
+      {
+        id: 'amb-wb15-01',
+        name: 'Bikash Mondal',
+        phone: '+91 98301 44521',
+        vehicleNumber: 'WB-15-E-4819',
+        ambulanceType: 'BLS',
+        tier: 'rural',
+        district: 'Hooghly',
+        block: 'Tarakeswar',
+        baseHospital: 'Tarakeswar Rural Hospital',
+        equipment: 'Oxygen Cylinder, Folding Stretcher, First Aid Kit',
+        etaMinutes: 4,
+        distanceKm: 1.8,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb15-02',
+        name: 'Sourav Mukherjee',
+        phone: '+91 94340 82910',
+        vehicleNumber: 'WB-15-G-9104',
+        ambulanceType: 'MATRIYAAN',
+        tier: 'rural',
+        district: 'Hooghly',
+        block: 'Polba-Dadpur',
+        baseHospital: 'Polba Rural Hospital',
+        equipment: 'Maternity Delivery Kit, Infant Warmer, Suction Unit',
+        etaMinutes: 7,
+        distanceKm: 3.2,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb15-03',
+        name: 'Tapan Sarkar',
+        phone: '+91 98312 67104',
+        vehicleNumber: 'WB-15-B-1120',
+        ambulanceType: 'ALS',
+        tier: 'district',
+        district: 'Hooghly',
+        block: 'Chinsurah',
+        baseHospital: 'Hooghly District Hospital (Imambara)',
+        equipment: 'ICU Transport Ventilator, Defibrillator, Multi-para Monitor',
+        etaMinutes: 5,
+        distanceKm: 2.1,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb15-04',
+        name: 'Ranjit Roy',
+        phone: '+91 98365 31092',
+        vehicleNumber: 'WB-15-F-3382',
+        ambulanceType: 'BLS',
+        tier: 'rural',
+        district: 'Hooghly',
+        block: 'Singur',
+        baseHospital: 'Singur Rural Hospital',
+        equipment: 'Oxygen Support, Foldable Spine Board',
+        etaMinutes: 6,
+        distanceKm: 2.5,
+        status: 'Available'
+      },
+
+      // Howrah District
+      {
+        id: 'amb-wb12-01',
+        name: 'Prabir Ghosh',
+        phone: '+91 98305 18239',
+        vehicleNumber: 'WB-12-D-9102',
+        ambulanceType: 'ALS',
+        tier: 'district',
+        district: 'Howrah',
+        block: 'Howrah Sadar',
+        baseHospital: 'Howrah District Hospital',
+        equipment: 'ICU Cardiac Monitor, Defibrillator, Advanced Airway',
+        etaMinutes: 5,
+        distanceKm: 1.5,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb12-02',
+        name: 'Debabrata Majhi',
+        phone: '+91 94331 40592',
+        vehicleNumber: 'WB-12-E-5519',
+        ambulanceType: 'MATRIYAAN',
+        tier: 'rural',
+        district: 'Howrah',
+        block: 'Amta-I',
+        baseHospital: 'Amta Rural Hospital',
+        equipment: 'Obstetric Kit, Neonatal Resuscitator, O2',
+        etaMinutes: 8,
+        distanceKm: 3.9,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb12-03',
+        name: 'Dipankar Das',
+        phone: '+91 98310 99481',
+        vehicleNumber: 'WB-12-C-4108',
+        ambulanceType: 'BLS',
+        tier: 'rural',
+        district: 'Howrah',
+        block: 'Domjur',
+        baseHospital: 'Domjur Rural Hospital',
+        equipment: 'High-flow Oxygen, Wheelchair, Splints',
+        etaMinutes: 4,
+        distanceKm: 1.9,
+        status: 'Available'
+      },
+
+      // Kolkata (State Apex & Central)
+      {
+        id: 'amb-wb02-01',
+        name: 'Anirban Bhattacharya',
+        phone: '+91 98300 23419',
+        vehicleNumber: 'WB-02-AB-5431',
+        ambulanceType: 'ALS',
+        tier: 'state',
+        district: 'Kolkata',
+        block: 'Bhowanipore',
+        baseHospital: 'IPGMER & SSKM Hospital',
+        equipment: 'Critical Care Transport, Hamilton T1 Ventilator, Syringe Pump',
+        etaMinutes: 3,
+        distanceKm: 0.9,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb02-02',
+        name: 'Subrata Paul',
+        phone: '+91 98302 77103',
+        vehicleNumber: 'WB-02-AJ-8821',
+        ambulanceType: 'ALS',
+        tier: 'state',
+        district: 'Kolkata',
+        block: 'College Street',
+        baseHospital: 'Medical College & Hospital, Kolkata',
+        equipment: 'Defibrillator Monitor, Portable Suction, O2 Bank',
+        etaMinutes: 5,
+        distanceKm: 1.4,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb02-03',
+        name: 'Sunil Shaw',
+        phone: '+91 94330 18844',
+        vehicleNumber: 'WB-02-AK-3019',
+        ambulanceType: 'MATRIYAAN',
+        tier: 'state',
+        district: 'Kolkata',
+        block: 'Shyambazar',
+        baseHospital: 'R.G. Kar Medical College & Hospital',
+        equipment: 'Dedicated Matriyaan Transport, Neonatal Cradle',
+        etaMinutes: 6,
+        distanceKm: 2.0,
+        status: 'Available'
+      },
+
+      // North 24 Parganas
+      {
+        id: 'amb-wb24-01',
+        name: 'Swapan Bauri',
+        phone: '+91 98319 82014',
+        vehicleNumber: 'WB-24-F-7120',
+        ambulanceType: 'BLS',
+        tier: 'district',
+        district: 'North 24 Parganas',
+        block: 'Barasat',
+        baseHospital: 'Barasat Government Medical College & District Hospital',
+        equipment: 'Oxygen Concentrator, Spine Board, Trauma Kit',
+        etaMinutes: 4,
+        distanceKm: 1.6,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb24-02',
+        name: 'Partha Sarathi Roy',
+        phone: '+91 94338 90123',
+        vehicleNumber: 'WB-24-G-4401',
+        ambulanceType: 'MATRIYAAN',
+        tier: 'rural',
+        district: 'North 24 Parganas',
+        block: 'Habra-I',
+        baseHospital: 'Habra State General & Rural Hospital',
+        equipment: 'Matriyaan Delivery Kit, Baby Incubator, O2 Mask',
+        etaMinutes: 7,
+        distanceKm: 3.1,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb24-03',
+        name: 'Kamal Biswas',
+        phone: '+91 98314 66102',
+        vehicleNumber: 'WB-24-H-1928',
+        ambulanceType: 'ALS',
+        tier: 'rural',
+        district: 'North 24 Parganas',
+        block: 'Basirhat',
+        baseHospital: 'Basirhat District Hospital',
+        equipment: 'Cardiac Monitor, Defibrillator, Advanced Suction',
+        etaMinutes: 6,
+        distanceKm: 2.8,
+        status: 'Available'
+      },
+
+      // South 24 Parganas
+      {
+        id: 'amb-wb96-01',
+        name: 'Sanjoy Halder',
+        phone: '+91 98322 41908',
+        vehicleNumber: 'WB-96-C-8812',
+        ambulanceType: 'ALS',
+        tier: 'state',
+        district: 'South 24 Parganas',
+        block: 'Diamond Harbour',
+        baseHospital: 'Diamond Harbour Government Medical College',
+        equipment: 'ICU Ventilator, Multi-channel ECG, Emergency Drugs Kit',
+        etaMinutes: 5,
+        distanceKm: 2.2,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb96-02',
+        name: 'Gouranga Naskar',
+        phone: '+91 94344 19283',
+        vehicleNumber: 'WB-96-D-2219',
+        ambulanceType: 'MATRIYAAN',
+        tier: 'rural',
+        district: 'South 24 Parganas',
+        block: 'Kakdwip',
+        baseHospital: 'Kakdwip Sub-Divisional Hospital',
+        equipment: 'Matriyaan Safe Delivery Transport, Neonatal O2',
+        etaMinutes: 8,
+        distanceKm: 4.5,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb96-03',
+        name: 'Sukumar Mondal',
+        phone: '+91 98328 77192',
+        vehicleNumber: 'WB-96-E-6014',
+        ambulanceType: 'BLS',
+        tier: 'rural',
+        district: 'South 24 Parganas',
+        block: 'Canning-I',
+        baseHospital: 'Canning Sub-Divisional & Rural Hospital',
+        equipment: 'Oxygen Support, Snakebite Anti-Venom Carry Kit',
+        etaMinutes: 6,
+        distanceKm: 2.9,
+        status: 'Available'
+      },
+
+      // Nadia District
+      {
+        id: 'amb-wb52-01',
+        name: 'Ashok Pramanik',
+        phone: '+91 94341 55219',
+        vehicleNumber: 'WB-52-C-3390',
+        ambulanceType: 'BLS',
+        tier: 'district',
+        district: 'Nadia',
+        block: 'Krishnanagar',
+        baseHospital: 'Nadia District Hospital (Krishnanagar)',
+        equipment: 'Oxygen Kit, Folding Stretcher, First Aid Supplies',
+        etaMinutes: 4,
+        distanceKm: 1.7,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb52-02',
+        name: 'Manojit Dutta',
+        phone: '+91 98317 22091',
+        vehicleNumber: 'WB-52-D-7711',
+        ambulanceType: 'MATRIYAAN',
+        tier: 'rural',
+        district: 'Nadia',
+        block: 'Ranaghat',
+        baseHospital: 'Ranaghat Sub-Divisional Hospital',
+        equipment: 'Matriyaan Obstetric Kit, Baby Warmer Unit',
+        etaMinutes: 7,
+        distanceKm: 3.5,
+        status: 'Available'
+      },
+
+      // Purba Bardhaman
+      {
+        id: 'amb-wb39-01',
+        name: 'Aloke Mukherjee',
+        phone: '+91 98321 09844',
+        vehicleNumber: 'WB-39-E-6219',
+        ambulanceType: 'ALS',
+        tier: 'state',
+        district: 'Purba Bardhaman',
+        block: 'Burdwan Sadar',
+        baseHospital: 'Burdwan Medical College & Hospital',
+        equipment: 'Transport Ventilator, Biphasic Defibrillator, Infusion Pump',
+        etaMinutes: 5,
+        distanceKm: 2.0,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb39-02',
+        name: 'Chandan Konar',
+        phone: '+91 94348 66120',
+        vehicleNumber: 'WB-39-F-1102',
+        ambulanceType: 'BLS',
+        tier: 'rural',
+        district: 'Purba Bardhaman',
+        block: 'Kalna',
+        baseHospital: 'Kalna Sub-Divisional Hospital',
+        equipment: 'Oxygen Cylinder, Immobilization Collars, Stretcher',
+        etaMinutes: 6,
+        distanceKm: 2.8,
+        status: 'Available'
+      },
+
+      // Bankura District
+      {
+        id: 'amb-wb68-01',
+        name: 'Tarun Karmakar',
+        phone: '+91 94345 88129',
+        vehicleNumber: 'WB-68-D-1903',
+        ambulanceType: 'ALS',
+        tier: 'state',
+        district: 'Bankura',
+        block: 'Bankura Sadar',
+        baseHospital: 'Bankura Sammilani Medical College & Hospital',
+        equipment: 'ICU Cardiac Support, Oxygen Resuscitator, Defibrillator',
+        etaMinutes: 4,
+        distanceKm: 1.8,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb68-02',
+        name: 'Nimai Singha',
+        phone: '+91 98329 11045',
+        vehicleNumber: 'WB-68-E-4491',
+        ambulanceType: 'MATRIYAAN',
+        tier: 'rural',
+        district: 'Bankura',
+        block: 'Bishnupur',
+        baseHospital: 'Bishnupur District Hospital',
+        equipment: 'Matriyaan Delivery Setup, Neonatal Warmer, Oxygen',
+        etaMinutes: 8,
+        distanceKm: 4.1,
+        status: 'Available'
+      },
+
+      // Paschim Medinipur
+      {
+        id: 'amb-wb34-01',
+        name: 'Shyamal Midya',
+        phone: '+91 98324 77210',
+        vehicleNumber: 'WB-34-F-8820',
+        ambulanceType: 'ALS',
+        tier: 'state',
+        district: 'Midnapore West',
+        block: 'Midnapore Sadar',
+        baseHospital: 'Midnapore Medical College & Hospital',
+        equipment: 'Portable Ventilator, Monitor, Trauma Spine Board',
+        etaMinutes: 5,
+        distanceKm: 2.3,
+        status: 'Available'
+      },
+
+      // Murshidabad
+      {
+        id: 'amb-wb58-01',
+        name: 'Rejaul Karim',
+        phone: '+91 94343 00918',
+        vehicleNumber: 'WB-58-B-3108',
+        ambulanceType: 'ALS',
+        tier: 'state',
+        district: 'Murshidabad',
+        block: 'Berhampore',
+        baseHospital: 'Murshidabad Medical College & Hospital',
+        equipment: 'ICU Cardiac Life Support, High Flow O2, Defib',
+        etaMinutes: 5,
+        distanceKm: 2.1,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb58-02',
+        name: 'Mofikul Islam',
+        phone: '+91 98325 66710',
+        vehicleNumber: 'WB-58-D-9914',
+        ambulanceType: 'MATRIYAAN',
+        tier: 'rural',
+        district: 'Murshidabad',
+        block: 'Jangipur',
+        baseHospital: 'Jangipur Sub-Divisional Hospital',
+        equipment: 'Matriyaan Delivery Kit, Suction, Baby Incubator',
+        etaMinutes: 7,
+        distanceKm: 3.4,
+        status: 'Available'
+      },
+
+      // Darjeeling
+      {
+        id: 'amb-wb74-01',
+        name: 'Pema Tamang',
+        phone: '+91 94349 11802',
+        vehicleNumber: 'WB-74-H-3190',
+        ambulanceType: 'ALS',
+        tier: 'state',
+        district: 'Darjeeling',
+        block: 'Sushrutanagar / Siliguri',
+        baseHospital: 'North Bengal Medical College & Hospital',
+        equipment: 'Hill Terrain 4WD, ICU Ventilator, High Altitude Oxygen',
+        etaMinutes: 6,
+        distanceKm: 2.7,
+        status: 'Available'
+      },
+      {
+        id: 'amb-wb74-02',
+        name: 'Dawa Lepcha',
+        phone: '+91 98326 55019',
+        vehicleNumber: 'WB-74-J-4821',
+        ambulanceType: 'BLS',
+        tier: 'rural',
+        district: 'Darjeeling',
+        block: 'Kurseong',
+        baseHospital: 'Kurseong Sub-Divisional Hospital',
+        equipment: 'Hill Rescue Stretcher, O2 Cylinder, Trauma Support',
+        etaMinutes: 9,
+        distanceKm: 4.8,
+        status: 'Available'
+      }
+    ];
+
+    // Ambulance State
+    let activeAmbulanceType = 'ALL';
+    let targetHospitalForAmbulance = null;
+    let dispatchTimer = null;
+    let activeDispatchDriver = null;
+
+    // Populate the ambulance district dropdown
+    function initAmbulanceDistrictSelect() {
+      const select = document.getElementById('amb-district-select');
+      if (!select) return;
+      // Preserve first option (All Districts)
+      select.innerHTML = '<option value="ALL">🌐 All Districts (West Bengal)</option>';
+      WEST_BENGAL_DISTRICTS.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = `${d} District`;
+        select.appendChild(opt);
+      });
+    }
+
+    // Dynamic Driver Synthesizer for any district not in static list
+    function generateDynamicDriversForDistrict(districtName) {
+      const rto = WB_RTO_CODES[districtName] || 'WB-01';
+      // Find hospitals from our live dataset in this district
+      const matchingHosp = hospitals.filter(h => h.district && h.district.toLowerCase() === districtName.toLowerCase());
+      const baseHosp1 = matchingHosp[0]?.name || `${districtName} District Hospital`;
+      const baseHosp2 = matchingHosp[1]?.name || `${districtName} Sub-Divisional Hospital`;
+      const baseHosp3 = matchingHosp[2]?.name || `${districtName} Rural Hospital`;
+
+      return [
+        {
+          id: `amb-${districtName.toLowerCase().replace(/\s+/g, '-')}-01`,
+          name: 'Soumen Mukherjee',
+          phone: '+91 98304 ' + Math.floor(10000 + Math.random() * 90000),
+          vehicleNumber: `${rto}-C-${Math.floor(1000 + Math.random() * 9000)}`,
+          ambulanceType: 'ALS',
+          tier: matchingHosp[0]?.category === 'medical_college' ? 'state' : 'district',
+          district: districtName,
+          block: matchingHosp[0]?.block || `${districtName} Sadar`,
+          baseHospital: baseHosp1,
+          equipment: 'ICU Cardiac Monitor, Defibrillator, Transport Oxygen',
+          etaMinutes: 5,
+          distanceKm: 2.1,
+          status: 'Available'
+        },
+        {
+          id: `amb-${districtName.toLowerCase().replace(/\s+/g, '-')}-02`,
+          name: 'Biswajit Roy',
+          phone: '+91 94342 ' + Math.floor(10000 + Math.random() * 90000),
+          vehicleNumber: `${rto}-D-${Math.floor(1000 + Math.random() * 9000)}`,
+          ambulanceType: 'BLS',
+          tier: matchingHosp[1]?.category === 'rural' ? 'rural' : 'district',
+          district: districtName,
+          block: matchingHosp[1]?.block || `${districtName} North`,
+          baseHospital: baseHosp2,
+          equipment: 'Oxygen Support, Spine Board, Trauma Kit',
+          etaMinutes: 7,
+          distanceKm: 3.4,
+          status: 'Available'
+        },
+        {
+          id: `amb-${districtName.toLowerCase().replace(/\s+/g, '-')}-03`,
+          name: 'Sanatan Mahato',
+          phone: '+91 98327 ' + Math.floor(10000 + Math.random() * 90000),
+          vehicleNumber: `${rto}-E-${Math.floor(1000 + Math.random() * 9000)}`,
+          ambulanceType: 'MATRIYAAN',
+          tier: 'rural',
+          district: districtName,
+          block: matchingHosp[2]?.block || `${districtName} Rural Block`,
+          baseHospital: baseHosp3,
+          equipment: 'Matriyaan Obstetric Kit, Infant Cradle, Oxygen',
+          etaMinutes: 9,
+          distanceKm: 4.6,
+          status: 'Available'
+        }
+      ];
+    }
+
+    // Dynamic Driver Synthesizer for a specific target hospital
+    function generateDynamicDriversForHospital(hosp) {
+      const dist = hosp.district || 'West Bengal';
+      const rto = WB_RTO_CODES[dist] || 'WB-01';
+      const tier = hosp.category === 'medical_college' ? 'state' : (hosp.category === 'rural' ? 'rural' : 'district');
+
+      return [
+        {
+          id: `amb-hosp-${hosp.id || 'target'}-01`,
+          name: 'Subhasish Mondal',
+          phone: '+91 98311 ' + Math.floor(10000 + Math.random() * 90000),
+          vehicleNumber: `${rto}-A-${Math.floor(1000 + Math.random() * 9000)}`,
+          ambulanceType: 'BLS',
+          tier: tier,
+          district: dist,
+          block: hosp.block || `${dist} Area`,
+          baseHospital: hosp.name,
+          equipment: 'High-flow Oxygen Cylinder, Stretcher, First Aid Kit',
+          etaMinutes: 4,
+          distanceKm: 1.5,
+          status: 'Available'
+        },
+        {
+          id: `amb-hosp-${hosp.id || 'target'}-02`,
+          name: 'Goutam Ghosh',
+          phone: '+91 94336 ' + Math.floor(10000 + Math.random() * 90000),
+          vehicleNumber: `${rto}-B-${Math.floor(1000 + Math.random() * 9000)}`,
+          ambulanceType: tier === 'state' ? 'ALS' : 'MATRIYAAN',
+          tier: tier,
+          district: dist,
+          block: hosp.block || `${dist} Area`,
+          baseHospital: hosp.name,
+          equipment: tier === 'state' ? 'ICU Transport Ventilator, Defibrillator, Syringe Pump' : 'Dedicated Matriyaan Maternity Delivery Kit & Baby Incubator',
+          etaMinutes: 6,
+          distanceKm: 2.8,
+          status: 'Available'
+        }
+      ];
+    }
+
+    // Query and filter drivers
+    function getFilteredDrivers() {
+      const distSelect = document.getElementById('amb-district-select');
+      const tierSelect = document.getElementById('amb-tier-select');
+      const distVal = distSelect ? distSelect.value : 'ALL';
+      const tierVal = tierSelect ? tierSelect.value : 'ALL';
+
+      let drivers = [...AMBULANCE_DRIVERS_DATA];
+
+      // If targeted to a specific hospital, show drivers matching this hospital first
+      if (targetHospitalForAmbulance) {
+        const hospName = (targetHospitalForAmbulance.name || '').toLowerCase();
+        const hospDist = (targetHospitalForAmbulance.district || '').toLowerCase();
+
+        let hospitalMatches = drivers.filter(d => {
+          return d.district.toLowerCase() === hospDist ||
+                 d.baseHospital.toLowerCase().includes(hospName) ||
+                 hospName.includes(d.baseHospital.toLowerCase());
+        });
+
+        if (hospitalMatches.length === 0) {
+          hospitalMatches = generateDynamicDriversForHospital(targetHospitalForAmbulance);
+        }
+        drivers = hospitalMatches;
+      } else {
+        // District filter
+        if (distVal !== 'ALL') {
+          let distMatches = drivers.filter(d => d.district.toLowerCase() === distVal.toLowerCase());
+          if (distMatches.length === 0) {
+            distMatches = generateDynamicDriversForDistrict(distVal);
+          }
+          drivers = distMatches;
+        }
+      }
+
+      // Facility tier filter
+      if (tierVal !== 'ALL') {
+        drivers = drivers.filter(d => d.tier === tierVal);
+      }
+
+      // Ambulance type filter
+      if (activeAmbulanceType !== 'ALL') {
+        drivers = drivers.filter(d => d.ambulanceType === activeAmbulanceType);
+      }
+
+      return drivers;
+    }
+
+    // Render drivers list cards
+    function renderAmbulanceDrivers() {
+      const container = document.getElementById('amb-drivers-list');
+      const countLabel = document.getElementById('amb-available-count');
+      if (!container) return;
+
+      const drivers = getFilteredDrivers();
+
+      if (countLabel) {
+        countLabel.textContent = `${drivers.length} Verified Drivers Available Nearby`;
+      }
+
+      if (drivers.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 30px 16px; color: #64748b;">
+            <div style="font-size: 32px; margin-bottom: 8px;">🚑</div>
+            <div style="font-weight: 700; color: #1e293b; margin-bottom: 4px;">No Available Drivers in this Category</div>
+            <div style="font-size: 13px;">Try switching to "All Types" or select "All Levels" to view other nearby vehicles.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      drivers.forEach(driver => {
+        let typeBadgeClass = 'amb-badge-bls';
+        let typeBadgeText = '🚑 BLS Basic';
+        if (driver.ambulanceType === 'ALS') {
+          typeBadgeClass = 'amb-badge-als';
+          typeBadgeText = '🚨 Cardiac ICU (ALS)';
+        } else if (driver.ambulanceType === 'MATRIYAAN') {
+          typeBadgeClass = 'amb-badge-mat';
+          typeBadgeText = '🤰 Matriyaan (Maternity)';
+        }
+
+        let tierBadgeText = '🌾 Rural Block';
+        if (driver.tier === 'district') tierBadgeText = '🏥 District Hospital';
+        if (driver.tier === 'state') tierBadgeText = '🏛️ State Apex';
+
+        const card = document.createElement('div');
+        card.className = 'amb-driver-card';
+        card.innerHTML = `
+          <div class="amb-driver-header">
+            <div>
+              <div class="amb-driver-name">👤 ${driver.name}</div>
+              <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                📞 <strong>${driver.phone}</strong> &bull; Base: <strong>${driver.baseHospital}</strong>
+              </div>
+            </div>
+            <span class="amb-driver-vehicle">${driver.vehicleNumber}</span>
+          </div>
+
+          <div class="amb-driver-badges">
+            <span class="amb-badge ${typeBadgeClass}">${typeBadgeText}</span>
+            <span class="amb-badge amb-badge-area">${tierBadgeText}</span>
+            <span class="amb-badge amb-badge-eta">⚡ ETA ~${driver.etaMinutes} mins (${driver.distanceKm} km)</span>
+          </div>
+
+          <div class="amb-driver-meta">
+            <strong>Equipment:</strong> ${driver.equipment}
+          </div>
+
+          <div class="amb-driver-actions">
+            <button class="amb-btn-call btn-call-driver" type="button" aria-label="Call Driver ${driver.name}">
+              <span>📞</span>
+              <span>Call Driver (Demo)</span>
+            </button>
+            <button class="amb-btn-dispatch btn-dispatch-driver" type="button" aria-label="Dispatch Driver ${driver.name}">
+              <span>🚨</span>
+              <span>Dispatch Now</span>
+            </button>
+          </div>
+        `;
+
+        // Wire Call Driver Demo Action
+        card.querySelector('.btn-call-driver')?.addEventListener('click', () => {
+          handleCallDriver(driver);
+        });
+
+        // Wire Dispatch Now Simulation Action
+        card.querySelector('.btn-dispatch-driver')?.addEventListener('click', () => {
+          startDispatchTracking(driver);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // Call Driver handler (Demo notification)
+    function handleCallDriver(driver) {
+      const confirmed = window.confirm(
+        `📞 [DEMO CALL SIMULATION]\n\n` +
+        `Connecting to Driver: ${driver.name}\n` +
+        `Mobile: ${driver.phone}\n` +
+        `Vehicle: ${driver.vehicleNumber}\n` +
+        `Base Station: ${driver.baseHospital} (${driver.district})\n\n` +
+        `NOTICE: In live production, this connects via cellular GSM network.\n` +
+        `Press OK to simulate dialing or Cancel to return.`
+      );
+      if (confirmed) {
+        // Also trigger tel: protocol for real mobile devices
+        window.location.href = `tel:${driver.phone.replace(/\s+/g, '')}`;
+      }
+    }
+
+    // Live Dispatch Simulation Tracker
+    function startDispatchTracking(driver) {
+      activeDispatchDriver = driver;
+      if (dispatchTimer) clearInterval(dispatchTimer);
+
+      document.getElementById('amb-drivers-view').style.display = 'none';
+      const trackingView = document.getElementById('amb-tracking-view');
+      trackingView.classList.add('active');
+
+      const infoContainer = document.getElementById('tracking-driver-info');
+      if (infoContainer) {
+        infoContainer.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+            <div>
+              <div style="font-size: 15px; font-weight: 700; color: #1e293b;">👤 Driver: ${driver.name}</div>
+              <div style="font-size: 12.5px; color: #475569; margin-top: 2px;">
+                📞 Mobile: <strong>${driver.phone}</strong> &bull; Vehicle: <code style="font-weight:700;">${driver.vehicleNumber}</code>
+              </div>
+            </div>
+            <span class="amb-badge amb-badge-eta">🟢 Active Trip</span>
+          </div>
+          <div style="font-size: 12px; color: #64748b; line-height: 1.4;">
+            <strong>Station:</strong> ${driver.baseHospital} (${driver.district})<br>
+            <strong>Equipment:</strong> ${driver.equipment}
+          </div>
+        `;
+      }
+
+      // Configure tracking call button
+      const callBtn = document.getElementById('btn-tracking-call');
+      if (callBtn) {
+        callBtn.onclick = () => handleCallDriver(driver);
+      }
+
+      // Initialize steps
+      const step1 = document.getElementById('amb-step-1');
+      const step2 = document.getElementById('amb-step-2');
+      const step3 = document.getElementById('amb-step-3');
+      const step4 = document.getElementById('amb-step-4');
+      const statusText = document.getElementById('tracking-status-text');
+      const etaText = document.getElementById('tracking-eta-text');
+
+      step1.className = 'amb-step done';
+      step2.className = 'amb-step done';
+      step3.className = 'amb-step active';
+      step4.className = 'amb-step';
+
+      let secondsRemaining = Math.max(12, driver.etaMinutes * 60);
+      statusText.textContent = `Ambulance Dispatched & En Route`;
+      etaText.textContent = `Estimated Arrival: ~${driver.etaMinutes} minutes (${driver.distanceKm} km)`;
+
+      // Countdown loop (ticks fast for demo purposes)
+      dispatchTimer = setInterval(() => {
+        secondsRemaining -= 15;
+        if (secondsRemaining <= 0) {
+          clearInterval(dispatchTimer);
+          dispatchTimer = null;
+          step3.className = 'amb-step done';
+          step4.className = 'amb-step done';
+          statusText.textContent = `✅ Ambulance Arrived at Patient Location`;
+          etaText.textContent = `Driver ${driver.name} has arrived with vehicle ${driver.vehicleNumber}.`;
+        } else {
+          const mins = Math.floor(secondsRemaining / 60);
+          const secs = secondsRemaining % 60;
+          etaText.textContent = `Estimated Arrival: ~${mins}m ${secs}s remaining (${driver.distanceKm} km)`;
+        }
+      }, 1500);
+    }
+
+    function resetTrackingView() {
+      if (dispatchTimer) {
+        clearInterval(dispatchTimer);
+        dispatchTimer = null;
+      }
+      const trackingView = document.getElementById('amb-tracking-view');
+      if (trackingView) trackingView.classList.remove('active');
+      const driversView = document.getElementById('amb-drivers-view');
+      if (driversView) driversView.style.display = 'block';
+    }
+
+    // Open Ambulance Modal
+    function openAmbulanceModal(targetHospital = null) {
+      targetHospitalForAmbulance = targetHospital;
+      resetTrackingView();
+
+      const modal = document.getElementById('ambulance-modal');
+      const targetBox = document.getElementById('amb-target-facility');
+      const targetText = document.getElementById('amb-target-facility-text');
+      const distSelect = document.getElementById('amb-district-select');
+
+      if (targetHospital) {
+        if (targetBox && targetText) {
+          targetText.innerHTML = `📍 Requesting ambulance towards: <strong>${targetHospital.name}</strong> (${targetHospital.district})`;
+          targetBox.style.display = 'flex';
+        }
+        if (distSelect && targetHospital.district) {
+          distSelect.value = targetHospital.district;
+        }
+      } else {
+        if (targetBox) targetBox.style.display = 'none';
+        if (distSelect) {
+          distSelect.value = selectedDistrict !== 'ALL' ? selectedDistrict : 'ALL';
+        }
+      }
+
+      renderAmbulanceDrivers();
+
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    // Close Ambulance Modal
+    function closeAmbulanceModal() {
+      const modal = document.getElementById('ambulance-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      }
+      resetTrackingView();
+      targetHospitalForAmbulance = null;
+    }
+
+    // Expose to window for card clicks
+    window.openAmbulanceModal = openAmbulanceModal;
+    window.closeAmbulanceModal = closeAmbulanceModal;
+
+    // Wire Modal UI Listeners
+    initAmbulanceDistrictSelect();
+
+    document.getElementById('btn-book-ambulance')?.addEventListener('click', () => {
+      openAmbulanceModal(null);
+    });
+
+    document.getElementById('btn-close-ambulance')?.addEventListener('click', closeAmbulanceModal);
+
+    document.getElementById('ambulance-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'ambulance-modal') {
+        closeAmbulanceModal();
+      }
+    });
+
+    document.getElementById('btn-clear-target-facility')?.addEventListener('click', () => {
+      targetHospitalForAmbulance = null;
+      const targetBox = document.getElementById('amb-target-facility');
+      if (targetBox) targetBox.style.display = 'none';
+      renderAmbulanceDrivers();
+    });
+
+    document.getElementById('amb-district-select')?.addEventListener('change', () => {
+      targetHospitalForAmbulance = null;
+      const targetBox = document.getElementById('amb-target-facility');
+      if (targetBox) targetBox.style.display = 'none';
+      renderAmbulanceDrivers();
+    });
+
+    document.getElementById('amb-tier-select')?.addEventListener('change', () => {
+      renderAmbulanceDrivers();
+    });
+
+    document.querySelectorAll('.amb-type-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.amb-type-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeAmbulanceType = pill.dataset.type || 'ALL';
+        renderAmbulanceDrivers();
+      });
+    });
+
+    document.getElementById('btn-back-to-drivers')?.addEventListener('click', resetTrackingView);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAmbulanceModal();
+    });
   </script>
+
+  <!-- AMBULANCE BOOKING & DISPATCH MODAL (DEMO ONLY) -->
+  <div id="ambulance-modal" class="amb-modal-overlay" aria-hidden="true" style="display: none;">
+    <div class="amb-modal-content" role="dialog" aria-modal="true" aria-labelledby="amb-modal-title-text">
+      <div class="amb-modal-header">
+        <div>
+          <div class="amb-modal-title" id="amb-modal-title-text">
+            <span>🚑</span>
+            <span>Emergency Ambulance Dispatch</span>
+          </div>
+          <div class="amb-modal-subtitle">Direct Driver Connection • West Bengal Network</div>
+        </div>
+        <button id="btn-close-ambulance" class="amb-btn-close" type="button" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="amb-modal-body">
+        <!-- Demo Disclaimer -->
+        <div class="amb-demo-badge">
+          ⚠️ <strong>DEMO SIMULATION ONLY:</strong> Connects to simulated nearby drivers for testing. For genuine emergencies, dial <strong>102</strong> (National Ambulance Service) or <strong>108 / 112</strong> (State Emergency Services).
+        </div>
+
+        <!-- Target Facility Banner (Optional) -->
+        <div id="amb-target-facility" style="display: none;" class="amb-target-facility-box">
+          <div id="amb-target-facility-text"></div>
+          <button id="btn-clear-target-facility" class="btn-reset-district" type="button" style="background:#dbeafe;color:#1e40af;">Show All</button>
+        </div>
+
+        <!-- Drivers Directory View -->
+        <div id="amb-drivers-view">
+          <!-- Filters -->
+          <div class="amb-filter-row">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 140px;">
+                <label for="amb-district-select" style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">DISTRICT:</label>
+                <select id="amb-district-select" class="amb-select">
+                  <option value="ALL">🌐 All Districts (West Bengal)</option>
+                </select>
+              </div>
+              <div style="flex: 1; min-width: 140px;">
+                <label for="amb-tier-select" style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">FACILITY TIER:</label>
+                <select id="amb-tier-select" class="amb-select">
+                  <option value="ALL">All Levels (Rural / District / State)</option>
+                  <option value="rural">🌾 Rural Hospitals (RH & BPHC)</option>
+                  <option value="district">🏥 District & Sub-divisional</option>
+                  <option value="state">🏛️ State Apex Medical Colleges</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Ambulance Category Pills -->
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">VEHICLE TYPE:</label>
+              <div class="amb-type-pills" id="amb-type-pills">
+                <button type="button" class="amb-type-pill active" data-type="ALL">All Types</button>
+                <button type="button" class="amb-type-pill" data-type="BLS">Basic (BLS)</button>
+                <button type="button" class="amb-type-pill" data-type="ALS">🚨 Cardiac ICU (ALS)</button>
+                <button type="button" class="amb-type-pill" data-type="MATRIYAAN">🤰 Matriyaan</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Drivers List Header -->
+          <div class="amb-list-header">
+            <span id="amb-available-count">Locating verified drivers...</span>
+            <span class="amb-live-badge">🟢 LIVE TELEMETRY</span>
+          </div>
+
+          <!-- Drivers List -->
+          <div id="amb-drivers-list">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Live Tracking Simulation Screen (Initially Hidden) -->
+        <div id="amb-tracking-view" class="amb-tracking-screen">
+          <div class="amb-siren-animation">🚑💨</div>
+          <div class="amb-tracking-status" id="tracking-status-text">Ambulance Dispatched & En Route</div>
+          <div class="amb-tracking-eta" id="tracking-eta-text">Estimated Arrival: 5 minutes</div>
+
+          <div class="amb-progress-steps">
+            <div class="amb-step done" id="amb-step-1">
+              <div class="amb-step-dot"></div>
+              <span>1. Request Accepted</span>
+            </div>
+            <div class="amb-step done" id="amb-step-2">
+              <div class="amb-step-dot"></div>
+              <span>2. Dispatched</span>
+            </div>
+            <div class="amb-step active" id="amb-step-3">
+              <div class="amb-step-dot"></div>
+              <span>3. En Route</span>
+            </div>
+            <div class="amb-step" id="amb-step-4">
+              <div class="amb-step-dot"></div>
+              <span>4. Arrived</span>
+            </div>
+          </div>
+
+          <!-- Active Driver Info Card -->
+          <div id="tracking-driver-info" class="amb-tracking-driver-card">
+            <!-- Injected via JS -->
+          </div>
+
+          <div class="amb-tracking-actions">
+            <button id="btn-tracking-call" class="amb-btn-call" type="button">
+              📞 Call Driver
+            </button>
+            <button id="btn-back-to-drivers" class="btn-reset-district" type="button" style="padding: 10px 14px; font-size: 12.5px;">
+              ✕ Close Tracking
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </body>
 </html>
