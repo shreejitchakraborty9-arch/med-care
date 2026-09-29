@@ -7,7 +7,8 @@
       "**/node_modules/**",
       "seed.js",
       ".env",
-      "env-config.js"
+      "env-config.js",
+      "IMPLEMENTATION_PLAN.md"
     ],
     "rewrites": [
       {

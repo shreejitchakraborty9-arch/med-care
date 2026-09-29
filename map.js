@@ -1,5 +1,7 @@
 // map.js - Interactive Google Maps Engine for West Bengal Hospitals
 
+window.initMap = window.initMap || function() {};
+
 let mapInstance = null;
 let markersMap = new Map(); // hospital.id -> google.maps.Marker
 let activeInfoWindow = null;
@@ -27,14 +29,21 @@ function loadGoogleMapsApi(apiKey) {
       return resolve(window.google.maps);
     }
 
-    const callbackName = "initMap";
-    window[callbackName] = () => {
+    const prevInit = window.initMap;
+    window.initMap = () => {
+      if (typeof prevInit === "function") prevInit();
       resolve(window.google.maps);
     };
 
+    const existing = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.google.maps));
+      return;
+    }
+
     const script = document.createElement("script");
     const keyParam = apiKey ? `key=${apiKey}&` : "";
-    script.src = `https://maps.googleapis.com/maps/api/js?${keyParam}callback=${callbackName}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?${keyParam}callback=initMap`;
     script.async = true;
     script.defer = true;
 
