@@ -37,7 +37,7 @@ The application provides dual-role access control with demo credentials pre-conf
 <a id="verified-healthcare-facility-coverage"></a>
 ## 🏥 Verified Healthcare Facility Coverage
 
-MedWatch West Bengal monitors **exactly 74 healthcare facilities** with verified GPS coordinates and ward distributions spanning all **23 Districts of West Bengal**:
+MedWatch West Bengal monitors **exactly 74 healthcare facilities** (44 Rural BPHCs, 10 District Hospitals, 20 State Medical Colleges) with verified GPS coordinates and ward distributions spanning all **23 Districts of West Bengal**:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐

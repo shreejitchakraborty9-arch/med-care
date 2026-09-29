@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MedWatch â€” Admin Dashboard</title>
+  <title>MedWatch — Admin Dashboard</title>
   <script src="env-config.js"></script>
   <script type="module" src="firebase-config.js"></script>
   <script>
@@ -1452,7 +1452,7 @@
         // Expose hospital data to agent sidebar module
         window._latestHospitals = hospitals;
 
-        // Check if any hospital newly crossed 80% occupancy â€” notify EpidemicAgent
+        // Check if any hospital newly crossed 80% occupancy — notify EpidemicAgent
         const newThresholdCrossings = hospitals.some((h) => {
           const total = Number(h.totalBeds) || 0;
           const occ = Number(h.occupiedBeds) || 0;
@@ -2823,10 +2823,10 @@
   </script>
 
   <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       AGENT NOTIFICATION SIDEBAR â€” Styles
+       AGENT NOTIFICATION SIDEBAR — Styles
   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <style>
-    /* â”€â”€ Sidebar Shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* -- Sidebar Shell ------------------------------------------ */
     #agent-sidebar {
       position: fixed;
       top: 0;
@@ -2845,7 +2845,7 @@
     #agent-sidebar.sidebar-closed {
       transform: translateX(100%);
     }
-    /* â”€â”€ Sidebar Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* -- Sidebar Header ----------------------------------------- */
     #agent-sidebar .ag-header {
       background: #1a2744;
       color: #ffffff;
@@ -2881,7 +2881,7 @@
       padding: 2px 8px;
       line-height: 1;
     }
-    /* â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* -- Tabs --------------------------------------------------- */
     #agent-sidebar .ag-tabs {
       display: flex;
       border-bottom: 2px solid #e5e7eb;
@@ -2916,7 +2916,7 @@
       font-weight: 700;
       vertical-align: middle;
     }
-    /* â”€â”€ Scroll area â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* -- Scroll area -------------------------------------------- */
     #agent-sidebar .ag-scroll {
       flex: 1;
       overflow-y: auto;
@@ -2924,7 +2924,7 @@
       scrollbar-width: thin;
       scrollbar-color: #d1d5db transparent;
     }
-    /* â”€â”€ Alert Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* -- Alert Cards -------------------------------------------- */
     .ag-card {
       background: #ffffff;
       border: 1px solid #e5e7eb;
@@ -3061,7 +3061,7 @@
       border-radius: 4px;
       margin: 8px 0;
     }
-    /* â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* -- Toast -------------------------------------------------- */
     #ag-toast {
       position: fixed;
       bottom: 24px;
@@ -3079,7 +3079,7 @@
       pointer-events: none;
     }
     #ag-toast.show { opacity: 1; }
-    /* â”€â”€ Mobile: sidebar hidden by default â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* -- Mobile: sidebar hidden by default --------------------- */
     @media (max-width: 900px) {
       #agent-sidebar { width: 100vw; max-width: 360px; }
       #agent-sidebar:not(.sidebar-closed) { box-shadow: -3px 0 30px rgba(0,0,0,0.3); }
@@ -3088,7 +3088,7 @@
   </style>
 
   <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       AGENT NOTIFICATION SIDEBAR â€” HTML
+       AGENT NOTIFICATION SIDEBAR — HTML
   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <aside id="agent-sidebar" role="complementary" aria-label="AI Agent Alerts Sidebar">
     <!-- Header -->
@@ -3123,7 +3123,7 @@
   <div id="ag-toast">&#x2713; Alert marked as resolved</div>
 
   <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       AGENT SYSTEM â€” JavaScript (ES Module)
+       AGENT SYSTEM — JavaScript (ES Module)
   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <script type="module">
     import { db } from "./firebase-config.js";
@@ -3136,10 +3136,10 @@
       subscribeToAgentAlerts
     } from "./agents.js";
 
-    // â”€â”€ Initialise agents DB connection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Initialise agents DB connection -------------------------
     initAgentsDb(db);
 
-    // â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- State ---------------------------------------------------
     let activeTab = "medicine";
     const localAlerts = {
       medicine: [],
@@ -3148,7 +3148,7 @@
     };
     let isSidebarOpen = window.innerWidth > 900; // open on desktop by default
 
-    // â”€â”€ DOM refs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- DOM refs ------------------------------------------------
     const sidebar       = document.getElementById("agent-sidebar");
     const agCloseBtn    = document.getElementById("ag-close-btn");
     const agBellBtn     = document.getElementById("agent-bell-btn");
@@ -3161,7 +3161,7 @@
     // Apply initial sidebar state
     if (!isSidebarOpen) sidebar.classList.add("sidebar-closed");
 
-    // â”€â”€ Toggle sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Toggle sidebar -----------------------------------------
     function toggleSidebar() {
       isSidebarOpen = !isSidebarOpen;
       sidebar.classList.toggle("sidebar-closed", !isSidebarOpen);
@@ -3169,7 +3169,7 @@
     agBellBtn.addEventListener("click", toggleSidebar);
     agCloseBtn.addEventListener("click", toggleSidebar);
 
-    // â”€â”€ Tab switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Tab switching ------------------------------------------
     tabButtons.forEach(btn => {
       btn.addEventListener("click", () => {
         tabButtons.forEach(b => { b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
@@ -3180,7 +3180,7 @@
       });
     });
 
-    // â”€â”€ Toast utility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Toast utility ------------------------------------------
     let toastTimeout = null;
     function showToast(msg = "Alert marked as resolved") {
       agToast.textContent = msg;
@@ -3189,7 +3189,7 @@
       toastTimeout = setTimeout(() => agToast.classList.remove("show"), 3000);
     }
 
-    // â”€â”€ Web Audio CRITICAL beep â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Web Audio CRITICAL beep --------------------------------
     function playCriticalBeep() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3203,7 +3203,7 @@
       } catch {}
     }
 
-    // â”€â”€ Format timestamp â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Format timestamp ---------------------------------------
     function fmtTime(iso) {
       if (!iso) return "";
       try {
@@ -3213,7 +3213,7 @@
       } catch { return iso; }
     }
 
-    // â”€â”€ Update badge counts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Update badge counts ------------------------------------
     function updateBadges() {
       const counts = { medicine: 0, bed: 0, epidemic: 0 };
       for (const [type, list] of Object.entries(localAlerts)) {
@@ -3365,7 +3365,7 @@
       await resolveAlertInFirestore(alertId);
     };
 
-    // â”€â”€ Render the active tab's alerts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Render the active tab's alerts -------------------------
     function renderAlertList() {
       agScroll.innerHTML = "";
       const list = localAlerts[activeTab] || [];
@@ -3397,7 +3397,7 @@
       resolved.forEach(a   => agScroll.appendChild(buildCard(a)));
     }
 
-    // â”€â”€ Ingest new alerts from an agent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Ingest new alerts from an agent ------------------------
     function ingestAlerts(agentType, newAlerts, isNew = true) {
       if (!newAlerts || !newAlerts.length) return;
       const type = agentType.toLowerCase(); // medicine|bed|epidemic
@@ -3423,7 +3423,7 @@
       }
     }
 
-    // â”€â”€ Firestore real-time listener (deduplicates via firestoreId) â”€
+    // -- Firestore real-time listener (deduplicates via firestoreId) --
     subscribeToAgentAlerts((allAlerts) => {
       // Rebuild localAlerts from Firestore truth
       localAlerts.medicine  = allAlerts.filter(a => a.agentType === "MEDICINE");
@@ -3433,7 +3433,7 @@
       renderAlertList();
     });
 
-    // â”€â”€ Expose agent runner for dashboard main script â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Expose agent runner for dashboard main script ----------
     //    Attach to window so the existing module can call it via event
     async function runAllAgents(hospitalsData) {
       if (!hospitalsData || !hospitalsData.length) return;
@@ -3461,7 +3461,7 @@
         ingestAlerts("EPIDEMIC", [{ _error: true, agentType:"EPIDEMIC", message: "Agent temporarily unavailable." }], false);
     }
 
-    // â”€â”€ Hook into hospital data â€” wait for it to be populated â”€â”€â”€
+    // -- Hook into hospital data — wait for it to be populated ---
     //    The dashboard's main module populates window._latestHospitals
     function waitForHospitalsAndStart() {
       if (window._latestHospitals && window._latestHospitals.length > 0) {
@@ -3470,11 +3470,11 @@
         // Run all agents immediately on load
         runAllAgents(data);
 
-        // Agent 1 â€” Medicine: every 5 minutes
+        // Agent 1 — Medicine: every 5 minutes
         setInterval(() => runAllAgents(window._latestHospitals || data), 5 * 60 * 1000);
 
-        // Agent 2 â€” Bed: every 3 minutes (covered inside runAllAgents)
-        // Agent 3 â€” Epidemic: every 10 minutes
+        // Agent 2 — Bed: every 3 minutes (covered inside runAllAgents)
+        // Agent 3 — Epidemic: every 10 minutes
         // All three are batched into runAllAgents to simplify interval management.
         // Separated intervals for precise per-agent scheduling:
         setInterval(() => BedAgent(window._latestHospitals || data).then(r => ingestAlerts("BED", r, true)).catch(() => {}),
