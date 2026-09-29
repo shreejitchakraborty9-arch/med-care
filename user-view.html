@@ -1480,12 +1480,22 @@
 </head>
 <body>
 
+  <!-- Persistent Hackathon Submission Prototype Disclaimer Banner -->
+  <aside class="hackathon-disclaimer-banner" role="alert" aria-label="Hackathon Prototype Disclaimer">
+    <div class="hackathon-disclaimer-content">
+      <span class="hackathon-disclaimer-badge">⚠️ HACKATHON PROTOTYPE</span>
+      <span class="hackathon-disclaimer-text">Illustrative demonstration data only — Not an official Government of West Bengal service.</span>
+      <span class="hackathon-disclaimer-sub">(Real hospital names &amp; emergency helplines referenced for simulation; bed capacity &amp; medicine stock metrics are mock data.)</span>
+    </div>
+  </aside>
+
+
   <!-- 1. HEADER: Compact Gov Header with Logout -->
   <header class="citizen-header">
     <div class="citizen-title-wrap">
       <div>
         <h1>MedWatch — Hospital Availability</h1>
-        <p>Real-Time Hospital Availability • West Bengal</p>
+        <p>Real-Time Hospital Availability • West Bengal <span style="background: rgba(245,158,11,0.3); color: #fef08a; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-left: 6px; border: 1px solid rgba(245,158,11,0.5);">HACKATHON PROTOTYPE</span></p>
       </div>
     </div>
     <button id="btn-logout" class="btn-logout-citizen" aria-label="Logout">
@@ -1496,7 +1506,16 @@
   <!-- Main Mobile Container -->
   <main class="citizen-container">
 
-    <!-- 1. TOP-SEGMENTED SWITCHER (Apple HIG / Material 3 Segmented Pill Bar) -->
+        <!-- Citizen Context Disclaimer Banner -->
+    <div class="citizen-disclaimer-callout" role="note" style="background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 10px 16px; border-radius: 8px; font-size: 12.5px; color: #78350f; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 16px;" aria-hidden="true">⚠️</span>
+        <span><strong>Hackathon Prototype Notice:</strong> Hospital bed availability, ward allocations, and driver dispatch shown are illustrative test data for hackathon evaluation. This is not an official Government of West Bengal emergency service. In genuine emergencies, call <strong>108</strong> or <strong>102</strong> directly.</span>
+      </div>
+      <span style="background: #fef3c7; color: #b45309; font-weight: 700; font-size: 10.5px; padding: 2px 8px; border-radius: 4px; border: 1px solid #fcd34d; white-space: nowrap;">DEMO SYSTEM</span>
+    </div>
+
+<!-- 1. TOP-SEGMENTED SWITCHER (Apple HIG / Material 3 Segmented Pill Bar) -->
     <nav class="citizen-segmented-nav" role="tablist" aria-label="Portal View Navigation">
       <button 
         type="button" 
@@ -1609,7 +1628,7 @@
               <span>🚑</span>
               <span>Emergency Ambulance Dispatch</span>
             </div>
-            <div class="amb-modal-subtitle">Direct Driver Connection • West Bengal Network</div>
+            <div class="amb-modal-subtitle">Simulated Driver Connection • Hackathon Prototype</div>
           </div>
           <button id="btn-close-ambulance" class="amb-btn-close" type="button" aria-label="Close dialog">&times;</button>
         </div>
@@ -1617,7 +1636,7 @@
         <div class="amb-modal-body">
           <!-- Demo Disclaimer -->
           <div class="amb-demo-badge">
-            ⚠️ <strong>DEMO SIMULATION ONLY:</strong> Connects to simulated nearby drivers for testing. For genuine emergencies, dial <strong>102</strong> (National Ambulance Service) or <strong>108 / 112</strong> (State Emergency Services).
+            ⚠️ <strong>HACKATHON DEMO SIMULATION ONLY:</strong> Illustrative test data — not an official Government of West Bengal emergency service. Connects to simulated nearby drivers for testing. For genuine emergencies, dial <strong>102</strong> (National Ambulance Service) or <strong>108 / 112</strong> (State Emergency Services).
           </div>
 
           <!-- Target Facility Banner (Optional) -->
