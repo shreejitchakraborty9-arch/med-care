@@ -8,7 +8,8 @@
       "seed.js",
       ".env",
       "env-config.js",
-      "IMPLEMENTATION_PLAN.md"
+      "IMPLEMENTATION_PLAN.md",
+      "*.bat"
     ],
     "rewrites": [
       {
