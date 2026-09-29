@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 const config = `window.ENV = {
   FIREBASE_API_KEY: "${process.env.FIREBASE_API_KEY}",
