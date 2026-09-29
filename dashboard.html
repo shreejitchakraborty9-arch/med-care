@@ -58,13 +58,21 @@
         <span style="font-size: 14px;">&#x1F4CB;</span>
         <span id="bell-badge" class="alert-badge-high" style="padding: 1px 6px; font-size: 10px;">0</span>
       </a>
-      <button id="btn-print-report" class="btn-primary" title="Print Executive Supply Report" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.35);">
-        &#x1F5A8;&#xFE0F; Print Report
+      <button id="mode-toggle" class="btn-read-mode" title="Toggle Dashboard Mode">
+        👁 Read Mode
       </button>
-      <span class="header-badge" id="live-indicator">&#x25CF; SYSTEM ONLINE</span>
+      <button id="btn-print-report" class="btn-primary" title="Print Executive Supply Report" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.35);">
+        🖨️ Print Report
+      </button>
+      <span class="header-badge" id="live-indicator">● SYSTEM ONLINE</span>
       <span id="header-user" style="color: #cbd5e1; font-size: 12px;">Admin Mode</span>
     </div>
   </header>
+
+  <!-- Edit Mode Warning Banner -->
+  <div id="edit-mode-banner" style="display: none;">
+    <span>⚠️ EDIT MODE ACTIVE — All changes save directly to database in real time</span>
+  </div>
 
   <!-- Emergency Alert Banner -->
   <div id="emergency-banner" style="display: none; background-color: var(--status-red); color: #ffffff; padding: 12px 24px; font-weight: 700; text-align: center; font-size: 15px; letter-spacing: 0.5px; border-bottom: 3px solid #991b1b; box-shadow: 0 2px 8px rgba(211, 47, 47, 0.35);">
@@ -86,10 +94,13 @@
           <span>&#x26A0;&#xFE0F;</span> AI Alerts
         </a>
         <a href="#section-table" class="nav-link" id="nav-hospitals">
-          <span>&#x1F3E5;</span> Hospitals
+          <span>🏥</span> Hospitals
+        </a>
+        <a href="#section-history" class="nav-link" id="nav-history">
+          <span>📋</span> Edit History
         </a>
         <a href="javascript:void(0)" class="nav-link" id="nav-logout" style="color: #b91c1c;">
-          <span>&#x1F6AA;</span> Logout
+          <span>🚪</span> Logout
         </a>
       </nav>
 
@@ -131,6 +142,11 @@
           </div>
         </div>
       </section>
+
+      <!-- Last edited timestamp (Read Mode) -->
+      <div id="last-edited-label" class="read-only" style="margin: -12px 0 20px 2px;">
+        <span>🕒</span> <span id="last-edited-text">Last edited: Checking audit trail...</span>
+      </div>
 
       <!-- SECTION 2: AI Alerts Panel -->
       <section id="section-alerts" class="ai-panel" aria-label="AI Generated Alerts">
@@ -182,6 +198,15 @@
               <option value="">All Districts</option>
             </select>
           </div>
+        </div>
+
+        <div class="edit-table-toolbar edit-only">
+          <button type="button" id="btn-open-add-hospital" class="btn-add-hospital">
+            ➕ Add New Hospital
+          </button>
+          <button type="button" id="btn-open-bulk-update" class="btn-bulk-update">
+            📋 Bulk Update
+          </button>
         </div>
 
         <div class="table-responsive">
@@ -240,6 +265,37 @@
         </div>
       </section>
 
+      <!-- SECTION 5: Edit History Log -->
+      <section id="section-history" aria-label="Admin Edit History Log" style="margin-bottom: 24px;">
+        <div class="section-header">
+          <h2 class="section-title">Admin Modification & Action Audit Trail</h2>
+          <div style="font-size: 12px; color: var(--text-muted);">
+            Last 50 changes recorded in real time to Firestore
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="hospital-table" id="history-table">
+            <thead>
+              <tr>
+                <th style="width: 160px;">Timestamp</th>
+                <th style="width: 140px;">Action</th>
+                <th>Hospital Name</th>
+                <th>District</th>
+                <th>Change Details</th>
+                <th style="width: 100px;">Admin</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 20px; color: var(--text-muted);">
+                  Loading audit logs...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -247,7 +303,7 @@
   <div id="redistribution-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="modal-title-text" class="modal-title">&#x1F6A8; Health Emergency Redistribution Protocol</h3>
+        <h3 id="modal-title-text" class="modal-title">🚨 Health Emergency Redistribution Protocol</h3>
         <button id="modal-close-btn" class="modal-close" aria-label="Close Modal">&times;</button>
       </div>
       <div class="modal-body" id="modal-body-content">
@@ -260,6 +316,232 @@
       </div>
     </div>
   </div>
+
+  <!-- Medicine Edit Modal -->
+  <div id="medicines-edit-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">💊 Edit Medicines — <span id="med-modal-hospital-name"></span></h3>
+        <button class="modal-close" id="med-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="med-modal-error" class="modal-error-box"></div>
+        <div id="med-list-container">
+          <!-- Dynamic or pre-filled medicine inputs -->
+        </div>
+        <button type="button" id="btn-add-med-row" class="btn-primary" style="margin-top: 12px; font-size: 11.5px; background: #f1f5f9; color: #1e293b; border: 1px dashed #94a3b8; cursor: pointer;">
+          ➕ Add Medicine
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="med-modal-cancel">Cancel</button>
+        <button type="button" class="btn-modal-save" id="med-modal-save">💾 Save Medicines</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vaccine Edit Modal -->
+  <div id="vaccines-edit-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">💉 Edit Vaccines — <span id="vac-modal-hospital-name"></span></h3>
+        <button class="modal-close" id="vac-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="vac-modal-error" class="modal-error-box"></div>
+        <div id="vac-list-container">
+          <!-- Dynamic or pre-filled vaccine inputs -->
+        </div>
+        <button type="button" id="btn-add-vac-row" class="btn-primary" style="margin-top: 12px; font-size: 11.5px; background: #f1f5f9; color: #1e293b; border: 1px dashed #94a3b8; cursor: pointer;">
+          ➕ Add Vaccine
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="vac-modal-cancel">Cancel</button>
+        <button type="button" class="btn-modal-save" id="vac-modal-save">💾 Save Vaccines</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ward Capacity Modal -->
+  <div id="wards-edit-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 class="modal-title">🏥 Ward Breakdown — <span id="ward-modal-hospital-name"></span></h3>
+        <button class="modal-close" id="ward-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="ward-modal-error" class="modal-error-box"></div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+          Configure bed capacities and occupancy across key hospital wards:
+        </div>
+        <div id="ward-inputs-grid">
+          <!-- 5 standard wards: General, ICU, Emergency, Maternity, Pediatric -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="ward-modal-cancel">Cancel</button>
+        <button type="button" class="btn-modal-save" id="ward-modal-save">💾 Save Wards</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Note Modal -->
+  <div id="note-edit-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📝 Admin Note / Status Report</h3>
+        <button class="modal-close" id="note-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-weight: 600; font-size: 13px; margin-bottom: 6px;" id="note-modal-hospital-name"></div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px;">
+          This note appears in the hospital directory and the map popup.
+        </div>
+        <div class="form-group">
+          <textarea id="note-modal-textarea" class="form-textarea" rows="4" placeholder="e.g., Oxygen tanker arriving in 2 hours or Generator repaired, power restored..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="note-modal-cancel">Cancel</button>
+        <button type="button" class="btn-modal-save" id="note-modal-save">💾 Save Note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add New Hospital Modal -->
+  <div id="add-hospital-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ Add New Hospital Facility</h3>
+        <button class="modal-close" id="add-hosp-close">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+        <div id="add-hosp-error" class="modal-error-box"></div>
+        <form id="add-hospital-form" onsubmit="return false;">
+          <div class="form-group">
+            <label class="form-label" for="add-hosp-name">Hospital Name *</label>
+            <input type="text" id="add-hosp-name" class="form-input" placeholder="e.g. Asansol District Hospital" required>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="add-hosp-district">District *</label>
+              <select id="add-hosp-district" class="form-select" required>
+                <!-- Districts dynamically populated -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="add-hosp-type">Facility Type *</label>
+              <select id="add-hosp-type" class="form-select" required>
+                <option value="District Hospital">District Hospital</option>
+                <option value="Medical College">Medical College</option>
+                <option value="Super Specialty Hospital">Super Specialty Hospital</option>
+                <option value="Sub-Divisional Hospital">Sub-Divisional Hospital</option>
+                <option value="Rural Hospital">Rural Hospital</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="add-hosp-lat">Latitude (WB: 21.50 to 27.20) *</label>
+              <input type="number" id="add-hosp-lat" class="form-input" step="0.0001" placeholder="22.5726" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="add-hosp-lng">Longitude (WB: 86.30 to 89.90) *</label>
+              <input type="number" id="add-hosp-lng" class="form-input" step="0.0001" placeholder="88.3639" required>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="add-hosp-total-beds">Total Beds *</label>
+              <input type="number" id="add-hosp-total-beds" class="form-input" min="1" value="250" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="add-hosp-occupied-beds">Occupied Beds *</label>
+              <input type="number" id="add-hosp-occupied-beds" class="form-input" min="0" value="180" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="add-hosp-contact">Contact / Helpline Number</label>
+            <input type="text" id="add-hosp-contact" class="form-input" placeholder="033-2222-3333">
+          </div>
+          <div style="font-weight: 700; font-size: 12.5px; color: var(--primary-navy); margin: 12px 0 6px;">
+            Initial Medicine Stock (Units)
+          </div>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Paracetamol</label>
+              <input type="number" id="add-hosp-med-paracetamol" class="form-input" min="0" value="1500">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amoxicillin</label>
+              <input type="number" id="add-hosp-med-amoxicillin" class="form-input" min="0" value="900">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ORS Packets</label>
+              <input type="number" id="add-hosp-med-ors" class="form-input" min="0" value="2000">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Normal Saline</label>
+              <input type="number" id="add-hosp-med-saline" class="form-input" min="0" value="700">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Metformin</label>
+              <input type="number" id="add-hosp-med-metformin" class="form-input" min="0" value="850">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="add-hosp-cancel">Cancel</button>
+        <button type="button" class="btn-modal-save" id="add-hosp-submit">💾 Add Hospital</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Spreadsheet Update Modal -->
+  <div id="bulk-update-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-content bulk-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 Bulk Spreadsheet Resource Update — All Hospitals</h3>
+        <button class="modal-close" id="bulk-modal-close">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 10px 16px;">
+        <div id="bulk-modal-status" style="display: none; padding: 8px 12px; margin-bottom: 8px; border-radius: 4px; font-weight: 600; font-size: 12px; background: #dbeafe; color: #1e40af;"></div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+          Edit bed counts and essential supply levels directly across all facilities. Use Tab key to navigate between cells.
+        </div>
+        <div class="bulk-table-wrap">
+          <table class="bulk-table">
+            <thead>
+              <tr>
+                <th style="width: 220px;">Hospital Name</th>
+                <th>District</th>
+                <th style="text-align: right;">Total Beds</th>
+                <th style="text-align: right;">Occupied Beds</th>
+                <th style="text-align: right;">Paracetamol</th>
+                <th style="text-align: right;">Amoxicillin</th>
+                <th style="text-align: right;">Saline</th>
+                <th style="text-align: right;">ORS</th>
+              </tr>
+            </thead>
+            <tbody id="bulk-table-body">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="bulk-modal-cancel">Cancel</button>
+        <button type="button" class="btn-modal-save" id="bulk-modal-save">💾 Save All Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
 
   <!-- Application Logic (ES Module) -->
   <script type="module">
@@ -278,7 +560,14 @@
       collection, 
       onSnapshot, 
       doc, 
-      updateDoc 
+      updateDoc,
+      setDoc,
+      addDoc,
+      deleteDoc,
+      writeBatch,
+      query,
+      orderBy,
+      limit 
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -287,6 +576,8 @@
     let currentAlerts = [];
     let mapInitialized = false;
     let isGeneratingAlerts = false;
+    let currentMode = localStorage.getItem('dashboard_mode') || 'read';
+    let editHistoryList = [];
 
     // Logout Handler: calls Firebase Auth signOut(), clears localStorage completely, and redirects to index.html
     document.getElementById('nav-logout').addEventListener('click', async (e) => {
@@ -318,6 +609,190 @@
     function closeModal() {
       modal.style.display = 'none';
     }
+
+    // ==========================================
+    // READ / EDIT MODE HANDLING & PERSISTENCE
+    // ==========================================
+    function setDashboardMode(mode) {
+      currentMode = mode;
+      localStorage.setItem('dashboard_mode', mode);
+      const toggleBtn = document.getElementById('mode-toggle');
+      const banner = document.getElementById('edit-mode-banner');
+
+      if (mode === 'edit') {
+        document.body.classList.remove('mode-read');
+        document.body.classList.add('mode-edit');
+        if (toggleBtn) {
+          toggleBtn.className = 'btn-edit-mode';
+          toggleBtn.innerHTML = '✏️ Edit Mode — LIVE';
+        }
+        if (banner) banner.style.display = 'flex';
+      } else {
+        document.body.classList.remove('mode-edit');
+        document.body.classList.add('mode-read');
+        if (toggleBtn) {
+          toggleBtn.className = 'btn-read-mode';
+          toggleBtn.innerHTML = '👁 Read Mode';
+        }
+        if (banner) banner.style.display = 'none';
+      }
+    }
+
+    const modeToggleBtn = document.getElementById('mode-toggle');
+    if (modeToggleBtn) {
+      modeToggleBtn.addEventListener('click', () => {
+        const nextMode = currentMode === 'read' ? 'edit' : 'read';
+        setDashboardMode(nextMode);
+      });
+    }
+    setDashboardMode(currentMode);
+
+    // ==========================================
+    // TOAST NOTIFICATIONS
+    // ==========================================
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast-msg toast-${type}`;
+      const icon = type === 'success' ? '✓' : (type === 'error' ? '⚠️' : 'ℹ️');
+      toast.innerHTML = `<span style="font-size:15px;">${icon}</span> <span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // ==========================================
+    // AUDIT LOGGING & EDIT HISTORY
+    // ==========================================
+    async function logEditHistory({ adminAction, hospitalName, district, fieldChanged, oldValue, newValue }) {
+      try {
+        await addDoc(collection(db, "edit_history"), {
+          timestamp: new Date().toISOString(),
+          adminAction: adminAction || "EDIT",
+          hospitalName: hospitalName || "-",
+          district: district || "-",
+          fieldChanged: fieldChanged || "-",
+          oldValue: oldValue !== undefined ? oldValue : "-",
+          newValue: newValue !== undefined ? newValue : "-",
+          editedBy: "Admin"
+        });
+      } catch (err) {
+        console.error("Failed to write audit entry to edit_history:", err);
+      }
+    }
+
+    function formatDateTime(isoString) {
+      if (!isoString) return "-";
+      try {
+        const d = new Date(isoString);
+        return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) + ' ' +
+               d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      } catch {
+        return isoString;
+      }
+    }
+
+    function updateLastEditedLabel(historyList) {
+      const labelText = document.getElementById('last-edited-text');
+      if (!labelText) return;
+      if (!historyList || historyList.length === 0) {
+        labelText.textContent = "Last edited: Never • 0 updates today";
+        return;
+      }
+      const latest = historyList[0];
+      const latestTime = formatLastUpdated(latest.timestamp);
+      
+      const todayDateStr = new Date().toDateString();
+      const updatesToday = historyList.filter(item => {
+        return item.timestamp && new Date(item.timestamp).toDateString() === todayDateStr;
+      }).length;
+      
+      labelText.textContent = `Last edited: ${latestTime} by ${latest.editedBy || 'Admin'} • ${updatesToday} total update${updatesToday === 1 ? '' : 's'} today`;
+    }
+
+    function renderEditHistoryTable(list) {
+      const tbody = document.getElementById('history-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (!list || list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No audit log entries recorded yet.</td></tr>`;
+        return;
+      }
+
+      list.forEach(item => {
+        const tr = document.createElement('tr');
+        let badgeClass = 'history-badge-bed';
+        if (item.adminAction === 'MEDICINE_UPDATE') badgeClass = 'history-badge-med';
+        else if (item.adminAction === 'HOSPITAL_ADDED') badgeClass = 'history-badge-add';
+        else if (item.adminAction === 'HOSPITAL_REMOVED') badgeClass = 'history-badge-remove';
+        else if (item.adminAction === 'EMERGENCY_LIFTED') badgeClass = 'history-badge-emergency';
+        else if (item.adminAction === 'BULK_UPDATE') badgeClass = 'history-badge-bulk';
+
+        let details = '';
+        if (item.fieldChanged && item.oldValue !== undefined && item.newValue !== undefined && item.oldValue !== '-' && item.newValue !== '-') {
+          details = `${item.fieldChanged}: ${item.oldValue} → ${item.newValue}`;
+        } else {
+          details = item.fieldChanged || item.adminAction;
+        }
+
+        tr.innerHTML = `
+          <td style="font-size: 11.5px; color: #4b5563;">${formatDateTime(item.timestamp)}</td>
+          <td><span class="history-badge ${badgeClass}">${item.adminAction}</span></td>
+          <td style="font-weight: 600;">${item.hospitalName || '-'}</td>
+          <td>${item.district || '-'}</td>
+          <td style="font-family: monospace; font-size: 11.5px;">${details}</td>
+          <td style="font-size: 12px; color: #64748b;">${item.editedBy || 'Admin'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function initEditHistoryListener() {
+      try {
+        const q = query(collection(db, "edit_history"), orderBy("timestamp", "desc"), limit(50));
+        onSnapshot(q, (snapshot) => {
+          const list = [];
+          snapshot.forEach(docSnap => {
+            list.push({ id: docSnap.id, ...docSnap.data() });
+          });
+          editHistoryList = list;
+          renderEditHistoryTable(list);
+          updateLastEditedLabel(list);
+        }, (err) => {
+          console.warn("Edit history query failed (falling back to simple collection snapshot):", err);
+          onSnapshot(collection(db, "edit_history"), (snap) => {
+            const list = [];
+            snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+            list.sort((a,b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+            editHistoryList = list.slice(0, 50);
+            renderEditHistoryTable(editHistoryList);
+            updateLastEditedLabel(editHistoryList);
+          }, (e) => console.error("Edit history fallback error:", e));
+        });
+      } catch (e) {
+        console.warn("initEditHistoryListener exception:", e);
+      }
+    }
+
+    // Sidebar navigation smooth scrolling
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          e.preventDefault();
+          document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+    });
 
     /**
      * 4. Updates Emergency Banner at top of dashboard
@@ -621,31 +1096,162 @@
         tr.innerHTML = `
           <td>
             <div style="font-weight: 700; color: #1a2744;">${h.name}</div>
+            ${h.notes ? `<div style="font-size: 11px; color: #475569; font-style: italic; margin-top: 2px;">📝 ${h.notes}</div>` : ''}
             <div style="font-size: 11px; color: #6b7280; margin-top: 3px;">
-              &#x1F552; Last updated: ${formatLastUpdated(h.lastUpdated)}
+              🕒 Last updated: ${formatLastUpdated(h.lastUpdated)}
             </div>
           </td>
           <td>${h.district}</td>
           <td><span style="font-size: 11.5px; color: #4b5563;">${h.type}</span></td>
-          <td style="text-align: right; font-weight: 600;">${total}</td>
-          <td style="text-align: right;">${occupied}</td>
-          <td style="text-align: right; font-weight: 700; color: ${free < 25 ? 'var(--status-red)' : 'var(--status-green)'};">${free}</td>
+          <td style="text-align: right; font-weight: 600;">
+            <span class="read-only">${total}</span>
+            <input type="number" min="1" class="edit-only edit-bed-input input-total-beds" value="${total}" data-id="${h.id}">
+          </td>
+          <td style="text-align: right;">
+            <span class="read-only">${occupied}</span>
+            <input type="number" min="0" class="edit-only edit-bed-input input-occupied-beds" value="${occupied}" data-id="${h.id}">
+          </td>
+          <td style="text-align: right;">
+            <span class="read-only" style="font-weight: 700; color: ${free < 25 ? 'var(--status-red)' : 'var(--status-green)'};">${free}</span>
+            <div class="edit-only" style="display:flex; flex-direction:column; align-items:flex-end;">
+              <span class="calc-free-val" style="font-weight: 700; color: ${free < 25 ? 'var(--status-red)' : 'var(--status-green)'};">${free}</span>
+              <button class="btn-save-row-beds" data-id="${h.id}">💾 Save</button>
+              <div class="save-feedback" id="save-fb-${h.id}" style="display:none; color:#15803d; font-size:10px; font-weight:700; margin-top:2px;">✓ Saved</div>
+            </div>
+          </td>
           <td style="text-align: center;">${statusBadge}</td>
           <td style="text-align: center;">
             <button 
-              class="${h.emergencyDeclared ? 'btn-danger' : 'btn-declare-emergency'}" 
+              class="${h.emergencyDeclared ? 'btn-danger' : 'btn-declare-emergency'} read-only btn-declare-emer" 
               data-id="${h.id}" 
               data-name="${h.name}"
               data-district="${h.district}"
               style="padding: 6px 10px; font-size: 11.5px;"
             >
-              ${h.emergencyDeclared ? '&#x1F6A8; EMERGENCY ACTIVE' : 'Declare Emergency'}
+              ${h.emergencyDeclared ? '🚨 EMERGENCY ACTIVE' : 'Declare Emergency'}
             </button>
+            <div class="edit-only" style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+              <button class="btn-row-edit btn-meds" data-id="${h.id}" title="Edit Medicine Inventory">💊 Meds</button>
+              <button class="btn-row-edit btn-vacs" data-id="${h.id}" title="Edit Vaccine Doses">💉 Vacs</button>
+              <button class="btn-row-edit btn-wards" data-id="${h.id}" title="Edit Ward Capacities">🏥 Wards</button>
+              <button class="btn-row-edit btn-note" data-id="${h.id}" title="Edit Admin Note">📝 Note</button>
+              ${h.emergencyDeclared ? `<button class="btn-lift-emergency" data-id="${h.id}" title="Lift Emergency Status">🟢 Lift</button>` : ''}
+              <button class="btn-delete-hospital" data-id="${h.id}" title="Remove Hospital">🗑 Remove</button>
+            </div>
           </td>
         `;
 
-        const btn = tr.querySelector('button');
-        btn.addEventListener('click', () => handleDeclareEmergency(h));
+        // Interactive Bed Recalculations
+        const totalInput = tr.querySelector('.input-total-beds');
+        const occInput = tr.querySelector('.input-occupied-beds');
+        const freeDisplay = tr.querySelector('.calc-free-val');
+        const saveRowBtn = tr.querySelector('.btn-save-row-beds');
+
+        function recalcFree() {
+          const t = parseInt(totalInput.value, 10) || 0;
+          const o = parseInt(occInput.value, 10) || 0;
+          const f = Math.max(0, t - o);
+          freeDisplay.textContent = f;
+          freeDisplay.style.color = (f < 25 || o > t) ? 'var(--status-red)' : 'var(--status-green)';
+        }
+
+        if (totalInput && occInput) {
+          totalInput.addEventListener('input', recalcFree);
+          occInput.addEventListener('input', recalcFree);
+        }
+
+        // Save inline bed updates
+        if (saveRowBtn) {
+          saveRowBtn.addEventListener('click', async () => {
+            const newTotal = parseInt(totalInput.value, 10);
+            const newOcc = parseInt(occInput.value, 10);
+
+            if (isNaN(newTotal) || newTotal <= 0) {
+              alert("Total beds must be a positive number.");
+              return;
+            }
+            if (isNaN(newOcc) || newOcc < 0) {
+              alert("Occupied beds cannot be negative.");
+              return;
+            }
+            if (newOcc > newTotal) {
+              alert("Occupied beds cannot exceed total beds.");
+              return;
+            }
+
+            try {
+              saveRowBtn.disabled = true;
+              const docRef = doc(db, "hospitals", h.id);
+              await updateDoc(docRef, {
+                totalBeds: newTotal,
+                occupiedBeds: newOcc,
+                lastUpdated: new Date().toISOString()
+              });
+
+              if (newTotal !== total) {
+                await logEditHistory({
+                  adminAction: "BED_UPDATE",
+                  hospitalName: h.name,
+                  district: h.district,
+                  fieldChanged: "totalBeds",
+                  oldValue: total,
+                  newValue: newTotal
+                });
+              }
+              if (newOcc !== occupied) {
+                await logEditHistory({
+                  adminAction: "BED_UPDATE",
+                  hospitalName: h.name,
+                  district: h.district,
+                  fieldChanged: "occupiedBeds",
+                  oldValue: occupied,
+                  newValue: newOcc
+                });
+              }
+
+              h.totalBeds = newTotal;
+              h.occupiedBeds = newOcc;
+              h.lastUpdated = new Date().toISOString();
+
+              const fb = tr.querySelector(`#save-fb-${h.id}`);
+              if (fb) {
+                fb.style.display = 'block';
+                setTimeout(() => { fb.style.display = 'none'; }, 2000);
+              }
+              showToast(`Bed counts updated for ${h.name}`, 'success');
+              renderStats();
+            } catch (err) {
+              console.error("Save row beds error:", err);
+              alert("Failed to save bed counts: " + err.message);
+            } finally {
+              saveRowBtn.disabled = false;
+            }
+          });
+        }
+
+        // Action button listeners
+        const declareBtn = tr.querySelector('.btn-declare-emer');
+        if (declareBtn) {
+          declareBtn.addEventListener('click', () => handleDeclareEmergency(h));
+        }
+
+        const medsBtn = tr.querySelector('.btn-meds');
+        if (medsBtn) medsBtn.addEventListener('click', () => openMedModal(h));
+
+        const vacsBtn = tr.querySelector('.btn-vacs');
+        if (vacsBtn) vacsBtn.addEventListener('click', () => openVacModal(h));
+
+        const wardsBtn = tr.querySelector('.btn-wards');
+        if (wardsBtn) wardsBtn.addEventListener('click', () => openWardModal(h));
+
+        const noteBtn = tr.querySelector('.btn-note');
+        if (noteBtn) noteBtn.addEventListener('click', () => openNoteModal(h));
+
+        const liftBtn = tr.querySelector('.btn-lift-emergency');
+        if (liftBtn) liftBtn.addEventListener('click', () => handleLiftEmergency(h));
+
+        const deleteBtn = tr.querySelector('.btn-delete-hospital');
+        if (deleteBtn) deleteBtn.addEventListener('click', () => handleRemoveHospital(h));
 
         tbody.appendChild(tr);
       });
@@ -666,6 +1272,734 @@
 
       renderHospitalTable(filtered);
     }
+
+    // ==========================================
+    // LIFT EMERGENCY & REMOVE HOSPITAL
+    // ==========================================
+    async function handleLiftEmergency(hospital) {
+      const confirmLift = confirm(`Are you sure you want to LIFT the health emergency status for ${hospital.name} in ${hospital.district}?`);
+      if (!confirmLift) return;
+
+      try {
+        const docRef = doc(db, "hospitals", hospital.id);
+        await updateDoc(docRef, { emergencyDeclared: false, lastUpdated: new Date().toISOString() });
+        hospital.emergencyDeclared = false;
+
+        await logEditHistory({
+          adminAction: "EMERGENCY_LIFTED",
+          hospitalName: hospital.name,
+          district: hospital.district,
+          fieldChanged: "emergencyDeclared",
+          oldValue: true,
+          newValue: false
+        });
+
+        showToast(`Emergency status lifted for ${hospital.name}`, 'success');
+        updateEmergencyBanner();
+        renderStats();
+        renderHospitalTable();
+        updateMapMarkers(hospitals);
+      } catch (err) {
+        console.error("Lift emergency error:", err);
+        showToast(`Failed to lift emergency: ${err.message}`, 'error');
+      }
+    }
+
+    async function handleRemoveHospital(hospital) {
+      const confirmText = prompt(
+        `⚠️ WARNING: This will permanently remove "${hospital.name}" from MedWatch.\n\nType 'DELETE' to confirm:`
+      );
+      if (confirmText !== 'DELETE') {
+        if (confirmText !== null) {
+          alert("Removal cancelled: confirmation phrase 'DELETE' was not entered.");
+        }
+        return;
+      }
+
+      try {
+        await deleteDoc(doc(db, "hospitals", hospital.id));
+
+        await logEditHistory({
+          adminAction: "HOSPITAL_REMOVED",
+          hospitalName: hospital.name,
+          district: hospital.district,
+          fieldChanged: "facility",
+          oldValue: hospital.name,
+          newValue: "DELETED"
+        });
+
+        hospitals = hospitals.filter(h => h.id !== hospital.id);
+        window._latestHospitals = hospitals;
+
+        renderHospitalTable();
+        renderStats();
+        updateMapMarkers(hospitals);
+        showToast(`${hospital.name} removed from MedWatch`, 'error');
+      } catch (err) {
+        console.error("Remove hospital error:", err);
+        showToast(`Failed to remove hospital: ${err.message}`, 'error');
+      }
+    }
+
+    // ==========================================
+    // MODAL EDITING LOGIC (MEDS, VACS, WARDS, NOTES)
+    // ==========================================
+    // --- Medicine Modal ---
+    const medModal = document.getElementById('medicines-edit-modal');
+    let medModalHospital = null;
+
+    function appendMedRow(label, val) {
+      const container = document.getElementById('med-list-container');
+      const row = document.createElement('div');
+      row.className = 'form-grid-2';
+      row.style.alignItems = 'center';
+      row.style.marginBottom = '8px';
+      row.innerHTML = `
+        <div>
+          <input type="text" class="form-input med-name-input" value="${label}" placeholder="Medicine name">
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <input type="number" min="0" class="form-input med-qty-input" value="${val}" placeholder="Quantity" style="text-align:right;">
+          <span style="font-size:11px; color:#64748b;">units</span>
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
+    function openMedModal(hospital) {
+      medModalHospital = hospital;
+      document.getElementById('med-modal-hospital-name').textContent = hospital.name;
+      document.getElementById('med-modal-error').style.display = 'none';
+
+      const container = document.getElementById('med-list-container');
+      container.innerHTML = '';
+
+      const standardMeds = [
+        { name: "Paracetamol", key: "paracetamol", defaultVal: 1000 },
+        { name: "Amoxicillin", key: "amoxicillin", defaultVal: 800 },
+        { name: "ORS Packets", key: "ors", defaultVal: 1500 },
+        { name: "Normal Saline", key: "saline", defaultVal: 600 },
+        { name: "Metformin", key: "metformin", defaultVal: 700 }
+      ];
+
+      const currentMeds = hospital.medicines || {};
+      const processedKeys = new Set();
+
+      standardMeds.forEach(m => {
+        let val = currentMeds[m.key] !== undefined ? currentMeds[m.key] : (currentMeds[m.name.toLowerCase()] !== undefined ? currentMeds[m.name.toLowerCase()] : m.defaultVal);
+        processedKeys.add(m.key);
+        processedKeys.add(m.name.toLowerCase());
+        appendMedRow(m.name, val);
+      });
+
+      for (const [k, v] of Object.entries(currentMeds)) {
+        if (!processedKeys.has(k.toLowerCase())) {
+          appendMedRow(k.charAt(0).toUpperCase() + k.slice(1), v);
+        }
+      }
+
+      medModal.style.display = 'flex';
+    }
+
+    document.getElementById('btn-add-med-row').addEventListener('click', () => {
+      appendMedRow('', 100);
+    });
+    document.getElementById('med-modal-close').addEventListener('click', () => { medModal.style.display = 'none'; });
+    document.getElementById('med-modal-cancel').addEventListener('click', () => { medModal.style.display = 'none'; });
+
+    document.getElementById('med-modal-save').addEventListener('click', async () => {
+      if (!medModalHospital) return;
+      const errorEl = document.getElementById('med-modal-error');
+      errorEl.style.display = 'none';
+
+      const rows = document.querySelectorAll('#med-list-container .form-grid-2');
+      const newMeds = {};
+      let hasError = false;
+
+      rows.forEach(r => {
+        const name = r.querySelector('.med-name-input').value.trim();
+        const qty = parseInt(r.querySelector('.med-qty-input').value, 10);
+        if (!name) return;
+        if (isNaN(qty) || qty < 0) {
+          hasError = true;
+        } else {
+          newMeds[name.toLowerCase()] = qty;
+        }
+      });
+
+      if (hasError) {
+        errorEl.textContent = "Please enter valid non-negative quantities for all medicines.";
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "hospitals", medModalHospital.id);
+        await updateDoc(docRef, {
+          medicines: newMeds,
+          lastUpdated: new Date().toISOString()
+        });
+
+        await logEditHistory({
+          adminAction: "MEDICINE_UPDATE",
+          hospitalName: medModalHospital.name,
+          district: medModalHospital.district,
+          fieldChanged: "medicines",
+          oldValue: "Updated Inventory",
+          newValue: `${Object.keys(newMeds).length} items`
+        });
+
+        medModalHospital.medicines = newMeds;
+        medModal.style.display = 'none';
+        showToast("Medicines updated successfully", "success");
+        renderQuickStats();
+      } catch (err) {
+        errorEl.textContent = "Failed to save: " + err.message;
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // --- Vaccine Modal ---
+    const vacModal = document.getElementById('vaccines-edit-modal');
+    let vacModalHospital = null;
+
+    function appendVacRow(label, val) {
+      const container = document.getElementById('vac-list-container');
+      const row = document.createElement('div');
+      row.className = 'form-grid-2';
+      row.style.alignItems = 'center';
+      row.style.marginBottom = '8px';
+      row.innerHTML = `
+        <div>
+          <input type="text" class="form-input vac-name-input" value="${label}" placeholder="Vaccine name">
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <input type="number" min="0" class="form-input vac-qty-input" value="${val}" placeholder="Doses" style="text-align:right;">
+          <span style="font-size:11px; color:#64748b;">doses</span>
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
+    function openVacModal(hospital) {
+      vacModalHospital = hospital;
+      document.getElementById('vac-modal-hospital-name').textContent = hospital.name;
+      document.getElementById('vac-modal-error').style.display = 'none';
+
+      const container = document.getElementById('vac-list-container');
+      container.innerHTML = '';
+
+      const standardVacs = [
+        { name: "Covaxin", key: "covaxin", defaultVal: 500 },
+        { name: "Covishield", key: "covishield", defaultVal: 600 },
+        { name: "Corbevax", key: "corbevax", defaultVal: 400 },
+        { name: "BCG", key: "bcg", defaultVal: 350 },
+        { name: "Polio", key: "polio", defaultVal: 800 }
+      ];
+
+      const currentVacs = hospital.vaccines || {};
+      const processedKeys = new Set();
+
+      standardVacs.forEach(v => {
+        let val = currentVacs[v.key] !== undefined ? currentVacs[v.key] : (currentVacs[v.name.toLowerCase()] !== undefined ? currentVacs[v.name.toLowerCase()] : v.defaultVal);
+        processedKeys.add(v.key);
+        processedKeys.add(v.name.toLowerCase());
+        appendVacRow(v.name, val);
+      });
+
+      for (const [k, v] of Object.entries(currentVacs)) {
+        if (!processedKeys.has(k.toLowerCase())) {
+          appendVacRow(k.charAt(0).toUpperCase() + k.slice(1), v);
+        }
+      }
+
+      vacModal.style.display = 'flex';
+    }
+
+    document.getElementById('btn-add-vac-row').addEventListener('click', () => {
+      appendVacRow('', 100);
+    });
+    document.getElementById('vac-modal-close').addEventListener('click', () => { vacModal.style.display = 'none'; });
+    document.getElementById('vac-modal-cancel').addEventListener('click', () => { vacModal.style.display = 'none'; });
+
+    document.getElementById('vac-modal-save').addEventListener('click', async () => {
+      if (!vacModalHospital) return;
+      const errorEl = document.getElementById('vac-modal-error');
+      errorEl.style.display = 'none';
+
+      const rows = document.querySelectorAll('#vac-list-container .form-grid-2');
+      const newVacs = {};
+      let hasError = false;
+
+      rows.forEach(r => {
+        const name = r.querySelector('.vac-name-input').value.trim();
+        const qty = parseInt(r.querySelector('.vac-qty-input').value, 10);
+        if (!name) return;
+        if (isNaN(qty) || qty < 0) {
+          hasError = true;
+        } else {
+          newVacs[name.toLowerCase()] = qty;
+        }
+      });
+
+      if (hasError) {
+        errorEl.textContent = "Please enter valid non-negative doses for all vaccines.";
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "hospitals", vacModalHospital.id);
+        await updateDoc(docRef, {
+          vaccines: newVacs,
+          lastUpdated: new Date().toISOString()
+        });
+
+        await logEditHistory({
+          adminAction: "VACCINE_UPDATE",
+          hospitalName: vacModalHospital.name,
+          district: vacModalHospital.district,
+          fieldChanged: "vaccines",
+          oldValue: "Updated Vaccines",
+          newValue: `${Object.keys(newVacs).length} vaccines`
+        });
+
+        vacModalHospital.vaccines = newVacs;
+        vacModal.style.display = 'none';
+        showToast("Vaccines updated successfully", "success");
+      } catch (err) {
+        errorEl.textContent = "Failed to save: " + err.message;
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // --- Ward Capacity Modal ---
+    const wardModal = document.getElementById('wards-edit-modal');
+    let wardModalHospital = null;
+
+    const standardWards = [
+      { key: "general", name: "General Ward", defaultTotal: 100, defaultOcc: 70 },
+      { key: "icu", name: "ICU", defaultTotal: 25, defaultOcc: 20 },
+      { key: "emergency", name: "Emergency Ward", defaultTotal: 30, defaultOcc: 25 },
+      { key: "maternity", name: "Maternity Ward", defaultTotal: 40, defaultOcc: 30 },
+      { key: "pediatric", name: "Pediatric Ward", defaultTotal: 30, defaultOcc: 18 }
+    ];
+
+    function openWardModal(hospital) {
+      wardModalHospital = hospital;
+      document.getElementById('ward-modal-hospital-name').textContent = hospital.name;
+      document.getElementById('ward-modal-error').style.display = 'none';
+
+      const container = document.getElementById('ward-inputs-grid');
+      container.innerHTML = '';
+
+      const currentWards = hospital.wards || {};
+
+      standardWards.forEach(w => {
+        const wardData = currentWards[w.key] || {};
+        const total = wardData.total !== undefined ? wardData.total : w.defaultTotal;
+        const occ = wardData.occupied !== undefined ? wardData.occupied : w.defaultOcc;
+
+        const row = document.createElement('div');
+        row.style.marginBottom = '10px';
+        row.style.padding = '8px 10px';
+        row.style.background = '#f8fafc';
+        row.style.borderRadius = '4px';
+        row.style.border = '1px solid #e2e8f0';
+        row.innerHTML = `
+          <div style="font-weight:600; font-size:12.5px; color:#1e293b; margin-bottom:4px;">${w.name}</div>
+          <div class="form-grid-2">
+            <div>
+              <label style="font-size:11px; color:#64748b;">Total Beds</label>
+              <input type="number" min="0" class="form-input ward-total-input" data-key="${w.key}" value="${total}">
+            </div>
+            <div>
+              <label style="font-size:11px; color:#64748b;">Occupied Beds</label>
+              <input type="number" min="0" class="form-input ward-occ-input" data-key="${w.key}" value="${occ}">
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      wardModal.style.display = 'flex';
+    }
+
+    document.getElementById('ward-modal-close').addEventListener('click', () => { wardModal.style.display = 'none'; });
+    document.getElementById('ward-modal-cancel').addEventListener('click', () => { wardModal.style.display = 'none'; });
+
+    document.getElementById('ward-modal-save').addEventListener('click', async () => {
+      if (!wardModalHospital) return;
+      const errorEl = document.getElementById('ward-modal-error');
+      errorEl.style.display = 'none';
+
+      const newWards = {};
+      let hasError = false;
+      let errorMsg = '';
+
+      standardWards.forEach(w => {
+        const totalInput = document.querySelector(`.ward-total-input[data-key="${w.key}"]`);
+        const occInput = document.querySelector(`.ward-occ-input[data-key="${w.key}"]`);
+        const total = parseInt(totalInput.value, 10);
+        const occ = parseInt(occInput.value, 10);
+
+        if (isNaN(total) || isNaN(occ) || total < 0 || occ < 0) {
+          hasError = true;
+          errorMsg = "Bed values must be non-negative numbers.";
+        } else if (occ > total) {
+          hasError = true;
+          errorMsg = `${w.name}: Occupied beds cannot exceed total beds.`;
+        } else {
+          newWards[w.key] = { total, occupied: occ, free: total - occ };
+        }
+      });
+
+      if (hasError) {
+        errorEl.textContent = errorMsg;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "hospitals", wardModalHospital.id);
+        await updateDoc(docRef, {
+          wards: newWards,
+          lastUpdated: new Date().toISOString()
+        });
+
+        await logEditHistory({
+          adminAction: "WARD_UPDATE",
+          hospitalName: wardModalHospital.name,
+          district: wardModalHospital.district,
+          fieldChanged: "wards",
+          oldValue: "Updated Ward Capacities",
+          newValue: `${Object.keys(newWards).length} wards`
+        });
+
+        wardModalHospital.wards = newWards;
+        wardModal.style.display = 'none';
+        showToast("Ward capacities updated successfully", "success");
+      } catch (err) {
+        errorEl.textContent = "Failed to save: " + err.message;
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // --- Admin Note Modal ---
+    const noteModal = document.getElementById('note-edit-modal');
+    let noteModalHospital = null;
+
+    function openNoteModal(hospital) {
+      noteModalHospital = hospital;
+      document.getElementById('note-modal-hospital-name').textContent = `${hospital.name} (${hospital.district})`;
+      document.getElementById('note-modal-textarea').value = hospital.notes || '';
+      noteModal.style.display = 'flex';
+    }
+
+    document.getElementById('note-modal-close').addEventListener('click', () => { noteModal.style.display = 'none'; });
+    document.getElementById('note-modal-cancel').addEventListener('click', () => { noteModal.style.display = 'none'; });
+
+    document.getElementById('note-modal-save').addEventListener('click', async () => {
+      if (!noteModalHospital) return;
+      const noteText = document.getElementById('note-modal-textarea').value.trim();
+
+      try {
+        const docRef = doc(db, "hospitals", noteModalHospital.id);
+        await updateDoc(docRef, {
+          notes: noteText,
+          lastUpdated: new Date().toISOString()
+        });
+
+        await logEditHistory({
+          adminAction: "NOTE_UPDATE",
+          hospitalName: noteModalHospital.name,
+          district: noteModalHospital.district,
+          fieldChanged: "notes",
+          oldValue: noteModalHospital.notes || "None",
+          newValue: noteText || "Cleared"
+        });
+
+        noteModalHospital.notes = noteText;
+        noteModal.style.display = 'none';
+        renderHospitalTable();
+        updateMapMarkers(hospitals);
+        showToast("Admin note saved", "success");
+      } catch (err) {
+        alert("Failed to save note: " + err.message);
+      }
+    });
+
+    // ==========================================
+    // ADD NEW HOSPITAL FEATURE
+    // ==========================================
+    const addHospModal = document.getElementById('add-hospital-modal');
+    const WB_DISTRICTS = [
+      "Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur",
+      "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram",
+      "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia",
+      "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur",
+      "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas",
+      "Uttar Dinajpur"
+    ];
+
+    function populateAddHospDistricts() {
+      const select = document.getElementById('add-hosp-district');
+      if (!select) return;
+      select.innerHTML = '';
+      WB_DISTRICTS.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        select.appendChild(opt);
+      });
+    }
+    populateAddHospDistricts();
+
+    document.getElementById('btn-open-add-hospital').addEventListener('click', () => {
+      document.getElementById('add-hosp-error').style.display = 'none';
+      document.getElementById('add-hospital-form').reset();
+      addHospModal.style.display = 'flex';
+    });
+
+    document.getElementById('add-hosp-close').addEventListener('click', () => { addHospModal.style.display = 'none'; });
+    document.getElementById('add-hosp-cancel').addEventListener('click', () => { addHospModal.style.display = 'none'; });
+
+    document.getElementById('add-hosp-submit').addEventListener('click', async () => {
+      const errorEl = document.getElementById('add-hosp-error');
+      errorEl.style.display = 'none';
+
+      const name = document.getElementById('add-hosp-name').value.trim();
+      const district = document.getElementById('add-hosp-district').value;
+      const type = document.getElementById('add-hosp-type').value;
+      const lat = parseFloat(document.getElementById('add-hosp-lat').value);
+      const lng = parseFloat(document.getElementById('add-hosp-lng').value);
+      const totalBeds = parseInt(document.getElementById('add-hosp-total-beds').value, 10);
+      const occupiedBeds = parseInt(document.getElementById('add-hosp-occupied-beds').value, 10);
+      const contact = document.getElementById('add-hosp-contact').value.trim();
+
+      if (!name) {
+        errorEl.textContent = "Hospital Name is required.";
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (isNaN(lat) || lat < 21.50 || lat > 27.20) {
+        errorEl.textContent = "Latitude must be between 21.50 and 27.20 (West Bengal boundary).";
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (isNaN(lng) || lng < 86.30 || lng > 89.90) {
+        errorEl.textContent = "Longitude must be between 86.30 and 89.90 (West Bengal boundary).";
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (isNaN(totalBeds) || totalBeds <= 0) {
+        errorEl.textContent = "Total beds must be greater than 0.";
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (isNaN(occupiedBeds) || occupiedBeds < 0 || occupiedBeds > totalBeds) {
+        errorEl.textContent = "Occupied beds must be between 0 and Total Beds.";
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      const pMeds = {
+        paracetamol: parseInt(document.getElementById('add-hosp-med-paracetamol').value, 10) || 0,
+        amoxicillin: parseInt(document.getElementById('add-hosp-med-amoxicillin').value, 10) || 0,
+        ors: parseInt(document.getElementById('add-hosp-med-ors').value, 10) || 0,
+        saline: parseInt(document.getElementById('add-hosp-med-saline').value, 10) || 0,
+        metformin: parseInt(document.getElementById('add-hosp-med-metformin').value, 10) || 0
+      };
+
+      const newId = `hosp_${Date.now()}`;
+      const newHospitalData = {
+        id: newId,
+        name,
+        district,
+        type,
+        lat,
+        lng,
+        totalBeds,
+        occupiedBeds,
+        medicines: pMeds,
+        vaccines: {
+          covaxin: 500,
+          covishield: 600,
+          corbevax: 400,
+          bcg: 350,
+          polio: 800
+        },
+        wards: {
+          general: { total: Math.round(totalBeds * 0.5), occupied: Math.round(occupiedBeds * 0.5) },
+          icu: { total: Math.round(totalBeds * 0.1), occupied: Math.round(occupiedBeds * 0.1) },
+          emergency: { total: Math.round(totalBeds * 0.15), occupied: Math.round(occupiedBeds * 0.15) },
+          maternity: { total: Math.round(totalBeds * 0.15), occupied: Math.round(occupiedBeds * 0.15) },
+          pediatric: { total: Math.round(totalBeds * 0.1), occupied: Math.round(occupiedBeds * 0.1) }
+        },
+        contact: contact || "1800-345-3261",
+        emergencyDeclared: false,
+        lastUpdated: new Date().toISOString()
+      };
+
+      try {
+        await setDoc(doc(db, "hospitals", newId), newHospitalData);
+        await logEditHistory({
+          adminAction: "HOSPITAL_ADDED",
+          hospitalName: name,
+          district,
+          fieldChanged: "facility",
+          oldValue: "None",
+          newValue: `${totalBeds} beds`
+        });
+
+        addHospModal.style.display = 'none';
+        showToast(`${name} added to MedWatch`, 'success');
+      } catch (err) {
+        errorEl.textContent = "Failed to add hospital: " + err.message;
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // ==========================================
+    // BULK SPREADSHEET UPDATE FEATURE
+    // ==========================================
+    const bulkModal = document.getElementById('bulk-update-modal');
+
+    document.getElementById('btn-open-bulk-update').addEventListener('click', () => {
+      openBulkModal();
+    });
+
+    document.getElementById('bulk-modal-close').addEventListener('click', () => { bulkModal.style.display = 'none'; });
+    document.getElementById('bulk-modal-cancel').addEventListener('click', () => { bulkModal.style.display = 'none'; });
+
+    function openBulkModal() {
+      const statusEl = document.getElementById('bulk-modal-status');
+      statusEl.style.display = 'none';
+      const tbody = document.getElementById('bulk-table-body');
+      tbody.innerHTML = '';
+
+      hospitals.forEach(h => {
+        const meds = h.medicines || {};
+        const tr = document.createElement('tr');
+        tr.dataset.id = h.id;
+        tr.innerHTML = `
+          <td style="font-weight:600;">${h.name}</td>
+          <td style="color:#64748b;">${h.district}</td>
+          <td style="text-align:right;">
+            <input type="number" min="1" class="bulk-input b-total" value="${h.totalBeds || 0}" data-orig="${h.totalBeds || 0}">
+          </td>
+          <td style="text-align:right;">
+            <input type="number" min="0" class="bulk-input b-occ" value="${h.occupiedBeds || 0}" data-orig="${h.occupiedBeds || 0}">
+          </td>
+          <td style="text-align:right;">
+            <input type="number" min="0" class="bulk-input b-med-para" value="${meds.paracetamol || 0}" data-orig="${meds.paracetamol || 0}">
+          </td>
+          <td style="text-align:right;">
+            <input type="number" min="0" class="bulk-input b-med-amox" value="${meds.amoxicillin || 0}" data-orig="${meds.amoxicillin || 0}">
+          </td>
+          <td style="text-align:right;">
+            <input type="number" min="0" class="bulk-input b-med-saline" value="${meds.saline || 0}" data-orig="${meds.saline || 0}">
+          </td>
+          <td style="text-align:right;">
+            <input type="number" min="0" class="bulk-input b-med-ors" value="${meds.ors || 0}" data-orig="${meds.ors || 0}">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      bulkModal.style.display = 'flex';
+    }
+
+    document.getElementById('bulk-modal-save').addEventListener('click', async () => {
+      const statusEl = document.getElementById('bulk-modal-status');
+      const saveBtn = document.getElementById('bulk-modal-save');
+      const rows = document.querySelectorAll('#bulk-table-body tr');
+      const updatesToApply = [];
+
+      for (const row of rows) {
+        const hid = row.dataset.id;
+        const hosp = hospitals.find(h => h.id === hid);
+        if (!hosp) continue;
+
+        const total = parseInt(row.querySelector('.b-total').value, 10);
+        const occ = parseInt(row.querySelector('.b-occ').value, 10);
+        const para = parseInt(row.querySelector('.b-med-para').value, 10);
+        const amox = parseInt(row.querySelector('.b-med-amox').value, 10);
+        const saline = parseInt(row.querySelector('.b-med-saline').value, 10);
+        const ors = parseInt(row.querySelector('.b-med-ors').value, 10);
+
+        const origTotal = parseInt(row.querySelector('.b-total').dataset.orig, 10);
+        const origOcc = parseInt(row.querySelector('.b-occ').dataset.orig, 10);
+        const origPara = parseInt(row.querySelector('.b-med-para').dataset.orig, 10);
+        const origAmox = parseInt(row.querySelector('.b-med-amox').dataset.orig, 10);
+        const origSaline = parseInt(row.querySelector('.b-med-saline').dataset.orig, 10);
+        const origOrs = parseInt(row.querySelector('.b-med-ors').dataset.orig, 10);
+
+        const changed = (total !== origTotal) || (occ !== origOcc) ||
+                        (para !== origPara) || (amox !== origAmox) ||
+                        (saline !== origSaline) || (ors !== origOrs);
+
+        if (changed) {
+          if (occ > total) {
+            alert(`${hosp.name}: Occupied beds (${occ}) cannot exceed Total beds (${total}).`);
+            return;
+          }
+          updatesToApply.push({
+            id: hid,
+            hosp,
+            totalBeds: total,
+            occupiedBeds: occ,
+            medicines: {
+              ...(hosp.medicines || {}),
+              paracetamol: para,
+              amoxicillin: amox,
+              saline,
+              ors
+            }
+          });
+        }
+      }
+
+      if (updatesToApply.length === 0) {
+        statusEl.style.display = 'block';
+        statusEl.textContent = 'No changes were detected.';
+        setTimeout(() => { bulkModal.style.display = 'none'; }, 1000);
+        return;
+      }
+
+      saveBtn.disabled = true;
+      statusEl.style.display = 'block';
+
+      let count = 0;
+      for (const item of updatesToApply) {
+        count++;
+        statusEl.textContent = `Updating ${count} of ${updatesToApply.length} hospitals...`;
+        try {
+          const docRef = doc(db, "hospitals", item.id);
+          await updateDoc(docRef, {
+            totalBeds: item.totalBeds,
+            occupiedBeds: item.occupiedBeds,
+            medicines: item.medicines,
+            lastUpdated: new Date().toISOString()
+          });
+
+          await logEditHistory({
+            adminAction: "BULK_UPDATE",
+            hospitalName: item.hosp.name,
+            district: item.hosp.district,
+            fieldChanged: "resources",
+            oldValue: `${item.hosp.occupiedBeds}/${item.hosp.totalBeds}`,
+            newValue: `${item.occupiedBeds}/${item.totalBeds}`
+          });
+        } catch (e) {
+          console.warn("Failed bulk item update:", item.id, e);
+        }
+      }
+
+      saveBtn.disabled = false;
+      bulkModal.style.display = 'none';
+      showToast(`Bulk update complete: ${updatesToApply.length} hospitals updated`, 'success');
+    });
 
     /**
      * Declare Emergency Click Handler
@@ -860,8 +2194,9 @@
       });
     }
 
-    // Initialize Dashboard with Realtime Firestore Sync
+    // Initialize Dashboard with Realtime Firestore Sync & Edit History Sync
     initRealtimeDashboard();
+    initEditHistoryListener();
   </script>
 
   <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•

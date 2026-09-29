@@ -168,6 +168,12 @@ function createInfoWindowContent(hospital) {
         <strong>Children Needing Vaccines:</strong> ${hospital.childrenNeedingVaccines ?? 0}
       </div>
 
+      ${hospital.notes ? `
+        <div style="margin-bottom: 10px; padding: 6px 10px; background: #f3f4f6; border-left: 3px solid #6b7280; font-size: 11.5px; font-style: italic; color: #4b5563; border-radius: 2px;">
+          <strong>Admin Note:</strong> ${hospital.notes}
+        </div>
+      ` : ''}
+
       ${hospital.emergencyDeclared 
         ? `<div style="padding: 6px 10px; background-color: #fee2e2; color: #991b1b; font-weight: 700; font-size: 11.5px; text-align: center; border: 1px solid #f87171;">
              🚨 STATE EMERGENCY PROTOCOL ACTIVE
@@ -291,6 +297,15 @@ export function updateMapMarkers(hospitals) {
       renderMapFallback(container, hospitals);
     }
     return;
+  }
+
+  // Prune markers for deleted hospitals
+  const activeIds = new Set(hospitals.map(h => h.id));
+  for (const [id, marker] of markersMap.entries()) {
+    if (!activeIds.has(id)) {
+      marker.setMap(null);
+      markersMap.delete(id);
+    }
   }
 
   hospitals.forEach(hospital => {
