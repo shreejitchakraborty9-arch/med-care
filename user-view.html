@@ -17,7 +17,81 @@
     })();
   </script>
   <style>
-    /* Mobile-first citizen view stylesheet */
+    /* ==========================================================================
+       Google Material 3 & Apple HIG Clinical Design System Tokens
+       ========================================================================== */
+    :root {
+      /* Primary Clinical Blues (NHS / Mayo Clinic Care & Authority) */
+      --wb-brand-primary: #0284c7;        /* Sky 600 - Primary actions & interactive elements */
+      --wb-brand-deep: #0369a1;           /* Sky 700 - Hover / Active button states */
+      --wb-brand-light: #e0f2fe;          /* Sky 100 - Subtle blue highlights */
+      --wb-brand-surface: #f0f9ff;        /* Sky 50 - Active tab / selection tint */
+
+      /* Executive Navy & Official State Identity */
+      --wb-navy-header: #0f172a;          /* Slate 900 - Sticky header background */
+      --wb-navy-surface: #1e293b;         /* Slate 800 - Deep dark card / modal header */
+      --wb-navy-stripe: #b71c1c;          /* WB Gov Official Dual-Tone Crimson Accent Stripe */
+
+      /* Mayo Clinic Healing Teal (Specialty & Rural Health Accent) */
+      --wb-teal-primary: #0d9488;         /* Teal 600 - Rural hospital badges & secondary actions */
+      --wb-teal-light: #ccfbf1;           /* Teal 100 - Rural chip background */
+      --wb-teal-dark: #115e59;            /* Teal 800 - Text on teal badges */
+
+      /* Neutral Surface Scale (Apple HIG Frosted & Elevated Neutrals) */
+      --wb-bg-canvas: #f8fafc;            /* Slate 50 - Base background reducing ocular fatigue */
+      --wb-surface-card: #ffffff;         /* Pure white resting card surface */
+      --wb-surface-subdued: #f1f5f9;      /* Slate 100 - Inactive tables, input backdrops */
+      --wb-surface-elevated: #ffffff;     /* Floating modals, slide-out inspector drawer */
+
+      /* Borders & Dividers */
+      --wb-border-subtle: #e2e8f0;        /* Slate 200 - 1px card boundary */
+      --wb-border-medium: #cbd5e1;        /* Slate 300 - Form input resting border */
+      --wb-border-strong: #94a3b8;        /* Slate 400 - Active input / tab borders */
+
+      /* High-Legibility Typography Scale (WCAG AAA Contrast Tested) */
+      --wb-text-primary: #0f172a;         /* Slate 900 - Contrast 15.8:1 on white (WCAG AAA) */
+      --wb-text-secondary: #334155;       /* Slate 700 - Contrast 9.4:1 on white (WCAG AAA) */
+      --wb-text-muted: #64748b;           /* Slate 500 - Contrast 4.6:1 on white (WCAG AA) */
+      --wb-text-inverse: #ffffff;         /* White text for navy headers and colored badges */
+
+      /* Semantic Status & Severity Triplets */
+      --wb-status-safe-text: #15803d;     /* Green 700 */
+      --wb-status-safe-bg: #f0fdf4;       /* Green 50 */
+      --wb-status-safe-border: #86efac;   /* Green 300 */
+      --wb-status-safe-bar: #22c55e;      /* Green 500 */
+
+      --wb-status-warn-text: #b45309;     /* Amber 700 */
+      --wb-status-warn-bg: #fffbeb;       /* Amber 50 */
+      --wb-status-warn-border: #fcd34d;   /* Amber 300 */
+      --wb-status-warn-bar: #f59e0b;      /* Amber 500 */
+
+      --wb-status-crit-text: #b91c1c;     /* Red 700 */
+      --wb-status-crit-bg: #fef2f2;       /* Red 50 */
+      --wb-status-crit-border: #fca5a5;   /* Red 300 */
+      --wb-status-crit-bar: #ef4444;      /* Red 500 */
+
+      --wb-emergency-banner-bg: #991b1b;  /* Red 800 */
+      --wb-emergency-banner-glow: 0 4px 16px rgba(153, 27, 27, 0.4);
+
+      /* Surface Elevation & Shadows (Apple HIG Tonal Depth) */
+      --wb-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+      --wb-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+      --wb-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+      --wb-shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+      --wb-shadow-modal: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+
+      /* Border Radii */
+      --wb-radius-sm: 8px;                /* Inner badges, ward boxes */
+      --wb-radius-md: 12px;               /* Buttons, inputs, search bar */
+      --wb-radius-lg: 16px;               /* Hospital cards, map container */
+      --wb-radius-xl: 20px;               /* Modals, bottom sheets */
+      --wb-radius-pill: 9999px;           /* Segmented switcher, district chips */
+
+      /* Touch Targets */
+      --wb-touch-min-height: 48px;
+      --wb-touch-min-width: 48px;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -26,8 +100,8 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f5f6fa;
-      color: #1f2937;
+      background-color: var(--wb-bg-canvas);
+      color: var(--wb-text-primary);
       font-size: 16px;
       line-height: 1.5;
       -webkit-tap-highlight-color: transparent;
@@ -35,115 +109,277 @@
       width: 100%;
     }
 
-    /* Compact Header */
+    /* Compact Official State Header */
     .citizen-header {
-      background-color: #1a2744;
+      background-color: var(--wb-navy-header);
       color: #ffffff;
-      min-height: 56px;
-      padding: 10px 16px;
+      min-height: 60px;
+      padding: 10px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 1000;
-      border-bottom: 2px solid #b71c1c;
+      border-bottom: 2px solid var(--wb-navy-stripe);
+      box-shadow: var(--wb-shadow-sm);
       width: 100%;
     }
 
     .citizen-title-wrap {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .citizen-title-wrap h1 {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       color: #ffffff;
       line-height: 1.2;
+      letter-spacing: -0.2px;
     }
 
     .citizen-title-wrap p {
-      font-size: 11px;
-      color: #cbd5e1;
+      font-size: 11.5px;
+      color: #94a3b8;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.5px;
+      font-weight: 500;
     }
 
+    /* 1. Header Logout Button (>= 48px touch target) */
     .btn-logout-citizen {
-      background-color: rgba(255, 255, 255, 0.15);
+      background-color: rgba(255, 255, 255, 0.12);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      border-radius: 0;
-      padding: 8px 14px;
-      font-size: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: var(--wb-radius-pill);
+      padding: 10px 18px;
+      font-size: 13.5px;
       font-weight: 600;
       cursor: pointer;
-      min-height: 44px;
+      min-height: 48px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       text-decoration: none;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .btn-logout-citizen:hover {
+      background-color: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.4);
     }
 
     .btn-logout-citizen:active {
       background-color: rgba(255, 255, 255, 0.3);
     }
 
-    /* Container */
+    /* Fluid Citizen Container Architecture */
     .citizen-container {
       width: 100%;
-      max-width: 600px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding: 16px;
-      padding-bottom: 90px; /* Space for phone navigation bar */
+      padding: 24px 20px calc(90px + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
     }
 
-    /* Search Bar & View Toggle */
+    @media (max-width: 1024px) {
+      .citizen-container {
+        max-width: 920px;
+        padding: 20px 18px calc(84px + env(safe-area-inset-bottom, 0px));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .citizen-container {
+        max-width: 100%;
+        padding: 16px 14px calc(76px + env(safe-area-inset-bottom, 0px));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .citizen-container {
+        padding: 12px 10px calc(70px + env(safe-area-inset-bottom, 0px));
+      }
+    }
+
+    /* ==========================================================================
+       Top-Segmented Switcher (Apple HIG / Material 3 Segmented Pill Bar)
+       ========================================================================== */
+    .citizen-segmented-nav {
+      display: flex;
+      align-items: center;
+      background: var(--wb-surface-subdued);
+      padding: 5px;
+      border-radius: var(--wb-radius-pill);
+      border: 1px solid var(--wb-border-subtle);
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+      margin-bottom: 16px;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .segmented-pill {
+      flex: 1 1 0;
+      min-height: 48px; /* Strict >=48px touch target */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: var(--wb-radius-pill);
+      background: transparent;
+      color: var(--wb-text-secondary);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      text-decoration: none;
+    }
+
+    .segmented-pill:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--wb-text-primary);
+    }
+
+    .segmented-pill.active {
+      background: #ffffff;
+      color: var(--wb-brand-primary);
+      font-weight: 700;
+      box-shadow: var(--wb-shadow-sm);
+    }
+
+    .seg-icon {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .seg-label {
+      line-height: 1.2;
+    }
+
+    @media (max-width: 580px) {
+      .segmented-pill {
+        font-size: 12.5px;
+        padding: 8px 6px;
+        gap: 4px;
+      }
+      .seg-icon {
+        font-size: 14px;
+      }
+    }
+
+    /* ==========================================================================
+       Secondary Search & Action Toolbar (Search + Nearest Facility Locator)
+       ========================================================================== */
+    .citizen-search-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
     .search-section {
       margin-bottom: 16px;
     }
 
+    .search-input-shell {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-leading-icon {
+      position: absolute;
+      left: 16px;
+      font-size: 16px;
+      color: var(--wb-text-muted);
+      pointer-events: none;
+      line-height: 1;
+    }
+
     .citizen-search-input {
       width: 100%;
-      min-height: 48px;
-      padding: 12px 16px;
-      font-size: 16px;
+      min-height: 48px; /* Strict >=48px touch target */
+      padding: 12px 18px 12px 46px;
+      font-size: 14.5px;
       font-family: inherit;
-      border: 1.5px solid #d1d5db;
-      border-radius: 4px;
+      border: 1.5px solid var(--wb-border-subtle);
+      border-radius: var(--wb-radius-md);
       background-color: #ffffff;
-      color: #1f2937;
+      color: var(--wb-text-primary);
       outline: none;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--wb-shadow-xs);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .citizen-search-input:focus {
-      border-color: #1a2744;
-      box-shadow: 0 0 0 2px rgba(26, 39, 68, 0.15);
+      border-color: var(--wb-brand-primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    /* Nearest Hospital Action Pill (>= 48px touch target) */
+    .btn-nearest-pill,
+    .btn-nearest-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px; /* Strict >=48px touch target */
+      padding: 10px 18px;
+      border-radius: var(--wb-radius-md);
+      border: 1.5px solid var(--wb-border-medium);
+      background: #ffffff;
+      color: var(--wb-text-secondary);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--wb-shadow-xs);
+      user-select: none;
+    }
+
+    .btn-nearest-pill:hover,
+    .btn-nearest-toggle:hover {
+      background: var(--wb-surface-subdued);
+      border-color: var(--wb-border-strong);
+      color: var(--wb-text-primary);
+    }
+
+    .btn-nearest-pill.active,
+    .btn-nearest-toggle.active {
+      background: linear-gradient(135deg, var(--wb-brand-primary) 0%, var(--wb-brand-deep) 100%);
+      border-color: var(--wb-brand-deep);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+    }
+
+    @media (max-width: 640px) {
+      .citizen-search-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn-nearest-pill,
+      .btn-nearest-toggle {
+        width: 100%;
+      }
     }
 
     .btn-view-toggle {
       width: 100%;
       min-height: 48px;
-      margin-top: 10px;
-      background-color: #1a2744;
-      color: #ffffff;
-      border: 1px solid #121c31;
-      border-radius: 0;
-      font-size: 16px;
-      font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      letter-spacing: 0.2px;
-    }
-
-    .btn-view-toggle:active {
-      background-color: #121c31;
     }
 
     /* Summary Bar */
@@ -152,34 +388,86 @@
       justify-content: space-between;
       align-items: center;
       font-size: 14px;
-      color: #4b5563;
-      padding: 4px 2px 10px;
+      color: var(--wb-text-secondary);
+      padding: 6px 4px 14px;
       font-weight: 500;
     }
 
-    /* Hospital Cards */
-    .hospital-card {
-      background-color: #ffffff;
-      border: 1px solid #d1d5db;
-      border-radius: 4px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    #hospital-count-label {
+      font-weight: 600;
+      color: var(--wb-text-primary);
+    }
+
+    #sort-mode-indicator {
+      font-size: 12.5px;
+      color: var(--wb-text-muted);
+      font-weight: 500;
+    }
+
+    /* Hospital Cards Grid Architecture */
+    #citizen-card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+      gap: 20px;
       width: 100%;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      #citizen-card-list {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    /* Hospital Card Component */
+    .hospital-card {
+      background-color: var(--wb-surface-card);
+      border: 1px solid var(--wb-border-subtle);
+      border-radius: var(--wb-radius-lg);
+      padding: 20px;
+      box-shadow: var(--wb-shadow-sm);
+      transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s ease, border-color 0.2s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .hospital-card:hover {
+      box-shadow: var(--wb-shadow-md);
     }
 
     .hospital-card.card-emergency {
-      border-left: 5px solid #d32f2f;
+      border-left: 5px solid var(--wb-status-crit-bar) !important;
       background-color: #fffdfd;
     }
 
-    .emergency-badge {
-      background-color: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #f87171;
-      border-radius: 4px;
+    .hospital-card.card-nearest {
+      border: 2px solid var(--wb-brand-primary) !important;
+      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.18);
+      position: relative;
+    }
+
+    .nearest-banner {
+      background: var(--wb-brand-surface);
+      color: var(--wb-brand-deep);
+      border: 1px solid var(--wb-brand-light);
+      border-radius: var(--wb-radius-sm);
       padding: 8px 12px;
-      font-size: 14px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .emergency-badge {
+      background-color: var(--wb-status-crit-bg);
+      color: var(--wb-status-crit-text);
+      border: 1px solid var(--wb-status-crit-border);
+      border-radius: var(--wb-radius-sm);
+      padding: 8px 12px;
+      font-size: 13px;
       font-weight: 700;
       margin-bottom: 12px;
       display: flex;
@@ -189,20 +477,21 @@
     }
 
     .card-header-row {
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     .hospital-card-name {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
-      color: #1a2744;
-      line-height: 1.3;
-      margin-bottom: 4px;
+      color: var(--wb-text-primary);
+      line-height: 1.35;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
     }
 
     .hospital-card-meta {
-      font-size: 14px;
-      color: #4b5563;
+      font-size: 13px;
+      color: var(--wb-text-muted);
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
@@ -210,281 +499,378 @@
     }
 
     .facility-pill {
-      background-color: #f3f4f6;
-      border: 1px solid #e5e7eb;
-      padding: 2px 8px;
+      background-color: var(--wb-surface-subdued);
+      border: 1px solid var(--wb-border-subtle);
+      padding: 3px 8px;
       font-size: 12px;
       font-weight: 600;
-      color: #374151;
-      border-radius: 2px;
+      color: var(--wb-text-secondary);
+      border-radius: var(--wb-radius-sm);
     }
 
-    /* Bed Availability Progress Bar */
-    .progress-section {
-      margin-top: 14px;
-    }
-
-    .progress-track {
-      width: 100%;
-      height: 12px;
-      background-color: #e5e7eb;
-      border-radius: 6px;
-      overflow: hidden;
-      margin-bottom: 8px;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 6px;
-      transition: width 0.3s ease;
-    }
-
-    .progress-green {
-      background-color: #388e3c;
-    }
-
-    .progress-orange {
-      background-color: #f57c00;
-    }
-
-    .progress-red {
-      background-color: #d32f2f;
-    }
-
-    .bed-text-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .bed-free-count {
-      color: #1a2744;
-    }
-
-    .bed-percentage-tag {
-      font-size: 13px;
-      padding: 2px 8px;
-      border-radius: 12px;
+    .badge-mc {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
       font-weight: 700;
-      color: #ffffff;
+      font-size: 11.5px;
+      padding: 3px 8px;
+      border-radius: var(--wb-radius-sm);
     }
 
-    .tag-green { background-color: #388e3c; }
-    .tag-orange { background-color: #f57c00; }
-    .tag-red { background-color: #d32f2f; }
-
-    /* Nearest Hospital Highlighting */
-    .btn-nearest-toggle {
-      width: 100%;
-      min-height: 48px;
-      margin-top: 8px;
-      background-color: #0d47a1;
-      color: #ffffff;
-      border: 1px solid #08306b;
-      border-radius: 0;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      letter-spacing: 0.2px;
-      transition: background-color 0.2s ease;
-    }
-
-    .btn-nearest-toggle:active {
-      background-color: #08306b;
-    }
-
-    .btn-nearest-toggle.active {
-      background-color: #1b5e20;
-      border-color: #144618;
-    }
-
-    .hospital-card.card-nearest {
-      border: 2px solid #0d47a1 !important;
-      box-shadow: 0 4px 14px rgba(13, 71, 161, 0.22);
-      position: relative;
-    }
-
-    .nearest-banner {
-      background-color: #e3f2fd;
-      color: #0d47a1;
-      border: 1.5px solid #90caf9;
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-size: 13.5px;
+    .badge-dh {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
       font-weight: 700;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 11.5px;
+      padding: 3px 8px;
+      border-radius: var(--wb-radius-sm);
+    }
+
+    .badge-rh {
+      background-color: var(--wb-teal-light);
+      border: 1px solid #99f6e4;
+      color: var(--wb-teal-dark);
+      font-weight: 700;
+      font-size: 11.5px;
+      padding: 3px 8px;
+      border-radius: var(--wb-radius-sm);
     }
 
     .distance-tag {
       font-size: 12px;
       font-weight: 700;
-      color: #0d47a1;
-      background-color: #e3f2fd;
-      padding: 2px 7px;
-      border-radius: 3px;
-      border: 1px solid #bbdefb;
+      color: var(--wb-brand-deep);
+      background-color: var(--wb-brand-light);
+      padding: 3px 8px;
+      border-radius: var(--wb-radius-sm);
+      border: 1px solid #bae6fd;
     }
+
+    /* Bed Availability Progress Section */
+    .progress-section {
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+
+    .bed-text-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .bed-free-count {
+      font-size: 15px;
+      color: var(--wb-text-primary);
+    }
+
+    .bed-free-count strong {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--wb-text-primary);
+    }
+
+    .bed-total-label {
+      font-weight: 400;
+      color: var(--wb-text-muted);
+      font-size: 13px;
+    }
+
+    .bed-percentage-tag {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: var(--wb-radius-pill);
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.2px;
+    }
+
+    .tag-green { background-color: var(--wb-status-safe-bar); }
+    .tag-orange { background-color: var(--wb-status-warn-bar); }
+    .tag-red { background-color: var(--wb-status-crit-bar); }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background-color: var(--wb-surface-subdued);
+      border-radius: var(--wb-radius-pill);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: var(--wb-radius-pill);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .progress-green { background-color: var(--wb-status-safe-bar); }
+    .progress-orange { background-color: var(--wb-status-warn-bar); }
+    .progress-red { background-color: var(--wb-status-crit-bar); }
 
     /* Map View Container */
     #citizen-map-view {
       display: none;
       width: 100%;
-      height: calc(100vh - 220px);
-      min-height: 420px;
-      background-color: #e5e7eb;
-      border: 1.5px solid #d1d5db;
-      border-radius: 4px;
+      height: 600px;
+      min-height: 440px;
+      background-color: var(--wb-surface-subdued);
+      border: 1px solid var(--wb-border-subtle);
+      border-radius: var(--wb-radius-lg);
       position: relative;
       margin-bottom: 24px;
+      overflow: hidden;
+      box-shadow: var(--wb-shadow-sm);
     }
 
-    /* District Touch Bar */
+    @media (max-width: 768px) {
+      #citizen-map-view {
+        height: 480px;
+      }
+    }
+
+    /* District Touch Bar (>= 48px touch targets) */
     .district-touch-container {
-      margin-bottom: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 10px 12px;
+      margin-bottom: 16px;
+      background: var(--wb-surface-card);
+      border: 1px solid var(--wb-border-subtle);
+      border-radius: var(--wb-radius-md);
+      padding: 12px 14px;
+      box-shadow: var(--wb-shadow-xs);
     }
 
     .district-touch-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       font-size: 13px;
       font-weight: 600;
-      color: #1a2744;
+      color: var(--wb-text-primary);
     }
 
+    /* 3. Reset District Button (>= 48px touch target) */
     .btn-reset-district {
-      background: #e2e8f0;
-      border: none;
-      color: #334155;
-      font-size: 11px;
+      background: var(--wb-surface-subdued);
+      border: 1px solid var(--wb-border-subtle);
+      color: var(--wb-text-secondary);
+      font-size: 13px;
       font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
+      min-height: 48px;
+      padding: 10px 18px;
+      border-radius: var(--wb-radius-pill);
       cursor: pointer;
-      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      user-select: none;
     }
+
     .btn-reset-district:hover {
-      background: #cbd5e1;
+      background: var(--wb-border-subtle);
+      color: var(--wb-text-primary);
     }
 
     .district-chips-scroll {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       overflow-x: auto;
-      padding-bottom: 4px;
+      padding: 4px 2px 8px;
       scrollbar-width: thin;
       -webkit-overflow-scrolling: touch;
     }
 
+    /* 2. District Chip (>= 48px touch target) */
     .district-chip {
       flex: 0 0 auto;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 16px;
-      padding: 6px 12px;
-      font-size: 12px;
+      background: var(--wb-surface-card);
+      border: 1px solid var(--wb-border-medium);
+      border-radius: var(--wb-radius-pill);
+      min-height: 48px;
+      padding: 10px 18px;
+      font-size: 13.5px;
       font-weight: 600;
-      color: #334155;
+      color: var(--wb-text-secondary);
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.2s ease;
       white-space: nowrap;
+      user-select: none;
     }
 
     .district-chip:hover {
-      border-color: #1a2744;
-      background: #f1f5f9;
+      border-color: var(--wb-brand-primary);
+      background: var(--wb-brand-surface);
+      color: var(--wb-brand-deep);
     }
 
     .district-chip.active {
-      background: #1a2744;
+      background: var(--wb-brand-primary);
       color: #ffffff;
-      border-color: #1a2744;
-      box-shadow: 0 2px 4px rgba(26, 39, 68, 0.2);
+      border-color: var(--wb-brand-deep);
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
     }
 
-    /* Facility Type Filter Tabs */
+    /* 4. Facility Type Filter Tabs (>= 48px touch targets) */
     .facility-type-tabs {
       display: flex;
-      gap: 6px;
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px dashed #cbd5e1;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--wb-border-subtle);
     }
 
     .type-tab {
       flex: 1;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      padding: 6px 10px;
-      font-size: 11.5px;
+      background: var(--wb-surface-card);
+      border: 1px solid var(--wb-border-medium);
+      border-radius: var(--wb-radius-md);
+      min-height: 48px;
+      padding: 12px 16px;
+      font-size: 13.5px;
       font-weight: 600;
-      color: #475569;
+      color: var(--wb-text-secondary);
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      user-select: none;
     }
 
     .type-tab:hover {
-      background: #f8fafc;
+      background: var(--wb-surface-subdued);
     }
 
     .type-tab.active {
-      background: #2563eb;
+      background: var(--wb-brand-primary);
       color: #ffffff;
-      border-color: #2563eb;
+      border-color: var(--wb-brand-deep);
     }
 
-    /* Facility Badges */
-    .badge-mc {
-      background-color: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1d4ed8;
-      font-weight: 700;
+    /* ==========================================================================
+       Progressive Disclosure Ward Accordion Architecture
+       ========================================================================== */
+    .ward-accordion-container {
+      margin-top: 14px;
+      border-radius: var(--wb-radius-md);
+      overflow: hidden;
+    }
+
+    /* 5. Progressive Disclosure Ward Accordion Button (>= 48px touch target) */
+    .btn-ward-accordion,
+    .ward-accordion-toggle {
+      width: 100%;
+      min-height: 48px; /* Strict >=48px touch target */
+      padding: 10px 14px;
+      background: var(--wb-surface-subdued);
+      border: 1px solid var(--wb-border-subtle);
+      border-radius: var(--wb-radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: inherit;
+      color: var(--wb-text-secondary);
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+
+    .btn-ward-accordion:hover,
+    .ward-accordion-toggle:hover {
+      background: var(--wb-brand-surface);
+      color: var(--wb-brand-deep);
+      border-color: var(--wb-brand-light);
+    }
+
+    .btn-ward-accordion[aria-expanded="true"],
+    .ward-accordion-toggle[aria-expanded="true"] {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      background: var(--wb-brand-surface);
+      border-color: var(--wb-brand-light);
+      color: var(--wb-brand-deep);
+    }
+
+    .ward-toggle-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ward-quick-badges {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .ward-mini-tag {
       font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 3px;
-    }
-
-    .badge-dh {
-      background-color: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      color: #0f172a;
       font-weight: 700;
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 3px;
+      padding: 2px 6px;
+      border-radius: 4px;
     }
 
-    .badge-rh {
-      background-color: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #15803d;
+    .ward-mini-tag.mini-green { background: #dcfce7; color: #166534; }
+    .ward-mini-tag.mini-orange { background: #ffedd5; color: #9a3412; }
+    .ward-mini-tag.mini-red { background: #fee2e2; color: #991b1b; }
+
+    .accordion-chevron {
+      display: inline-block;
+      font-size: 14px;
+      color: var(--wb-text-muted);
       font-weight: 700;
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 3px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
     }
 
-    /* Ward-Level Bed Breakdown */
+    .btn-ward-accordion[aria-expanded="true"] .accordion-chevron,
+    .ward-accordion-toggle[aria-expanded="true"] .accordion-chevron {
+      transform: rotate(180deg);
+      color: var(--wb-brand-primary);
+    }
+
+    /* Accordion Drawer */
+    .ward-accordion-drawer {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      background: #fafafa;
+      border: 1px solid var(--wb-border-subtle);
+      border-top: none;
+      border-bottom-left-radius: var(--wb-radius-md);
+      border-bottom-right-radius: var(--wb-radius-md);
+      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+    }
+
+    .ward-accordion-drawer.open {
+      opacity: 1;
+    }
+
+    .ward-drawer-inner {
+      padding: 12px 14px 16px;
+    }
+
+    .ward-drawer-inner .ward-breakdown-card {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    /* Ward-Level Bed Breakdown (Preserved internal classes) */
     .ward-breakdown-card {
       margin-top: 12px;
       padding-top: 10px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid var(--wb-border-subtle);
     }
 
     .ward-breakdown-header {
@@ -494,7 +880,7 @@
       margin-bottom: 8px;
       font-size: 12px;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--wb-text-primary);
       text-transform: uppercase;
       letter-spacing: 0.4px;
     }
@@ -531,9 +917,9 @@
     }
 
     .ward-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 4px;
+      background: #ffffff;
+      border: 1px solid var(--wb-border-subtle);
+      border-radius: var(--wb-radius-sm);
       padding: 8px 10px;
       display: flex;
       flex-direction: column;
@@ -541,14 +927,14 @@
     }
 
     .ward-box.ward-critical {
-      background: #fff1f2;
-      border-color: #fecdd3;
+      background: var(--wb-status-crit-bg);
+      border-color: var(--wb-status-crit-border);
     }
 
     .ward-box-title {
       font-size: 12px;
       font-weight: 600;
-      color: #475569;
+      color: var(--wb-text-secondary);
       margin-bottom: 4px;
       display: flex;
       align-items: center;
@@ -558,13 +944,13 @@
     .ward-box-count {
       font-size: 13.5px;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--wb-text-primary);
     }
 
     .ward-box-total {
       font-size: 11px;
       font-weight: 400;
-      color: #64748b;
+      color: var(--wb-text-muted);
     }
 
     .ward-tag {
@@ -584,11 +970,11 @@
     .maternity-alert-box {
       margin-top: 8px;
       padding: 8px 10px;
-      background: #fee2e2;
-      border: 1px solid #f87171;
-      border-radius: 4px;
+      background: var(--wb-status-crit-bg);
+      border: 1px solid var(--wb-status-crit-border);
+      border-radius: var(--wb-radius-sm);
       font-size: 12px;
-      color: #991b1b;
+      color: var(--wb-status-crit-text);
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -604,7 +990,7 @@
       background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
       color: #ffffff;
       border: 1px solid #7f1d1d;
-      border-radius: 4px;
+      border-radius: var(--wb-radius-md);
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
@@ -622,31 +1008,44 @@
       box-shadow: 0 4px 10px rgba(185, 28, 28, 0.35);
     }
 
+    /* 6. Card Ambulance Request Button (>= 48px touch target) */
     .btn-card-ambulance {
       width: 100%;
-      margin-top: 10px;
-      padding: 9px 12px;
-      background: #fff1f2;
-      color: #991b1b;
-      border: 1.5px solid #fecdd3;
-      border-radius: 4px;
-      font-size: 12.5px;
+      min-height: 48px; /* Strict >=48px touch target */
+      margin-top: 14px;
+      padding: 12px 18px;
+      background: var(--wb-status-crit-bg);
+      color: var(--wb-status-crit-text);
+      border: 1.5px solid var(--wb-status-crit-border);
+      border-radius: var(--wb-radius-md);
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.2px;
+      box-sizing: border-box;
     }
 
     .btn-card-ambulance:hover {
-      background: #ffe4e6;
-      border-color: #fda4af;
-      color: #881337;
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #991b1b;
+      box-shadow: 0 2px 8px rgba(185, 28, 28, 0.15);
+      transform: translateY(-1px);
     }
 
-    /* Ambulance Modal Styles */
+    .btn-card-ambulance:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* ==========================================================================
+       Ambulance Dispatch System (Modal Mode & Inline Tab Mode)
+       ========================================================================== */
     .amb-modal-overlay {
       display: none;
       position: fixed;
@@ -654,7 +1053,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(4px);
       z-index: 9999;
       align-items: center;
@@ -667,28 +1066,53 @@
       display: flex;
     }
 
+    /* Inline Tab Mode for Ambulance Section */
+    .amb-modal-overlay.amb-view-inline {
+      position: static;
+      background: transparent;
+      backdrop-filter: none;
+      padding: 0;
+      display: block !important;
+      z-index: 1;
+      margin-bottom: 24px;
+    }
+
+    .amb-modal-overlay.amb-view-inline .amb-modal-content {
+      max-width: 100%;
+      max-height: none;
+      border-radius: var(--wb-radius-lg);
+      box-shadow: var(--wb-shadow-sm);
+      border: 1px solid var(--wb-border-subtle);
+      background: #ffffff;
+      animation: none;
+    }
+
+    .amb-modal-overlay.amb-view-inline .amb-btn-close {
+      display: none;
+    }
+
     .amb-modal-content {
       background: #ffffff;
-      border-radius: 8px;
+      border-radius: var(--wb-radius-xl);
       width: 100%;
-      max-width: 580px;
+      max-width: 620px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-      border: 1px solid #e2e8f0;
+      box-shadow: var(--wb-shadow-modal);
+      border: 1px solid var(--wb-border-subtle);
       display: flex;
       flex-direction: column;
     }
 
     .amb-modal-header {
-      padding: 16px 20px;
-      background: #1a2744;
+      padding: 18px 24px;
+      background: var(--wb-navy-header);
       color: #ffffff;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
+      border-top-left-radius: var(--wb-radius-xl);
+      border-top-right-radius: var(--wb-radius-xl);
     }
 
     .amb-modal-title {
@@ -705,13 +1129,16 @@
       margin-top: 2px;
     }
 
+    /* 7. Modal Close Button (>= 48px touch target) */
     .amb-btn-close {
       background: rgba(255, 255, 255, 0.15);
       border: none;
       color: #ffffff;
-      font-size: 18px;
-      width: 32px;
-      height: 32px;
+      font-size: 24px;
+      min-width: 48px;
+      min-height: 48px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
@@ -724,7 +1151,7 @@
     }
 
     .amb-modal-body {
-      padding: 16px 20px;
+      padding: 20px 24px;
     }
 
     .amb-demo-badge {
@@ -732,77 +1159,93 @@
       background: #fef3c7;
       color: #92400e;
       border: 1px solid #fde68a;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 4px;
-      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: var(--wb-radius-sm);
+      margin-bottom: 14px;
       width: 100%;
       text-align: center;
+      line-height: 1.4;
     }
 
     .amb-filter-row {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 16px;
-      background: #f8fafc;
-      padding: 12px;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
+      background: var(--wb-surface-subdued);
+      padding: 14px;
+      border-radius: var(--wb-radius-md);
+      border: 1px solid var(--wb-border-subtle);
     }
 
+    /* 8. Ambulance Dropdowns (>= 48px touch target) */
     .amb-select {
-      padding: 8px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      font-size: 13px;
+      min-height: 48px; /* Strict >=48px touch target */
+      padding: 10px 14px;
+      border: 1px solid var(--wb-border-medium);
+      border-radius: var(--wb-radius-md);
+      font-size: 14px;
       font-weight: 600;
-      color: #1e293b;
-      background: #ffffff;
+      color: var(--wb-text-primary);
+      background: var(--wb-surface-card);
       width: 100%;
+      outline: none;
+    }
+
+    .amb-select:focus {
+      border-color: var(--wb-brand-primary);
     }
 
     .amb-type-pills {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       overflow-x: auto;
-      padding-bottom: 2px;
+      padding-bottom: 4px;
     }
 
+    /* 9. Ambulance Category Pills (>= 48px touch target) */
     .amb-type-pill {
       flex: 1;
+      min-height: 48px; /* Strict >=48px touch target */
+      padding: 10px 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 6px 8px;
-      font-size: 11.5px;
+      font-size: 13px;
       font-weight: 600;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
+      background: var(--wb-surface-card);
+      border: 1px solid var(--wb-border-medium);
+      border-radius: var(--wb-radius-pill);
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      color: var(--wb-text-secondary);
+      user-select: none;
     }
 
     .amb-type-pill.active {
-      background: #b91c1c;
+      background: var(--wb-status-crit-text);
       color: #ffffff;
-      border-color: #b91c1c;
+      border-color: var(--wb-status-crit-text);
+      box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
     }
 
     .amb-driver-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-left: 4px solid #b91c1c;
-      border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--wb-border-subtle);
+      border-left: 4px solid var(--wb-status-crit-bar);
+      border-radius: var(--wb-radius-md);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--wb-shadow-xs);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .amb-driver-card:hover {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: var(--wb-shadow-md);
       transform: translateY(-1px);
     }
 
@@ -810,13 +1253,13 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .amb-driver-name {
-      font-size: 15px;
+      font-size: 15.5px;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--wb-text-primary);
     }
 
     .amb-driver-vehicle {
@@ -825,8 +1268,8 @@
       font-weight: 700;
       color: #475569;
       background: #f1f5f9;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 3px 6px;
+      border-radius: 4px;
       border: 1px solid #e2e8f0;
     }
 
@@ -845,64 +1288,60 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .amb-badge {
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       padding: 2px 7px;
-      border-radius: 3px;
+      border-radius: 4px;
     }
 
     .amb-badge-bls { background: #e0f2fe; color: #0369a1; }
-    .amb-badge-als { background: #fef3c7; color: #b45309; }
+    .amb-badge-als { background: #fee2e2; color: #991b1b; }
     .amb-badge-mat { background: #fce7f3; color: #be185d; }
     .amb-badge-area { background: #f1f5f9; color: #334155; }
     .amb-badge-eta { background: #dcfce7; color: #15803d; }
 
     .amb-driver-actions {
       display: flex;
+      gap: 10px;
+    }
+
+    /* 10 & 11. Driver Call and Dispatch Buttons (>= 48px touch targets) */
+    .amb-btn-call,
+    .amb-btn-dispatch {
+      min-height: 48px; /* Strict >=48px touch target */
+      padding: 12px 18px;
+      border-radius: var(--wb-radius-md);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       gap: 8px;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      user-select: none;
     }
 
     .amb-btn-call {
       flex: 1;
-      padding: 8px 12px;
-      background: #0284c7;
+      background: var(--wb-brand-primary);
       color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-decoration: none;
-      transition: background 0.2s;
     }
 
     .amb-btn-call:hover {
-      background: #0369a1;
+      background: var(--wb-brand-deep);
     }
 
     .amb-btn-dispatch {
       flex: 1.3;
-      padding: 8px 12px;
-      background: #b91c1c;
+      background: var(--wb-status-crit-text);
       color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: background 0.2s;
     }
 
     .amb-btn-dispatch:hover {
@@ -912,10 +1351,10 @@
     /* Live Tracking Screen */
     .amb-tracking-screen {
       display: none;
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 16px;
+      background: var(--wb-surface-subdued);
+      border: 1.5px solid var(--wb-border-subtle);
+      border-radius: var(--wb-radius-lg);
+      padding: 20px;
       text-align: center;
     }
 
@@ -924,7 +1363,7 @@
     }
 
     .amb-siren-animation {
-      font-size: 38px;
+      font-size: 40px;
       animation: ambSiren 1s infinite alternate;
       margin-bottom: 8px;
     }
@@ -935,70 +1374,70 @@
     }
 
     .amb-tracking-status {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 800;
-      color: #b91c1c;
+      color: var(--wb-status-crit-text);
       margin-bottom: 4px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
 
     .amb-progress-steps {
       display: flex;
       justify-content: space-between;
-      margin: 16px 0;
+      margin: 18px 0;
       position: relative;
     }
 
     .amb-step {
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 700;
-      color: #94a3b8;
+      color: var(--wb-text-muted);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       flex: 1;
     }
 
     .amb-step.done {
-      color: #15803d;
+      color: var(--wb-status-safe-text);
     }
 
     .amb-step.active {
-      color: #b91c1c;
+      color: var(--wb-status-crit-text);
     }
 
     .amb-step-dot {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
-      background: #cbd5e1;
+      background: var(--wb-border-medium);
     }
 
     .amb-step.done .amb-step-dot {
-      background: #15803d;
+      background: var(--wb-status-safe-bar);
     }
 
     .amb-step.active .amb-step-dot {
-      background: #b91c1c;
-      box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.2);
+      background: var(--wb-status-crit-bar);
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
     }
 
     .amb-tracking-eta {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 12px;
+      color: var(--wb-text-primary);
+      margin-bottom: 14px;
     }
 
     .amb-target-facility-box {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-size: 12.5px;
+      border-radius: var(--wb-radius-md);
+      padding: 10px 14px;
+      font-size: 13px;
       color: #1e40af;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -1008,14 +1447,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-      font-size: 12px;
+      margin-bottom: 12px;
+      font-size: 12.5px;
       font-weight: 700;
-      color: #475569;
+      color: var(--wb-text-secondary);
     }
 
     .amb-live-badge {
-      color: #15803d;
+      color: var(--wb-status-safe-text);
       font-size: 11px;
       font-weight: 700;
       display: flex;
@@ -1025,16 +1464,17 @@
 
     .amb-tracking-driver-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 12px;
+      border: 1px solid var(--wb-border-subtle);
+      border-radius: var(--wb-radius-md);
+      padding: 14px;
       text-align: left;
       margin-bottom: 16px;
+      box-shadow: var(--wb-shadow-xs);
     }
 
     .amb-tracking-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
   </style>
 </head>
@@ -1059,31 +1499,70 @@
   <!-- Main Mobile Container -->
   <main class="citizen-container">
 
-    <!-- 2. SEARCH BAR & VIEW TOGGLE BUTTONS -->
-    <section class="search-section">
-      <input 
-        type="search" 
-        id="citizen-search" 
-        class="citizen-search-input" 
-        placeholder="Search by district or hospital name"
-        aria-label="Search by district or hospital name"
+    <!-- 1. TOP-SEGMENTED SWITCHER (Apple HIG / Material 3 Segmented Pill Bar) -->
+    <nav class="citizen-segmented-nav" role="tablist" aria-label="Portal View Navigation">
+      <button 
+        type="button" 
+        id="btn-tab-cards" 
+        class="segmented-pill active" 
+        role="tab" 
+        aria-selected="true" 
+        aria-controls="citizen-card-list"
+        data-view="cards"
       >
-      <!-- 4. MAP TOGGLE BUTTON (Min 44px height) -->
-      <button id="btn-toggle-view" class="btn-view-toggle">
-        <span>&#x1F5FA;&#xFE0F;</span>
-        <span id="toggle-btn-label">Switch to Map View</span>
+        <span class="seg-icon" aria-hidden="true">🏥</span>
+        <span class="seg-label">Find Care</span>
       </button>
 
-      <!-- 6. FIND NEAREST HOSPITAL WITH FREE BEDS BUTTON -->
-      <button id="btn-nearest-hospital" class="btn-nearest-toggle">
-        <span>📍</span>
+      <button 
+        type="button" 
+        id="btn-toggle-view" 
+        class="segmented-pill btn-view-toggle" 
+        role="tab" 
+        aria-selected="false" 
+        aria-controls="citizen-map-view"
+        data-view="map"
+      >
+        <span class="seg-icon" aria-hidden="true">🗺️</span>
+        <span id="toggle-btn-label" class="seg-label">Live Map</span>
+      </button>
+
+      <button 
+        type="button" 
+        id="btn-book-ambulance" 
+        class="segmented-pill btn-ambulance-toggle" 
+        role="tab" 
+        aria-selected="false" 
+        aria-controls="ambulance-modal"
+        data-view="ambulance"
+      >
+        <span class="seg-icon" aria-hidden="true">🚑</span>
+        <span class="seg-label">Ambulance Dispatch</span>
+      </button>
+    </nav>
+
+    <!-- 2. SECONDARY SEARCH & ACTION TOOLBAR (Search + Nearest Facility Locator) -->
+    <section class="citizen-search-toolbar search-section" role="search" aria-label="Hospital search and nearest locator">
+      <div class="search-input-shell">
+        <span class="search-leading-icon" aria-hidden="true">🔍</span>
+        <input 
+          type="search" 
+          id="citizen-search" 
+          class="citizen-search-input" 
+          placeholder="Search by hospital name, district, or block..." 
+          aria-label="Search by district or hospital name"
+          autocomplete="off"
+        >
+      </div>
+      <button 
+        type="button" 
+        id="btn-nearest-hospital" 
+        class="btn-nearest-pill btn-nearest-toggle" 
+        title="Sort by nearest hospital with available beds via GPS"
+        aria-label="Find Nearest Hospital with Free Beds"
+      >
+        <span class="nearest-icon" aria-hidden="true">📍</span>
         <span id="nearest-btn-label">Find Nearest Hospital with Free Beds</span>
-      </button>
-
-      <!-- 7. BOOK AN AMBULANCE BUTTON -->
-      <button id="btn-book-ambulance" class="btn-ambulance-toggle">
-        <span>🚑</span>
-        <span>Book an Ambulance (Connect to Driver)</span>
       </button>
     </section>
 
@@ -1124,6 +1603,122 @@
       </div>
     </section>
 
+    <!-- 5. AMBULANCE BOOKING & DISPATCH MODAL / INLINE VIEW (DEMO ONLY) -->
+    <div id="ambulance-modal" class="amb-modal-overlay" aria-hidden="true" style="display: none;">
+      <div class="amb-modal-content" role="dialog" aria-modal="true" aria-labelledby="amb-modal-title-text">
+        <div class="amb-modal-header">
+          <div>
+            <div class="amb-modal-title" id="amb-modal-title-text">
+              <span>🚑</span>
+              <span>Emergency Ambulance Dispatch</span>
+            </div>
+            <div class="amb-modal-subtitle">Direct Driver Connection • West Bengal Network</div>
+          </div>
+          <button id="btn-close-ambulance" class="amb-btn-close" type="button" aria-label="Close dialog">&times;</button>
+        </div>
+
+        <div class="amb-modal-body">
+          <!-- Demo Disclaimer -->
+          <div class="amb-demo-badge">
+            ⚠️ <strong>DEMO SIMULATION ONLY:</strong> Connects to simulated nearby drivers for testing. For genuine emergencies, dial <strong>102</strong> (National Ambulance Service) or <strong>108 / 112</strong> (State Emergency Services).
+          </div>
+
+          <!-- Target Facility Banner (Optional) -->
+          <div id="amb-target-facility" style="display: none;" class="amb-target-facility-box">
+            <div id="amb-target-facility-text"></div>
+            <button id="btn-clear-target-facility" class="btn-reset-district" type="button" style="background:#dbeafe;color:#1e40af;">Show All</button>
+          </div>
+
+          <!-- Drivers Directory View -->
+          <div id="amb-drivers-view">
+            <!-- Filters -->
+            <div class="amb-filter-row">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 140px;">
+                  <label for="amb-district-select" style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">DISTRICT:</label>
+                  <select id="amb-district-select" class="amb-select">
+                    <option value="ALL">🌐 All Districts (West Bengal)</option>
+                  </select>
+                </div>
+                <div style="flex: 1; min-width: 140px;">
+                  <label for="amb-tier-select" style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">FACILITY TIER:</label>
+                  <select id="amb-tier-select" class="amb-select">
+                    <option value="ALL">All Levels (Rural / District / State)</option>
+                    <option value="rural">🌾 Rural Hospitals (RH & BPHC)</option>
+                    <option value="district">🏥 District & Sub-divisional</option>
+                    <option value="state">🏛️ State Apex Medical Colleges</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Ambulance Category Pills -->
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">VEHICLE TYPE:</label>
+                <div class="amb-type-pills" id="amb-type-pills">
+                  <button type="button" class="amb-type-pill active" data-type="ALL">All Types</button>
+                  <button type="button" class="amb-type-pill" data-type="BLS">Basic (BLS)</button>
+                  <button type="button" class="amb-type-pill" data-type="ALS">🚨 Cardiac ICU (ALS)</button>
+                  <button type="button" class="amb-type-pill" data-type="MATRIYAAN">🤰 Matriyaan</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Drivers List Header -->
+            <div class="amb-list-header">
+              <span id="amb-available-count">Locating verified drivers...</span>
+              <span class="amb-live-badge">🟢 LIVE TELEMETRY</span>
+            </div>
+
+            <!-- Drivers List -->
+            <div id="amb-drivers-list">
+              <!-- Injected via JavaScript -->
+            </div>
+          </div>
+
+          <!-- Live Tracking Simulation Screen (Initially Hidden) -->
+          <div id="amb-tracking-view" class="amb-tracking-screen">
+            <div class="amb-siren-animation">🚑💨</div>
+            <div class="amb-tracking-status" id="tracking-status-text">Ambulance Dispatched & En Route</div>
+            <div class="amb-tracking-eta" id="tracking-eta-text">Estimated Arrival: 5 minutes</div>
+
+            <div class="amb-progress-steps">
+              <div class="amb-step done" id="amb-step-1">
+                <div class="amb-step-dot"></div>
+                <span>1. Request Accepted</span>
+              </div>
+              <div class="amb-step done" id="amb-step-2">
+                <div class="amb-step-dot"></div>
+                <span>2. Dispatched</span>
+              </div>
+              <div class="amb-step active" id="amb-step-3">
+                <div class="amb-step-dot"></div>
+                <span>3. En Route</span>
+              </div>
+              <div class="amb-step" id="amb-step-4">
+                <div class="amb-step-dot"></div>
+                <span>4. Arrived</span>
+              </div>
+            </div>
+
+            <!-- Active Driver Info Card -->
+            <div id="tracking-driver-info" class="amb-tracking-driver-card">
+              <!-- Injected via JS -->
+            </div>
+
+            <div class="amb-tracking-actions">
+              <button id="btn-tracking-call" class="amb-btn-call" type="button">
+                📞 Call Driver
+              </button>
+              <button id="btn-back-to-drivers" class="btn-reset-district" type="button" style="padding: 10px 14px; font-size: 12.5px;">
+                ✕ Close Tracking
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- ES Module Application Logic -->
@@ -1157,6 +1752,8 @@
     let isNearestActive = false;
     let selectedDistrict = 'ALL';
     let facilityTypeFilter = 'all'; // 'all' | 'main' | 'rural'
+    const expandedWardHospitalIds = new Set();
+    let activePortalView = 'cards'; // 'cards' | 'map' | 'ambulance'
 
     function initDistrictChips() {
       const bar = document.getElementById('district-chips-bar');
@@ -1249,20 +1846,63 @@
     }
 
     /**
-     * Map toggle handler (Switch between List View and Google Maps View)
+     * Unified Portal View Orchestration (Find Care | Live Map | Ambulance Dispatch)
      */
-    const toggleBtn = document.getElementById('btn-toggle-view');
+    const tabCards = document.getElementById('btn-tab-cards');
+    const tabMap = document.getElementById('btn-toggle-view');
+    const tabAmbulance = document.getElementById('btn-book-ambulance');
+    const toggleBtn = tabMap;
     const toggleLabel = document.getElementById('toggle-btn-label');
     const cardListSection = document.getElementById('citizen-card-list');
     const mapViewSection = document.getElementById('citizen-map-view');
+    const ambulanceContainer = document.getElementById('ambulance-modal');
+    const searchToolbar = document.querySelector('.citizen-search-toolbar');
+    const districtBar = document.querySelector('.district-touch-container');
+    const summaryBar = document.querySelector('.availability-summary-bar');
 
-    toggleBtn.addEventListener('click', async () => {
-      isMapView = !isMapView;
-      if (isMapView) {
-        cardListSection.style.display = 'none';
-        mapViewSection.style.display = 'block';
-        toggleLabel.textContent = 'Switch to List View';
-        toggleBtn.querySelector('span:first-child').textContent = '📋';
+    async function switchCitizenPortalView(view) {
+      activePortalView = view;
+
+      // Update Tab Pill Classes & ARIA attributes
+      [tabCards, tabMap, tabAmbulance].forEach(tab => {
+        if (!tab) return;
+        const isActive = tab.dataset.view === view;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      if (view === 'cards') {
+        isMapView = false;
+        if (cardListSection) cardListSection.style.display = 'grid';
+        if (mapViewSection) mapViewSection.style.display = 'none';
+        if (ambulanceContainer) {
+          ambulanceContainer.classList.remove('amb-view-inline');
+          ambulanceContainer.classList.remove('open');
+          ambulanceContainer.style.display = 'none';
+          ambulanceContainer.setAttribute('aria-hidden', 'true');
+        }
+        if (searchToolbar) searchToolbar.style.display = 'flex';
+        if (districtBar) districtBar.style.display = 'block';
+        if (summaryBar) summaryBar.style.display = 'flex';
+        if (toggleLabel) toggleLabel.textContent = 'Live Map';
+        if (toggleBtn?.querySelector('span:first-child')) toggleBtn.querySelector('span:first-child').textContent = '🗺️';
+        renderHospitalCards();
+
+      } else if (view === 'map') {
+        isMapView = true;
+        if (cardListSection) cardListSection.style.display = 'none';
+        if (mapViewSection) mapViewSection.style.display = 'block';
+        if (ambulanceContainer) {
+          ambulanceContainer.classList.remove('amb-view-inline');
+          ambulanceContainer.classList.remove('open');
+          ambulanceContainer.style.display = 'none';
+          ambulanceContainer.setAttribute('aria-hidden', 'true');
+        }
+        if (searchToolbar) searchToolbar.style.display = 'flex';
+        if (districtBar) districtBar.style.display = 'block';
+        if (summaryBar) summaryBar.style.display = 'flex';
+        if (toggleLabel) toggleLabel.textContent = 'Live Map';
+        if (toggleBtn?.querySelector('span:first-child')) toggleBtn.querySelector('span:first-child').textContent = '🗺️';
 
         if (!googleMap) {
           await initCitizenMap();
@@ -1276,11 +1916,41 @@
           }
           updateCitizenMapMarkers();
         }
+
+      } else if (view === 'ambulance') {
+        isMapView = false;
+        if (cardListSection) cardListSection.style.display = 'none';
+        if (mapViewSection) mapViewSection.style.display = 'none';
+        if (searchToolbar) searchToolbar.style.display = 'none';
+        if (districtBar) districtBar.style.display = 'none';
+        if (summaryBar) summaryBar.style.display = 'none';
+
+        if (ambulanceContainer) {
+          ambulanceContainer.classList.add('amb-view-inline');
+          ambulanceContainer.classList.remove('open');
+          ambulanceContainer.style.display = 'block';
+          ambulanceContainer.setAttribute('aria-hidden', 'false');
+        }
+        initAmbulanceDistrictSelect();
+        renderAmbulanceDrivers();
+      }
+    }
+
+    tabCards?.addEventListener('click', () => switchCitizenPortalView('cards'));
+
+    tabMap?.addEventListener('click', async () => {
+      if (activePortalView === 'map') {
+        await switchCitizenPortalView('cards');
       } else {
-        mapViewSection.style.display = 'none';
-        cardListSection.style.display = 'block';
-        toggleLabel.textContent = 'Switch to Map View';
-        toggleBtn.querySelector('span:first-child').textContent = '🗺️';
+        await switchCitizenPortalView('map');
+      }
+    });
+
+    tabAmbulance?.addEventListener('click', () => {
+      if (activePortalView === 'ambulance') {
+        switchCitizenPortalView('cards');
+      } else {
+        switchCitizenPortalView('ambulance');
       }
     });
 
@@ -1721,8 +2391,11 @@
           typeBadgeText = `🌾 Rural Hospital${h.block ? ' • ' + h.block + ' Block' : ''}`;
         }
 
+        const isExpanded = h.id ? expandedWardHospitalIds.has(h.id) : false;
+
         const card = document.createElement('article');
         card.className = `hospital-card ${h.emergencyDeclared ? 'card-emergency' : ''} ${isNearestCard ? 'card-nearest' : ''}`;
+        card.setAttribute('data-hospital-id', h.id || index);
 
         card.innerHTML = `
           ${isNearestCard ? `
@@ -1753,76 +2426,110 @@
           </div>
 
           <div class="progress-section">
+            <div class="bed-text-row">
+              <span class="bed-free-count">
+                <strong>${free}</strong> beds free <span class="bed-total-label">out of ${total} total</span>
+              </span>
+              <span class="bed-percentage-tag ${tagClass}">
+                ${freePercentage.toFixed(0)}% Free
+              </span>
+            </div>
+
             <div class="progress-track" aria-hidden="true">
               <div 
                 class="progress-fill ${progressClass}" 
                 style="width: ${Math.max(5, Math.min(100, freePercentage))}%;"
               ></div>
             </div>
-
-            <div class="bed-text-row">
-              <span class="bed-free-count">
-                ${free} beds free <span style="font-weight: 400; color: #6b7280;">out of ${total} total</span>
-              </span>
-              <span class="bed-percentage-tag ${tagClass}">
-                ${freePercentage.toFixed(0)}% Free
-              </span>
-            </div>
           </div>
 
-          <!-- Ward-Wise Availability Breakdown (Male, Female, Pregnancy/Maternity) -->
-          <div class="ward-breakdown-card">
-            <div class="ward-breakdown-header">
-              <span>🛏️ Live Ward Breakdown</span>
-              <span class="ward-live-sync">Real-Time Sync</span>
+          <!-- Progressive Disclosure Ward Accordion Container -->
+          <div class="ward-accordion-container">
+            <button 
+              class="btn-ward-accordion ward-accordion-toggle" 
+              type="button" 
+              aria-expanded="${isExpanded ? 'true' : 'false'}" 
+              aria-controls="ward-drawer-${h.id || index}" 
+              id="ward-toggle-${h.id || index}"
+            >
+              <div class="ward-toggle-left">
+                <span class="ward-toggle-icon">🛏️</span>
+                <span class="ward-toggle-title">Live Ward Breakdown</span>
+                <span class="ward-quick-badges" aria-label="Ward availability summary">
+                  <span class="ward-mini-tag ${maleFree > 0 ? (maleFree > 5 ? 'mini-green' : 'mini-orange') : 'mini-red'}">M: ${maleFree}</span>
+                  <span class="ward-mini-tag ${femaleFree > 0 ? (femaleFree > 5 ? 'mini-green' : 'mini-orange') : 'mini-red'}">F: ${femaleFree}</span>
+                  <span class="ward-mini-tag ${maternityFree > 0 ? (maternityFree > 3 ? 'mini-green' : 'mini-orange') : 'mini-red'}">Mat: ${maternityFree > 0 ? maternityFree : 'Full'}</span>
+                </span>
+              </div>
+              <div class="ward-toggle-right">
+                <span class="accordion-chevron" aria-hidden="true">▾</span>
+              </div>
+            </button>
+
+            <div 
+              class="ward-accordion-drawer ${isExpanded ? 'open' : ''}" 
+              id="ward-drawer-${h.id || index}" 
+              role="region" 
+              aria-labelledby="ward-toggle-${h.id || index}"
+              style="${isExpanded ? 'max-height: 500px;' : 'max-height: 0px;'}"
+            >
+              <div class="ward-drawer-inner">
+                <!-- Ward-Wise Availability Breakdown (Male, Female, Pregnancy/Maternity) -->
+                <div class="ward-breakdown-card">
+                  <div class="ward-breakdown-header">
+                    <span>🛏️ Live Ward Breakdown</span>
+                    <span class="ward-live-sync">Real-Time Sync</span>
+                  </div>
+                  <div class="ward-grid">
+                    <!-- Male Ward -->
+                    <div class="ward-box">
+                      <div class="ward-box-title">
+                        <span>👨 Male Ward</span>
+                        <span class="ward-tag ${maleFree > 0 ? (maleFree > 5 ? 'ward-tag-green' : 'ward-tag-orange') : 'ward-tag-red'}">
+                          ${maleFree > 0 ? maleFree + ' Free' : 'Full'}
+                        </span>
+                      </div>
+                      <div class="ward-box-count">
+                        ${maleFree} <span class="ward-box-total">/ ${maleTotal} beds free</span>
+                      </div>
+                    </div>
+
+                    <!-- Female Ward -->
+                    <div class="ward-box">
+                      <div class="ward-box-title">
+                        <span>👩 Female Ward</span>
+                        <span class="ward-tag ${femaleFree > 0 ? (femaleFree > 5 ? 'ward-tag-green' : 'ward-tag-orange') : 'ward-tag-red'}">
+                          ${femaleFree > 0 ? femaleFree + ' Free' : 'Full'}
+                        </span>
+                      </div>
+                      <div class="ward-box-count">
+                        ${femaleFree} <span class="ward-box-total">/ ${femaleTotal} beds free</span>
+                      </div>
+                    </div>
+
+                    <!-- Pregnancy / Maternity Ward -->
+                    <div class="ward-box ${maternityFree === 0 ? 'ward-critical' : ''}">
+                      <div class="ward-box-title">
+                        <span>🤰 Pregnancy Ward</span>
+                        <span class="ward-tag ${maternityFree > 0 ? (maternityFree > 3 ? 'ward-tag-green' : 'ward-tag-orange') : 'ward-tag-red'}">
+                          ${maternityFree > 0 ? maternityFree + ' Free' : 'Full'}
+                        </span>
+                      </div>
+                      <div class="ward-box-count">
+                        ${maternityFree} <span class="ward-box-total">/ ${maternityTotal} beds free</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  ${maternityFree === 0 ? `
+                    <div class="maternity-alert-box">
+                      <span>⚠️</span>
+                      <span><strong>Pregnancy/Maternity Ward Full:</strong> Divert delivery emergencies to nearest District/State Medical College.</span>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
             </div>
-            <div class="ward-grid">
-              <!-- Male Ward -->
-              <div class="ward-box">
-                <div class="ward-box-title">
-                  <span>👨 Male Ward</span>
-                  <span class="ward-tag ${maleFree > 0 ? (maleFree > 5 ? 'ward-tag-green' : 'ward-tag-orange') : 'ward-tag-red'}">
-                    ${maleFree > 0 ? maleFree + ' Free' : 'Full'}
-                  </span>
-                </div>
-                <div class="ward-box-count">
-                  ${maleFree} <span class="ward-box-total">/ ${maleTotal} beds free</span>
-                </div>
-              </div>
-
-              <!-- Female Ward -->
-              <div class="ward-box">
-                <div class="ward-box-title">
-                  <span>👩 Female Ward</span>
-                  <span class="ward-tag ${femaleFree > 0 ? (femaleFree > 5 ? 'ward-tag-green' : 'ward-tag-orange') : 'ward-tag-red'}">
-                    ${femaleFree > 0 ? femaleFree + ' Free' : 'Full'}
-                  </span>
-                </div>
-                <div class="ward-box-count">
-                  ${femaleFree} <span class="ward-box-total">/ ${femaleTotal} beds free</span>
-                </div>
-              </div>
-
-              <!-- Pregnancy / Maternity Ward -->
-              <div class="ward-box ${maternityFree === 0 ? 'ward-critical' : ''}">
-                <div class="ward-box-title">
-                  <span>🤰 Pregnancy Ward</span>
-                  <span class="ward-tag ${maternityFree > 0 ? (maternityFree > 3 ? 'ward-tag-green' : 'ward-tag-orange') : 'ward-tag-red'}">
-                    ${maternityFree > 0 ? maternityFree + ' Free' : 'Full'}
-                  </span>
-                </div>
-                <div class="ward-box-count">
-                  ${maternityFree} <span class="ward-box-total">/ ${maternityTotal} beds free</span>
-                </div>
-              </div>
-            </div>
-
-            ${maternityFree === 0 ? `
-              <div class="maternity-alert-box">
-                <span>⚠️</span>
-                <span><strong>Pregnancy/Maternity Ward Full:</strong> Divert delivery emergencies to nearest District/State Medical College.</span>
-              </div>
-            ` : ''}
           </div>
 
           <!-- Quick Ambulance Action Button -->
@@ -1832,6 +2539,28 @@
           </button>
         `;
 
+        // Progressive disclosure accordion toggle listener
+        const toggleBtn = card.querySelector('.ward-accordion-toggle');
+        const drawer = card.querySelector('.ward-accordion-drawer');
+
+        toggleBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const currentlyExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+          const nextState = !currentlyExpanded;
+
+          toggleBtn.setAttribute('aria-expanded', String(nextState));
+          drawer.classList.toggle('open', nextState);
+
+          if (nextState) {
+            if (h.id) expandedWardHospitalIds.add(h.id);
+            drawer.style.maxHeight = `${drawer.scrollHeight + 30}px`;
+          } else {
+            if (h.id) expandedWardHospitalIds.delete(h.id);
+            drawer.style.maxHeight = '0px';
+          }
+        });
+
+        // Quick ambulance action button listener
         card.querySelector('.btn-card-ambulance')?.addEventListener('click', (e) => {
           e.stopPropagation();
           openAmbulanceModal(h);
@@ -2713,6 +3442,7 @@
       renderAmbulanceDrivers();
 
       if (modal) {
+        modal.classList.remove('amb-view-inline');
         modal.style.display = 'flex';
         modal.classList.add('open');
         modal.setAttribute('aria-hidden', 'false');
@@ -2724,8 +3454,14 @@
       const modal = document.getElementById('ambulance-modal');
       if (modal) {
         modal.classList.remove('open');
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
+        if (activePortalView === 'ambulance') {
+          modal.classList.add('amb-view-inline');
+          modal.style.display = 'block';
+          modal.setAttribute('aria-hidden', 'false');
+        } else {
+          modal.style.display = 'none';
+          modal.setAttribute('aria-hidden', 'true');
+        }
       }
       resetTrackingView();
       targetHospitalForAmbulance = null;
@@ -2737,10 +3473,6 @@
 
     // Wire Modal UI Listeners
     initAmbulanceDistrictSelect();
-
-    document.getElementById('btn-book-ambulance')?.addEventListener('click', () => {
-      openAmbulanceModal(null);
-    });
 
     document.getElementById('btn-close-ambulance')?.addEventListener('click', closeAmbulanceModal);
 
@@ -2783,121 +3515,5 @@
       if (e.key === 'Escape') closeAmbulanceModal();
     });
   </script>
-
-  <!-- AMBULANCE BOOKING & DISPATCH MODAL (DEMO ONLY) -->
-  <div id="ambulance-modal" class="amb-modal-overlay" aria-hidden="true" style="display: none;">
-    <div class="amb-modal-content" role="dialog" aria-modal="true" aria-labelledby="amb-modal-title-text">
-      <div class="amb-modal-header">
-        <div>
-          <div class="amb-modal-title" id="amb-modal-title-text">
-            <span>🚑</span>
-            <span>Emergency Ambulance Dispatch</span>
-          </div>
-          <div class="amb-modal-subtitle">Direct Driver Connection • West Bengal Network</div>
-        </div>
-        <button id="btn-close-ambulance" class="amb-btn-close" type="button" aria-label="Close dialog">&times;</button>
-      </div>
-
-      <div class="amb-modal-body">
-        <!-- Demo Disclaimer -->
-        <div class="amb-demo-badge">
-          ⚠️ <strong>DEMO SIMULATION ONLY:</strong> Connects to simulated nearby drivers for testing. For genuine emergencies, dial <strong>102</strong> (National Ambulance Service) or <strong>108 / 112</strong> (State Emergency Services).
-        </div>
-
-        <!-- Target Facility Banner (Optional) -->
-        <div id="amb-target-facility" style="display: none;" class="amb-target-facility-box">
-          <div id="amb-target-facility-text"></div>
-          <button id="btn-clear-target-facility" class="btn-reset-district" type="button" style="background:#dbeafe;color:#1e40af;">Show All</button>
-        </div>
-
-        <!-- Drivers Directory View -->
-        <div id="amb-drivers-view">
-          <!-- Filters -->
-          <div class="amb-filter-row">
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <div style="flex: 1; min-width: 140px;">
-                <label for="amb-district-select" style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">DISTRICT:</label>
-                <select id="amb-district-select" class="amb-select">
-                  <option value="ALL">🌐 All Districts (West Bengal)</option>
-                </select>
-              </div>
-              <div style="flex: 1; min-width: 140px;">
-                <label for="amb-tier-select" style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 3px;">FACILITY TIER:</label>
-                <select id="amb-tier-select" class="amb-select">
-                  <option value="ALL">All Levels (Rural / District / State)</option>
-                  <option value="rural">🌾 Rural Hospitals (RH & BPHC)</option>
-                  <option value="district">🏥 District & Sub-divisional</option>
-                  <option value="state">🏛️ State Apex Medical Colleges</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Ambulance Category Pills -->
-            <div>
-              <label style="font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">VEHICLE TYPE:</label>
-              <div class="amb-type-pills" id="amb-type-pills">
-                <button type="button" class="amb-type-pill active" data-type="ALL">All Types</button>
-                <button type="button" class="amb-type-pill" data-type="BLS">Basic (BLS)</button>
-                <button type="button" class="amb-type-pill" data-type="ALS">🚨 Cardiac ICU (ALS)</button>
-                <button type="button" class="amb-type-pill" data-type="MATRIYAAN">🤰 Matriyaan</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Drivers List Header -->
-          <div class="amb-list-header">
-            <span id="amb-available-count">Locating verified drivers...</span>
-            <span class="amb-live-badge">🟢 LIVE TELEMETRY</span>
-          </div>
-
-          <!-- Drivers List -->
-          <div id="amb-drivers-list">
-            <!-- Injected via JavaScript -->
-          </div>
-        </div>
-
-        <!-- Live Tracking Simulation Screen (Initially Hidden) -->
-        <div id="amb-tracking-view" class="amb-tracking-screen">
-          <div class="amb-siren-animation">🚑💨</div>
-          <div class="amb-tracking-status" id="tracking-status-text">Ambulance Dispatched & En Route</div>
-          <div class="amb-tracking-eta" id="tracking-eta-text">Estimated Arrival: 5 minutes</div>
-
-          <div class="amb-progress-steps">
-            <div class="amb-step done" id="amb-step-1">
-              <div class="amb-step-dot"></div>
-              <span>1. Request Accepted</span>
-            </div>
-            <div class="amb-step done" id="amb-step-2">
-              <div class="amb-step-dot"></div>
-              <span>2. Dispatched</span>
-            </div>
-            <div class="amb-step active" id="amb-step-3">
-              <div class="amb-step-dot"></div>
-              <span>3. En Route</span>
-            </div>
-            <div class="amb-step" id="amb-step-4">
-              <div class="amb-step-dot"></div>
-              <span>4. Arrived</span>
-            </div>
-          </div>
-
-          <!-- Active Driver Info Card -->
-          <div id="tracking-driver-info" class="amb-tracking-driver-card">
-            <!-- Injected via JS -->
-          </div>
-
-          <div class="amb-tracking-actions">
-            <button id="btn-tracking-call" class="amb-btn-call" type="button">
-              📞 Call Driver
-            </button>
-            <button id="btn-back-to-drivers" class="btn-reset-district" type="button" style="padding: 10px 14px; font-size: 12.5px;">
-              ✕ Close Tracking
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
 </body>
 </html>
