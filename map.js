@@ -64,45 +64,57 @@ function loadGoogleMapsApi(apiKey) {
   });
 }
 
+// Icon cache to avoid decoding 74 separate SVGs on every data tick
+const iconCache = new Map();
+
 /**
  * Generates an SVG pin marker with occupancy coloring and pulsating animation for emergencies
  */
 function getMarkerIcon(colorHex, isEmergency) {
+  const cacheKey = `${colorHex}_${isEmergency ? '1' : '0'}`;
+  if (iconCache.has(cacheKey)) {
+    return iconCache.get(cacheKey);
+  }
+
+  const hasGoogle = typeof google !== 'undefined' && google.maps;
   if (isEmergency) {
     // Blinking animated SVG pin for active emergency
     const svgBlinking = `
       <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">
-        <circle cx="19" cy="19" r="17" fill="%23d32f2f" opacity="0.3">
+        <circle cx="19" cy="19" r="17" fill="#d32f2f" opacity="0.3">
           <animate attributeName="r" values="8;18;8" dur="1s" repeatCount="indefinite"/>
           <animate attributeName="opacity" values="0.9;0.1;0.9" dur="1s" repeatCount="indefinite"/>
         </circle>
-        <circle cx="19" cy="19" r="10" fill="%23d32f2f" stroke="%23ffffff" stroke-width="2"/>
-        <path d="M17 12h4v14h-4zM12 17h14v4h-14z" fill="%23ffffff"/>
+        <circle cx="19" cy="19" r="10" fill="#d32f2f" stroke="#ffffff" stroke-width="2"/>
+        <path d="M17 12h4v14h-4zM12 17h14v4h-14z" fill="#ffffff"/>
       </svg>
     `.trim();
 
-    return {
+    const icon = {
       url: `data:image/svg+xml;utf-8,${encodeURIComponent(svgBlinking)}`,
-      scaledSize: new google.maps.Size(38, 38),
-      anchor: new google.maps.Point(19, 19)
+      scaledSize: hasGoogle ? new google.maps.Size(38, 38) : { width: 38, height: 38 },
+      anchor: hasGoogle ? new google.maps.Point(19, 19) : { x: 19, y: 19 }
     };
+    iconCache.set(cacheKey, icon);
+    return icon;
   }
 
   // Standard high-contrast SVG map pin
-  const cleanColor = colorHex.replace("#", "%23");
   const svgPin = `
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
-      <path d="M16 0C7.2 0 0 7.2 0 16c0 11.2 16 26 16 26s16-14.8 16-26c0-8.8-7.2-16-16-16z" fill="${cleanColor}" stroke="%23ffffff" stroke-width="1.8"/>
-      <circle cx="16" cy="15" r="7.5" fill="%23ffffff"/>
-      <path d="M14.5 10h3v10h-3zM10.5 13.5h11v3h-11z" fill="${cleanColor}"/>
+      <path d="M16 0C7.2 0 0 7.2 0 16c0 11.2 16 26 16 26s16-14.8 16-26c0-8.8-7.2-16-16-16z" fill="${colorHex}" stroke="#ffffff" stroke-width="1.8"/>
+      <circle cx="16" cy="15" r="7.5" fill="#ffffff"/>
+      <path d="M14.5 10h3v10h-3zM10.5 13.5h11v3h-11z" fill="${colorHex}"/>
     </svg>
   `.trim();
 
-  return {
+  const icon = {
     url: `data:image/svg+xml;utf-8,${encodeURIComponent(svgPin)}`,
-    scaledSize: new google.maps.Size(32, 42),
-    anchor: new google.maps.Point(16, 42)
+    scaledSize: hasGoogle ? new google.maps.Size(32, 42) : { width: 32, height: 42 },
+    anchor: hasGoogle ? new google.maps.Point(16, 42) : { x: 16, y: 42 }
   };
+  iconCache.set(cacheKey, icon);
+  return icon;
 }
 
 /**

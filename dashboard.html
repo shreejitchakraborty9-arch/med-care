@@ -1474,7 +1474,6 @@
         renderStats();
         renderHospitalTable();
         renderQuickStats();
-        runMedicinesDemandAnalysis(false);
 
         // Initialize Google Map on first receipt, update markers on live updates
         if (!mapInitialized) {
@@ -1484,8 +1483,16 @@
           updateMapMarkers(hospitals);
         }
 
-        // 3. Auto-trigger AI alerts if any hospital has occupiedBeds > 80%
-        checkAndAutoTriggerAIAlerts();
+        // Stage heavier AI and background analysis to prevent initial frame lag
+        const runHeavyAgents = () => {
+          runMedicinesDemandAnalysis(false);
+          checkAndAutoTriggerAIAlerts();
+        };
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(runHeavyAgents);
+        } else {
+          setTimeout(runHeavyAgents, 0);
+        }
       }, (err) => {
         console.error("Firestore onSnapshot error:", err);
         if (hospitals.length === 0) {
@@ -1495,9 +1502,38 @@
           renderStats();
           renderHospitalTable();
           renderQuickStats();
-          checkAndAutoTriggerAIAlerts();
+          const runAlertCheck = () => {
+            checkAndAutoTriggerAIAlerts();
+          };
+          if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(runAlertCheck);
+          } else {
+            setTimeout(runAlertCheck, 0);
+          }
         }
       });
+    }
+
+    let filterListenersBound = false;
+    let tableSearchTimer = null;
+
+    function handleTableSearchInput() {
+      clearTimeout(tableSearchTimer);
+      tableSearchTimer = setTimeout(filterTable, 200);
+    }
+
+    function initFilterListeners() {
+      if (filterListenersBound) return;
+      const districtSelect = document.getElementById('district-filter');
+      const facilityTypeFilter = document.getElementById('facility-type-filter');
+      const tableSearchInput = document.getElementById('table-search');
+
+      if (districtSelect && tableSearchInput) {
+        filterListenersBound = true;
+        districtSelect.addEventListener('change', filterTable);
+        facilityTypeFilter?.addEventListener('change', filterTable);
+        tableSearchInput.addEventListener('input', handleTableSearchInput);
+      }
     }
 
     /**
@@ -1505,6 +1541,8 @@
      */
     function populateDistrictFilter() {
       const select = document.getElementById('district-filter');
+      if (!select) return;
+      const currentVal = select.value;
       const districts = [...new Set(hospitals.map(h => h.district))].sort();
       select.innerHTML = '<option value="">All Districts</option>';
       districts.forEach(d => {
@@ -1513,10 +1551,11 @@
         opt.textContent = d;
         select.appendChild(opt);
       });
+      if (currentVal && districts.includes(currentVal)) {
+        select.value = currentVal;
+      }
 
-      select.addEventListener('change', filterTable);
-      document.getElementById('facility-type-filter')?.addEventListener('change', filterTable);
-      document.getElementById('table-search').addEventListener('input', filterTable);
+      initFilterListeners();
     }
 
     /**
@@ -1660,10 +1699,217 @@
     /**
      * SECTION 3: Hospital Table Rendering & Filtering
      */
-    function renderHospitalTable(filteredList = null) {
-      const list = filteredList || hospitals;
+    let delegatedTbody = null;
+    function initTableDelegation() {
       const tbody = document.getElementById('hospitals-table-body');
-      tbody.innerHTML = '';
+      if (!tbody || tbody === delegatedTbody) return;
+      delegatedTbody = tbody;
+
+      // Bed inputs recalculation delegation
+      tbody.addEventListener('input', (e) => {
+        const target = e.target;
+        if (target && target.classList && (target.classList.contains('input-total-beds') || target.classList.contains('input-occupied-beds'))) {
+          const tr = target.closest('tr');
+          if (!tr) return;
+          const totalInput = tr.querySelector('.input-total-beds');
+          const occInput = tr.querySelector('.input-occupied-beds');
+          const freeDisplay = tr.querySelector('.calc-free-val');
+          if (totalInput && occInput && freeDisplay) {
+            const t = parseInt(totalInput.value, 10) || 0;
+            const o = parseInt(occInput.value, 10) || 0;
+            const f = Math.max(0, t - o);
+            freeDisplay.textContent = f;
+            freeDisplay.style.color = (f < 25 || o > t) ? 'var(--status-red)' : 'var(--status-green)';
+          }
+        }
+      });
+
+      // Row action buttons click delegation
+      tbody.addEventListener('click', async (e) => {
+        const target = e.target;
+        if (!target) return;
+
+        // Save bed row
+        const saveRowBtn = target.closest('.btn-save-row-beds');
+        if (saveRowBtn) {
+          const hospId = saveRowBtn.dataset.id;
+          const h = hospitals.find(x => String(x.id) === String(hospId));
+          if (!h) return;
+          const tr = saveRowBtn.closest('tr');
+          if (!tr) return;
+          const totalInput = tr.querySelector('.input-total-beds');
+          const occInput = tr.querySelector('.input-occupied-beds');
+          if (!totalInput || !occInput) return;
+
+          const newTotal = parseInt(totalInput.value, 10);
+          const newOcc = parseInt(occInput.value, 10);
+
+          if (isNaN(newTotal) || newTotal <= 0) {
+            alert("Total beds must be a positive number.");
+            return;
+          }
+          if (isNaN(newOcc) || newOcc < 0) {
+            alert("Occupied beds cannot be negative.");
+            return;
+          }
+          if (newOcc > newTotal) {
+            alert("Occupied beds cannot exceed total beds.");
+            return;
+          }
+
+          const total = Number(h.totalBeds) || 0;
+          const occupied = Number(h.occupiedBeds) || 0;
+
+          try {
+            saveRowBtn.disabled = true;
+            const docRef = doc(db, "hospitals", h.id);
+            await updateDoc(docRef, {
+              totalBeds: newTotal,
+              occupiedBeds: newOcc,
+              lastUpdated: new Date().toISOString()
+            });
+
+            if (newTotal !== total) {
+              await logEditHistory({
+                adminAction: "BED_UPDATE",
+                hospitalName: h.name,
+                district: h.district,
+                fieldChanged: "totalBeds",
+                oldValue: total,
+                newValue: newTotal
+              });
+            }
+            if (newOcc !== occupied) {
+              await logEditHistory({
+                adminAction: "BED_UPDATE",
+                hospitalName: h.name,
+                district: h.district,
+                fieldChanged: "occupiedBeds",
+                oldValue: occupied,
+                newValue: newOcc
+              });
+            }
+
+            h.totalBeds = newTotal;
+            h.occupiedBeds = newOcc;
+            h.lastUpdated = new Date().toISOString();
+
+            // Synchronize read-only spans in the row immediately
+            const readOnlySpans = tr.querySelectorAll('.read-only');
+            if (readOnlySpans.length >= 3) {
+              readOnlySpans[0].textContent = newTotal;
+              readOnlySpans[1].textContent = newOcc;
+              const newFree = Math.max(0, newTotal - newOcc);
+              readOnlySpans[2].textContent = newFree;
+              readOnlySpans[2].style.color = (newFree < 25 || newOcc > newTotal) ? 'var(--status-red)' : 'var(--status-green)';
+            }
+
+            const fb = tr.querySelector(`#save-fb-${h.id}`);
+            if (fb) {
+              fb.style.display = 'block';
+              setTimeout(() => { fb.style.display = 'none'; }, 2000);
+            }
+            showToast(`Bed counts updated for ${h.name}`, 'success');
+            renderStats();
+          } catch (err) {
+            console.error("Save row beds error:", err);
+            alert("Failed to save bed counts: " + err.message);
+          } finally {
+            saveRowBtn.disabled = false;
+          }
+          return;
+        }
+
+        // Declare emergency
+        const declareBtn = target.closest('.btn-declare-emer');
+        if (declareBtn) {
+          const hospId = declareBtn.dataset.id;
+          const h = hospitals.find(x => String(x.id) === String(hospId));
+          if (h) handleDeclareEmergency(h);
+          return;
+        }
+
+        // Medicines modal
+        const medsBtn = target.closest('.btn-meds');
+        if (medsBtn) {
+          const hospId = medsBtn.dataset.id;
+          const h = hospitals.find(x => String(x.id) === String(hospId));
+          if (h) openMedModal(h);
+          return;
+        }
+
+        // Vaccines modal
+        const vacsBtn = target.closest('.btn-vacs');
+        if (vacsBtn) {
+          const hospId = vacsBtn.dataset.id;
+          const h = hospitals.find(x => String(x.id) === String(hospId));
+          if (h) openVacModal(h);
+          return;
+        }
+
+        // Wards modal
+        const wardsBtn = target.closest('.btn-wards');
+        if (wardsBtn) {
+          const hospId = wardsBtn.dataset.id;
+          const h = hospitals.find(x => String(x.id) === String(hospId));
+          if (h) openWardModal(h);
+          return;
+        }
+
+        // Note modal
+        const noteBtn = target.closest('.btn-note');
+        if (noteBtn) {
+          const hospId = noteBtn.dataset.id;
+          const h = hospitals.find(x => String(x.id) === String(hospId));
+          if (h) openNoteModal(h);
+          return;
+        }
+
+        // Lift emergency
+        const liftBtn = target.closest('.btn-lift-emergency');
+        if (liftBtn) {
+          const hospId = liftBtn.dataset.id;
+          const h = hospitals.find(x => String(x.id) === String(hospId));
+          if (h) handleLiftEmergency(h);
+          return;
+        }
+
+        // Delete hospital
+        const deleteBtn = target.closest('.btn-delete-hospital');
+        if (deleteBtn) {
+          const hospId = deleteBtn.dataset.id;
+          const h = hospitals.find(x => String(x.id) === String(hospId));
+          if (h) handleRemoveHospital(h);
+          return;
+        }
+      });
+    }
+
+    function renderHospitalTable(filteredList = null) {
+      let list = filteredList;
+      if (!list) {
+        const search = (document.getElementById('table-search')?.value || '').toLowerCase().trim();
+        const district = document.getElementById('district-filter')?.value || '';
+        const facilityType = document.getElementById('facility-type-filter')?.value || '';
+        if (search || district || facilityType) {
+          list = hospitals.filter(h => {
+            const matchesSearch = !search || 
+              (h.name || '').toLowerCase().includes(search) || 
+              (h.district || '').toLowerCase().includes(search) || 
+              (h.block || '').toLowerCase().includes(search) || 
+              (h.type || '').toLowerCase().includes(search);
+            const matchesDistrict = !district || h.district === district;
+            const matchesType = !facilityType || h.category === facilityType;
+            return matchesSearch && matchesDistrict && matchesType;
+          });
+        } else {
+          list = hospitals;
+        }
+      }
+      const tbody = document.getElementById('hospitals-table-body');
+      if (!tbody) return;
+
+      initTableDelegation();
 
       if (list.length === 0) {
         tbody.innerHTML = `
@@ -1675,6 +1921,8 @@
         `;
         return;
       }
+
+      const fragment = document.createDocumentFragment();
 
       list.forEach(h => {
         const tr = document.createElement('tr');
@@ -1761,125 +2009,21 @@
           </td>
         `;
 
-        // Interactive Bed Recalculations
-        const totalInput = tr.querySelector('.input-total-beds');
-        const occInput = tr.querySelector('.input-occupied-beds');
-        const freeDisplay = tr.querySelector('.calc-free-val');
-        const saveRowBtn = tr.querySelector('.btn-save-row-beds');
-
-        function recalcFree() {
-          const t = parseInt(totalInput.value, 10) || 0;
-          const o = parseInt(occInput.value, 10) || 0;
-          const f = Math.max(0, t - o);
-          freeDisplay.textContent = f;
-          freeDisplay.style.color = (f < 25 || o > t) ? 'var(--status-red)' : 'var(--status-green)';
-        }
-
-        if (totalInput && occInput) {
-          totalInput.addEventListener('input', recalcFree);
-          occInput.addEventListener('input', recalcFree);
-        }
-
-        // Save inline bed updates
-        if (saveRowBtn) {
-          saveRowBtn.addEventListener('click', async () => {
-            const newTotal = parseInt(totalInput.value, 10);
-            const newOcc = parseInt(occInput.value, 10);
-
-            if (isNaN(newTotal) || newTotal <= 0) {
-              alert("Total beds must be a positive number.");
-              return;
-            }
-            if (isNaN(newOcc) || newOcc < 0) {
-              alert("Occupied beds cannot be negative.");
-              return;
-            }
-            if (newOcc > newTotal) {
-              alert("Occupied beds cannot exceed total beds.");
-              return;
-            }
-
-            try {
-              saveRowBtn.disabled = true;
-              const docRef = doc(db, "hospitals", h.id);
-              await updateDoc(docRef, {
-                totalBeds: newTotal,
-                occupiedBeds: newOcc,
-                lastUpdated: new Date().toISOString()
-              });
-
-              if (newTotal !== total) {
-                await logEditHistory({
-                  adminAction: "BED_UPDATE",
-                  hospitalName: h.name,
-                  district: h.district,
-                  fieldChanged: "totalBeds",
-                  oldValue: total,
-                  newValue: newTotal
-                });
-              }
-              if (newOcc !== occupied) {
-                await logEditHistory({
-                  adminAction: "BED_UPDATE",
-                  hospitalName: h.name,
-                  district: h.district,
-                  fieldChanged: "occupiedBeds",
-                  oldValue: occupied,
-                  newValue: newOcc
-                });
-              }
-
-              h.totalBeds = newTotal;
-              h.occupiedBeds = newOcc;
-              h.lastUpdated = new Date().toISOString();
-
-              const fb = tr.querySelector(`#save-fb-${h.id}`);
-              if (fb) {
-                fb.style.display = 'block';
-                setTimeout(() => { fb.style.display = 'none'; }, 2000);
-              }
-              showToast(`Bed counts updated for ${h.name}`, 'success');
-              renderStats();
-            } catch (err) {
-              console.error("Save row beds error:", err);
-              alert("Failed to save bed counts: " + err.message);
-            } finally {
-              saveRowBtn.disabled = false;
-            }
-          });
-        }
-
-        // Action button listeners
-        const declareBtn = tr.querySelector('.btn-declare-emer');
-        if (declareBtn) {
-          declareBtn.addEventListener('click', () => handleDeclareEmergency(h));
-        }
-
-        const medsBtn = tr.querySelector('.btn-meds');
-        if (medsBtn) medsBtn.addEventListener('click', () => openMedModal(h));
-
-        const vacsBtn = tr.querySelector('.btn-vacs');
-        if (vacsBtn) vacsBtn.addEventListener('click', () => openVacModal(h));
-
-        const wardsBtn = tr.querySelector('.btn-wards');
-        if (wardsBtn) wardsBtn.addEventListener('click', () => openWardModal(h));
-
-        const noteBtn = tr.querySelector('.btn-note');
-        if (noteBtn) noteBtn.addEventListener('click', () => openNoteModal(h));
-
-        const liftBtn = tr.querySelector('.btn-lift-emergency');
-        if (liftBtn) liftBtn.addEventListener('click', () => handleLiftEmergency(h));
-
-        const deleteBtn = tr.querySelector('.btn-delete-hospital');
-        if (deleteBtn) deleteBtn.addEventListener('click', () => handleRemoveHospital(h));
-
-        tbody.appendChild(tr);
+        fragment.appendChild(tr);
       });
+
+      if (typeof tbody.replaceChildren === 'function') {
+        tbody.replaceChildren(fragment);
+      } else {
+        tbody.innerHTML = '';
+        tbody.appendChild(fragment);
+      }
     }
 
     function filterTable() {
-      const search = document.getElementById('table-search').value.toLowerCase().trim();
-      const district = document.getElementById('district-filter').value;
+      clearTimeout(tableSearchTimer);
+      const search = (document.getElementById('table-search')?.value || '').toLowerCase().trim();
+      const district = document.getElementById('district-filter')?.value || '';
       const facilityType = document.getElementById('facility-type-filter')?.value || '';
 
       const filtered = hospitals.filter(h => {
@@ -2666,7 +2810,7 @@
         const btn = row.querySelector('button');
         if (btn) {
           btn.innerHTML = '&#x1F6A8; EMERGENCY ACTIVE';
-          btn.className = 'btn-danger';
+          btn.className = 'btn-danger read-only btn-declare-emer';
         }
       }
 
