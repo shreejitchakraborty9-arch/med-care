@@ -21,6 +21,15 @@
     }
 
     window.addEventListener('load', loadGoogleMaps);
+
+    // Graceful handler for Google Maps authentication / RefererNotAllowedMapError
+    window.gm_authFailure = function() {
+      console.warn('Google Maps Auth Notice (RefererNotAllowedMapError): Please authorize https://the-med-care.web.app/* in Google Cloud Console.');
+      const container = document.getElementById('map');
+      if (container && window.renderMapFallback && window._latestHospitals) {
+        window.renderMapFallback(container, window._latestHospitals);
+      }
+    };
   </script>
   <link rel="stylesheet" href="style.css">
   <script>

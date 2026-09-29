@@ -2062,6 +2062,14 @@
       });
     }
 
+    // Graceful fallback handler for Google Maps authentication / RefererNotAllowedMapError
+    window.gm_authFailure = function() {
+      console.warn("Google Maps Auth Notice: RefererNotAllowedMapError or key restriction. Rendering citizen map fallback.");
+      if (typeof renderCitizenMapFallback === "function") {
+        renderCitizenMapFallback();
+      }
+    };
+
     /**
      * Initialize Google Maps View
      */

@@ -2,6 +2,15 @@
 
 window.initMap = window.initMap || function() {};
 
+// Graceful fallback handler for Google Maps authentication / RefererNotAllowedMapError
+window.gm_authFailure = function() {
+  console.warn("Google Maps Auth Notice: RefererNotAllowedMapError or key restriction. Rendering West Bengal Spatial Grid fallback.");
+  const container = document.getElementById("map");
+  if (container && window._latestHospitals && typeof renderMapFallback === "function") {
+    renderMapFallback(container, window._latestHospitals);
+  }
+};
+
 let mapInstance = null;
 let markersMap = new Map(); // hospital.id -> google.maps.Marker
 let activeInfoWindow = null;
@@ -280,7 +289,7 @@ export async function initMap(containerId, hospitals, onEmergencyClick) {
 
     // Place Markers for all hospitals
     updateMapMarkers(hospitals);
-    console.log("Google Maps initialized with all 25 West Bengal hospitals.");
+    console.log(`Google Maps initialized with all ${hospitals.length} West Bengal hospitals.`);
   } catch (error) {
     console.warn("Could not load Google Maps JavaScript API:", error.message);
     renderMapFallback(container, hospitals);
@@ -343,12 +352,12 @@ export function updateMapMarkers(hospitals) {
 /**
  * Elegant interactive SVG / Canvas fallback if Google Maps API key is not active
  */
-function renderMapFallback(container, hospitals) {
+export function renderMapFallback(container, hospitals) {
   container.innerHTML = `
     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #eef2f6; display: flex; flex-direction: column; overflow: hidden;">
       <div style="padding: 10px 16px; background-color: #1a2744; color: #ffffff; display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
-        <span><strong>West Bengal Spatial Geographic Grid</strong> (Lat 23.6850, Lng 88.3522 &bull; 25 Hospitals Placed)</span>
-        <span style="font-size: 11px; background: rgba(255,255,255,0.15); padding: 2px 8px;">Interactive Fallback</span>
+        <span><strong>West Bengal Spatial Geographic Grid</strong> (${hospitals.length} Facilities Monitored)</span>
+        <span style="font-size: 11px; background: rgba(255,255,255,0.15); padding: 2px 8px;">Interactive Spatial Grid</span>
       </div>
       <div id="fallback-svg-wrapper" style="flex: 1; position: relative; width: 100%; height: 100%;">
         <svg viewBox="85.5 21.3 4.5 6.0" style="width: 100%; height: 100%; transform: scaleY(-1);">
@@ -358,6 +367,7 @@ function renderMapFallback(container, hospitals) {
             const { color, isEmergency } = getHospitalStatusColor(h);
             return `
               <circle cx="${h.lng}" cy="${h.lat}" r="0.08" fill="${color}" stroke="#ffffff" stroke-width="0.02" style="cursor: pointer;">
+                <title>${h.name} - ${h.district} (${h.occupiedBeds || 0}/${h.totalBeds || 0} Beds)</title>
                 ${isEmergency ? '<animate attributeName="r" values="0.06;0.12;0.06" dur="1s" repeatCount="indefinite"/>' : ''}
               </circle>
             `;
@@ -375,7 +385,10 @@ function renderMapFallback(container, hospitals) {
   container.appendChild(legend);
 }
 
+window.renderMapFallback = renderMapFallback;
+
 export default {
   initMap,
-  updateMapMarkers
+  updateMapMarkers,
+  renderMapFallback
 };
