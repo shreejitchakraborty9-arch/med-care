@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "npx serve . -p 3000",
+    "test": "node scripts/verify-integrity.js",
     "seed": "node seed.js",
     "deploy": "firebase deploy --only hosting"
   },

@@ -3,9 +3,10 @@
  * Government of West Bengal — Health Supply Chain Dashboard
  *
  * Agents:
- *   1. MedicineAgent   — analyzes medicine stock every 5 minutes
- *   2. BedAgent        — monitors bed occupancy every 3 minutes
- *   3. EpidemicAgent   — detects outbreak patterns every 10 minutes
+ *   1. MedicineAgent        — analyzes medicine stock every 5 minutes
+ *   2. BedAgent             — monitors bed occupancy every 3 minutes
+ *   3. EpidemicAgent        — detects outbreak patterns every 10 minutes
+ *   4. MedicinesDemandAgent — grassroots demand surveillance for 44 Rural BPHCs
  *
  * All agents run ONLY in dashboard.html and are NOT imported elsewhere.
  * Firestore writes go to the "agent_alerts" collection.

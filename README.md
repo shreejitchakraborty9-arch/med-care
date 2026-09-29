@@ -12,7 +12,10 @@
 
 ## ⚠️ Hackathon Demonstration Prototype Disclaimer
 
-> **Hackathon Prototype Notice:**  
+> **⚠️ HACKATHON PROTOTYPE — EVALUATION NOTICE:**  
+> **Illustrative demonstration data only — Not an official Government of West Bengal service.**  
+> *(Real hospital names & emergency helplines referenced for simulation; bed capacity & medicine stock metrics are mock data.)*  
+>  
 > This platform is an illustrative demonstration prototype created for the **HackToSkill** competition evaluation. Hospital bed availability, ward allocations, medicine reserves, epidemic alerts, and ambulance driver dispatching are simulated test data. This is not an official Government of West Bengal healthcare dispatch system. In genuine medical emergencies, citizens should dial **108** (Emergency Medical Services) or **102** (Janani Shishu Suraksha Karyakram) directly.
 
 ---
@@ -31,6 +34,7 @@ The application provides dual-role access control with demo credentials pre-conf
 
 ---
 
+<a id="verified-healthcare-facility-coverage"></a>
 ## 🏥 Verified Healthcare Facility Coverage
 
 MedWatch West Bengal monitors **exactly 74 healthcare facilities** with verified GPS coordinates and ward distributions spanning all **23 Districts of West Bengal**:
@@ -58,6 +62,7 @@ Each facility record models:
 
 ---
 
+<a id="autonomous-multi-agent-ai-architecture"></a>
 ## 🤖 Autonomous Multi-Agent AI Architecture
 
 MedWatch West Bengal embeds **4 autonomous watchdog AI agents** powered by **Google Gemini** (`gemini-3.5-flash-lite`). The agents perform continuous background surveillance, correlate multi-facility telemetry, and push actionable alerts directly into the Firestore real-time pipeline:
@@ -146,14 +151,19 @@ MedWatch West Bengal embeds **4 autonomous watchdog AI agents** powered by **Goo
 
 ---
 
+<a id="automated-quality-assurance--testing"></a>
 ## 🧪 Automated Quality Assurance & Testing
 
 MedWatch West Bengal features an automated **27-suite zero-regression test harness** (`scripts/verify-integrity.js`) that validates architectural consistency, DOM bindings, mathematical formulas, and end-to-end workflows.
 
 ### Running Integrity Tests
-Execute the automated test runner using Node.js:
+Execute the automated test runner using npm or Node.js:
 
 ```bash
+# Run via standard npm test
+npm test
+
+# Or directly via Node.js
 node scripts/verify-integrity.js
 ```
 
@@ -239,6 +249,8 @@ node scripts/verify-integrity.js
 
 3. **Run the Integrity Test Suite:**
    ```bash
+   npm test
+   # or
    node scripts/verify-integrity.js
    ```
 
