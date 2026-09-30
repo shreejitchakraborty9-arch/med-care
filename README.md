@@ -264,7 +264,7 @@ node scripts/verify-integrity.js
 
 ## 🏆 Hackathon Submission Metadata
 
-- **Competition:** HackToSkill Hackathon
+- **Competition:** Hack2Skill Hackathon
 - **Track:** Track 03 — Smart Health & Supply Chain Resilience
 - **Target Organization:** Department of Health & Family Welfare, Government of West Bengal
 - **Live Deployment:** [https://the-med-care.web.app](https://the-med-care.web.app)
